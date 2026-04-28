@@ -1,19 +1,73 @@
 import { useEffect, useRef, useState } from "react";
 import { useParams } from "react-router-dom";
+import { AutosaveController, type AutosaveState } from "./autosaveController.js";
+
+function formatTimestamp(ts: number): string {
+  const d = new Date(ts);
+  const hh = String(d.getHours()).padStart(2, "0");
+  const mm = String(d.getMinutes()).padStart(2, "0");
+  return `${hh}:${mm}`;
+}
+
+function SaveIndicator({ state }: { state: AutosaveState }) {
+  if (state.status === "saving") {
+    return (
+      <span style={{ color: "#888", fontSize: "0.875rem" }}>Saving…</span>
+    );
+  }
+  if (state.status === "saved") {
+    return (
+      <span style={{ color: "green", fontSize: "0.875rem" }}>
+        Saved ✓ {formatTimestamp(state.timestamp)}
+      </span>
+    );
+  }
+  if (state.status === "offline") {
+    return (
+      <span style={{ color: "#c0392b", fontSize: "0.875rem" }}>Offline ⚠</span>
+    );
+  }
+  return null;
+}
 
 export function SnipPage() {
   const { name } = useParams<{ name: string }>();
   const slug = name ?? "untitled";
 
   const [content, setContent] = useState("");
-  const [saving, setSaving] = useState(false);
-  const [status, setStatus] = useState<"idle" | "saved" | "error">("idle");
+  const [loadError, setLoadError] = useState(false);
+  const [saveState, setSaveState] = useState<AutosaveState>({ status: "idle" });
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+
+  // Keep a stable ref to the controller so we can call onChange
+  const controllerRef = useRef<AutosaveController | null>(null);
+
+  // Create / re-create the controller whenever the slug changes
+  useEffect(() => {
+    const controller = new AutosaveController({
+      fetch: (url, init) => fetch(url, init),
+      setTimeout: (fn, ms) => window.setTimeout(fn, ms),
+      clearTimeout: (id) => window.clearTimeout(id),
+      dateNow: () => Date.now(),
+      url: `/api/snips/${encodeURIComponent(slug)}`,
+    });
+
+    controllerRef.current = controller;
+
+    const unsub = controller.subscribe((state) => {
+      setSaveState(state);
+    });
+
+    return () => {
+      unsub();
+      controllerRef.current = null;
+    };
+  }, [slug]);
 
   // Load content from the server on mount / slug change
   useEffect(() => {
     setContent("");
-    setStatus("idle");
+    setLoadError(false);
 
     fetch(`/api/snips/${encodeURIComponent(slug)}`)
       .then((res) => {
@@ -25,26 +79,13 @@ export function SnipPage() {
         if (data) setContent(data.content);
       })
       .catch(() => {
-        setStatus("error");
+        setLoadError(true);
       });
   }, [slug]);
 
-  async function handleSave() {
-    setSaving(true);
-    setStatus("idle");
-    try {
-      const res = await fetch(`/api/snips/${encodeURIComponent(slug)}`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ content }),
-      });
-      if (!res.ok) throw new Error("save failed");
-      setStatus("saved");
-    } catch {
-      setStatus("error");
-    } finally {
-      setSaving(false);
-    }
+  function handleChange(text: string) {
+    setContent(text);
+    controllerRef.current?.onChange(text);
   }
 
   return (
@@ -70,37 +111,17 @@ export function SnipPage() {
         <strong style={{ fontSize: "1rem" }}>snippaste</strong>
         <span style={{ color: "#888", fontSize: "0.875rem" }}>/s/{slug}</span>
         <div style={{ marginLeft: "auto", display: "flex", alignItems: "center", gap: "0.5rem" }}>
-          {status === "saved" && (
-            <span style={{ color: "green", fontSize: "0.875rem" }}>Saved</span>
+          {loadError && (
+            <span style={{ color: "red", fontSize: "0.875rem" }}>Load error</span>
           )}
-          {status === "error" && (
-            <span style={{ color: "red", fontSize: "0.875rem" }}>Error</span>
-          )}
-          <button
-            onClick={handleSave}
-            disabled={saving}
-            style={{
-              padding: "0.375rem 0.875rem",
-              background: "#0070f3",
-              color: "#fff",
-              border: "none",
-              borderRadius: "4px",
-              cursor: saving ? "not-allowed" : "pointer",
-              fontSize: "0.875rem",
-            }}
-          >
-            {saving ? "Saving…" : "Save"}
-          </button>
+          <SaveIndicator state={saveState} />
         </div>
       </header>
 
       <textarea
         ref={textareaRef}
         value={content}
-        onChange={(e) => {
-          setContent(e.target.value);
-          setStatus("idle");
-        }}
+        onChange={(e) => handleChange(e.target.value)}
         placeholder="Start typing…"
         style={{
           flex: 1,
