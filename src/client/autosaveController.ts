@@ -7,9 +7,10 @@ export type AutosaveState =
   | { status: "dirty" }
   | { status: "saving" }
   | { status: "saved"; timestamp: number }
-  | { status: "offline" };
+  | { status: "offline" }
+  | { status: "too_large" };
 
-export type FetchLike = (url: string, init: RequestInit) => Promise<{ ok: boolean }>;
+export type FetchLike = (url: string, init: RequestInit) => Promise<{ ok: boolean; status: number }>;
 export type SetTimeoutLike = (fn: () => void, ms: number) => number;
 export type ClearTimeoutLike = (id: number | undefined) => void;
 
@@ -66,7 +67,7 @@ export class AutosaveController {
 
     const s = this.state.status;
 
-    if (s === "idle" || s === "dirty" || s === "saved" || s === "offline") {
+    if (s === "idle" || s === "dirty" || s === "saved" || s === "offline" || s === "too_large") {
       // Reset/start debounce timer
       if (this.debounceTimer !== null) {
         this.clearTimeout(this.debounceTimer ?? undefined);
@@ -102,6 +103,10 @@ export class AutosaveController {
       body: JSON.stringify({ content: text }),
     }).then(
       (res) => {
+        if (res.status === 413) {
+          this.handlePayloadTooLarge();
+          return;
+        }
         if (!res.ok) {
           this.handleSaveFailure();
           return;
@@ -137,5 +142,16 @@ export class AutosaveController {
     }
 
     this.setState({ status: "offline" });
+  }
+
+  private handlePayloadTooLarge(): void {
+    const pending = this.pendingText;
+    this.pendingText = null;
+
+    if (pending !== null) {
+      this.latestText = pending;
+    }
+
+    this.setState({ status: "too_large" });
   }
 }

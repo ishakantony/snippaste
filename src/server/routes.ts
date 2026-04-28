@@ -31,6 +31,14 @@ export function buildApp(store: SnipStore) {
     }
 
     const body = await c.req.json<{ content: string }>();
+
+    if (Buffer.byteLength(body.content, "utf8") > 1_048_576) {
+      return c.json(
+        { error: "content_too_large", message: "Content exceeds 1 MB limit" },
+        413
+      );
+    }
+
     store.upsert(result.slug, body.content);
 
     return c.body(null, 204);

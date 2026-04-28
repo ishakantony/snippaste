@@ -25,6 +25,11 @@ function SaveIndicator({ state }: { state: AutosaveState }) {
       <span style={{ color: "#c0392b", fontSize: "0.875rem" }}>Offline ⚠</span>
     );
   }
+  if (state.status === "too_large") {
+    return (
+      <span style={{ color: "#c0392b", fontSize: "0.875rem" }}>Too large ⚠</span>
+    );
+  }
   return null;
 }
 

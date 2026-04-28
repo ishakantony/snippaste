@@ -111,4 +111,46 @@ describe("Hono routes", () => {
     const body = await getRes.json() as { content: string };
     expect(body.content).toBe("second");
   });
+
+  it("PUT with exactly 1,048,576 bytes of content succeeds with 204", async () => {
+    const slug = "size-exact";
+    // Build a string whose UTF-8 length is exactly 1,048,576 bytes.
+    // ASCII chars are 1 byte each; JSON.stringify wraps with {"content":"..."} so
+    // we need the raw content bytes, not the full body bytes.
+    const content = "a".repeat(1_048_576);
+    expect(Buffer.byteLength(content, "utf8")).toBe(1_048_576);
+
+    const res = await app.fetch(
+      new Request(`http://localhost/api/snips/${slug}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ content }),
+      })
+    );
+    expect(res.status).toBe(204);
+  });
+
+  it("PUT with 1,048,577 bytes of content returns 413 and does not write", async () => {
+    const slug = "size-over";
+    const content = "a".repeat(1_048_577);
+    expect(Buffer.byteLength(content, "utf8")).toBe(1_048_577);
+
+    const putRes = await app.fetch(
+      new Request(`http://localhost/api/snips/${slug}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ content }),
+      })
+    );
+    expect(putRes.status).toBe(413);
+    const body = await putRes.json() as { error: string; message: string };
+    expect(body.error).toBe("content_too_large");
+    expect(typeof body.message).toBe("string");
+
+    // Confirm no DB write occurred
+    const getRes = await app.fetch(
+      new Request(`http://localhost/api/snips/${slug}`)
+    );
+    expect(getRes.status).toBe(404);
+  });
 });

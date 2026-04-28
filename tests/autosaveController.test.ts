@@ -5,7 +5,7 @@ import { AutosaveController, type AutosaveState, type ClearTimeoutLike, type Set
 // Test helpers
 // ---------------------------------------------------------------------------
 
-function makeFakeFetch(responses: Array<{ ok: boolean } | "reject">) {
+function makeFakeFetch(responses: Array<{ ok: boolean; status?: number } | "reject">) {
   let callIndex = 0;
   const calls: Array<{ url: string; body: string }> = [];
 
@@ -15,7 +15,7 @@ function makeFakeFetch(responses: Array<{ ok: boolean } | "reject">) {
     if (resp === "reject") {
       return Promise.reject(new Error("Network error"));
     }
-    return resp;
+    return { ok: resp.ok, status: resp.status ?? (resp.ok ? 204 : 500) };
   });
 
   return { fakeFetch, calls };
@@ -36,7 +36,7 @@ interface ControllerFixture {
 }
 
 function makeController(
-  responses: Array<{ ok: boolean } | "reject"> = [{ ok: true }],
+  responses: Array<{ ok: boolean; status?: number } | "reject"> = [{ ok: true }],
   slug = "test-slug"
 ): ControllerFixture {
   const { fakeFetch, calls: fetchCalls } = makeFakeFetch(responses);
@@ -178,8 +178,8 @@ describe("AutosaveController", () => {
 
   // -------------------------------------------------------------------------
   it("no concurrent in-flight saves: onChange during Saving queues pending, not a second fetch", async () => {
-    let resolveFirst!: (v: { ok: boolean }) => void;
-    const firstFetchPromise = new Promise<{ ok: boolean }>((res) => {
+    let resolveFirst!: (v: { ok: boolean; status: number }) => void;
+    const firstFetchPromise = new Promise<{ ok: boolean; status: number }>((res) => {
       resolveFirst = res;
     });
 
@@ -207,7 +207,7 @@ describe("AutosaveController", () => {
     expect(fakeFetch).toHaveBeenCalledTimes(1); // still just one
 
     // Resolve the first request
-    resolveFirst({ ok: true });
+    resolveFirst({ ok: true, status: 204 });
     await Promise.resolve();
     await Promise.resolve(); // allow chained .then to run
 
@@ -285,5 +285,42 @@ describe("AutosaveController", () => {
     expect(extraStates.map((s) => s.status)).toEqual(["idle", "dirty"]);
     // main states array still receives all updates
     expect(states.map((s) => s.status)).toContain("saved");
+  });
+
+  // -------------------------------------------------------------------------
+  it("413 response transitions to too_large state", async () => {
+    const { controller, states } = makeController([{ ok: false, status: 413 }]);
+
+    controller.onChange("huge content");
+    await vi.advanceTimersByTimeAsync(800);
+    await Promise.resolve();
+
+    const statuses = states.map((s) => s.status);
+    expect(statuses).toContain("saving");
+    expect(statuses.at(-1)).toBe("too_large");
+  });
+
+  // -------------------------------------------------------------------------
+  it("too_large → onChange re-tries; recovers to Saved when content becomes valid", async () => {
+    // First attempt returns 413, second succeeds
+    const { controller, states } = makeController([
+      { ok: false, status: 413 },
+      { ok: true, status: 204 },
+    ]);
+
+    controller.onChange("huge");
+    await vi.advanceTimersByTimeAsync(800);
+    await Promise.resolve();
+
+    expect(states.at(-1)).toEqual({ status: "too_large" });
+
+    // User reduces content — next onChange re-triggers save
+    controller.onChange("small");
+    expect(states.at(-1)).toEqual({ status: "dirty" });
+
+    await vi.advanceTimersByTimeAsync(800);
+    await Promise.resolve();
+
+    expect(states.at(-1)).toEqual({ status: "saved", timestamp: 1_700_000_000_000 });
   });
 });
