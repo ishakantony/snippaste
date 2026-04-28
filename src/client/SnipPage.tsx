@@ -1,5 +1,8 @@
 import { useEffect, useRef, useState } from "react";
 import { useParams } from "react-router-dom";
+import { EditorState } from "@codemirror/state";
+import { EditorView, lineNumbers, keymap } from "@codemirror/view";
+import { defaultKeymap } from "@codemirror/commands";
 import { AutosaveController, type AutosaveState } from "./autosaveController.js";
 
 function formatTimestamp(ts: number): string {
@@ -34,13 +37,17 @@ export function SnipPage() {
   const { name } = useParams<{ name: string }>();
   const slug = name ?? "untitled";
 
-  const [content, setContent] = useState("");
   const [loadError, setLoadError] = useState(false);
   const [saveState, setSaveState] = useState<AutosaveState>({ status: "idle" });
-  const textareaRef = useRef<HTMLTextAreaElement>(null);
 
   // Keep a stable ref to the controller so we can call onChange
   const controllerRef = useRef<AutosaveController | null>(null);
+
+  // Ref to the container div that CodeMirror will attach to
+  const editorContainerRef = useRef<HTMLDivElement>(null);
+
+  // Ref to the EditorView so we can update content after load
+  const editorViewRef = useRef<EditorView | null>(null);
 
   // Create / re-create the controller whenever the slug changes
   useEffect(() => {
@@ -64,9 +71,43 @@ export function SnipPage() {
     };
   }, [slug]);
 
+  // Create the CodeMirror editor on mount / slug change
+  useEffect(() => {
+    if (!editorContainerRef.current) return;
+
+    const updateListener = EditorView.updateListener.of((update) => {
+      if (update.docChanged) {
+        controllerRef.current?.onChange(update.state.doc.toString());
+      }
+    });
+
+    const view = new EditorView({
+      state: EditorState.create({
+        doc: "",
+        extensions: [
+          lineNumbers(),
+          EditorView.lineWrapping,
+          keymap.of(defaultKeymap),
+          updateListener,
+          EditorView.theme({
+            "&": { height: "100%", fontSize: "1rem", fontFamily: "monospace" },
+            ".cm-scroller": { overflow: "auto", lineHeight: "1.6" },
+          }),
+        ],
+      }),
+      parent: editorContainerRef.current,
+    });
+
+    editorViewRef.current = view;
+
+    return () => {
+      view.destroy();
+      editorViewRef.current = null;
+    };
+  }, [slug]);
+
   // Load content from the server on mount / slug change
   useEffect(() => {
-    setContent("");
     setLoadError(false);
 
     fetch(`/api/snips/${encodeURIComponent(slug)}`)
@@ -76,17 +117,21 @@ export function SnipPage() {
         return res.json() as Promise<{ slug: string; content: string; updatedAt: number }>;
       })
       .then((data) => {
-        if (data) setContent(data.content);
+        if (data && editorViewRef.current) {
+          const view = editorViewRef.current;
+          view.dispatch({
+            changes: {
+              from: 0,
+              to: view.state.doc.length,
+              insert: data.content,
+            },
+          });
+        }
       })
       .catch(() => {
         setLoadError(true);
       });
   }, [slug]);
-
-  function handleChange(text: string) {
-    setContent(text);
-    controllerRef.current?.onChange(text);
-  }
 
   return (
     <div
@@ -118,21 +163,13 @@ export function SnipPage() {
         </div>
       </header>
 
-      <textarea
-        ref={textareaRef}
-        value={content}
-        onChange={(e) => handleChange(e.target.value)}
-        placeholder="Start typing…"
+      <div
+        ref={editorContainerRef}
         style={{
           flex: 1,
-          width: "100%",
-          resize: "none",
-          border: "none",
-          outline: "none",
-          padding: "1rem",
-          fontSize: "1rem",
-          fontFamily: "monospace",
-          lineHeight: 1.6,
+          overflow: "hidden",
+          display: "flex",
+          flexDirection: "column",
         }}
       />
     </div>
