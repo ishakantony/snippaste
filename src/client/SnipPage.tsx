@@ -4,34 +4,7 @@ import { EditorState } from "@codemirror/state";
 import { EditorView, lineNumbers, keymap } from "@codemirror/view";
 import { defaultKeymap } from "@codemirror/commands";
 import { AutosaveController, type AutosaveState } from "./autosaveController.js";
-
-function formatTimestamp(ts: number): string {
-  const d = new Date(ts);
-  const hh = String(d.getHours()).padStart(2, "0");
-  const mm = String(d.getMinutes()).padStart(2, "0");
-  return `${hh}:${mm}`;
-}
-
-function SaveIndicator({ state }: { state: AutosaveState }) {
-  if (state.status === "saving") {
-    return (
-      <span style={{ color: "#888", fontSize: "0.875rem" }}>Saving…</span>
-    );
-  }
-  if (state.status === "saved") {
-    return (
-      <span style={{ color: "green", fontSize: "0.875rem" }}>
-        Saved ✓ {formatTimestamp(state.timestamp)}
-      </span>
-    );
-  }
-  if (state.status === "offline") {
-    return (
-      <span style={{ color: "#c0392b", fontSize: "0.875rem" }}>Offline ⚠</span>
-    );
-  }
-  return null;
-}
+import { Toolbar } from "./Toolbar.js";
 
 export function SnipPage() {
   const { name } = useParams<{ name: string }>();
@@ -133,6 +106,19 @@ export function SnipPage() {
       });
   }, [slug]);
 
+  function getContent(): string {
+    return editorViewRef.current?.state.doc.toString() ?? "";
+  }
+
+  function handleClear(): void {
+    const view = editorViewRef.current;
+    if (!view) return;
+    view.dispatch({
+      changes: { from: 0, to: view.state.doc.length, insert: "" },
+    });
+    controllerRef.current?.onChange("");
+  }
+
   return (
     <div
       style={{
@@ -142,26 +128,27 @@ export function SnipPage() {
         fontFamily: "sans-serif",
       }}
     >
-      <header
-        style={{
-          display: "flex",
-          alignItems: "center",
-          gap: "0.75rem",
-          padding: "0.5rem 1rem",
-          borderBottom: "1px solid #ddd",
-          background: "#fafafa",
-          flexShrink: 0,
-        }}
-      >
-        <strong style={{ fontSize: "1rem" }}>snippaste</strong>
-        <span style={{ color: "#888", fontSize: "0.875rem" }}>/s/{slug}</span>
-        <div style={{ marginLeft: "auto", display: "flex", alignItems: "center", gap: "0.5rem" }}>
-          {loadError && (
-            <span style={{ color: "red", fontSize: "0.875rem" }}>Load error</span>
-          )}
-          <SaveIndicator state={saveState} />
+      {loadError && (
+        <div
+          style={{
+            padding: "0.25rem 0.75rem",
+            background: "#fff0f0",
+            borderBottom: "1px solid #fcc",
+            fontSize: "0.8rem",
+            color: "red",
+            flexShrink: 0,
+          }}
+        >
+          Load error
         </div>
-      </header>
+      )}
+
+      <Toolbar
+        slug={slug}
+        saveState={saveState}
+        onGetContent={getContent}
+        onClear={handleClear}
+      />
 
       <div
         ref={editorContainerRef}
