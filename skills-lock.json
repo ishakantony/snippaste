@@ -1,0 +1,47 @@
+{
+  "version": 1,
+  "skills": {
+    "discuss": {
+      "source": "ishakantony/skills",
+      "sourceType": "github",
+      "skillPath": "discuss/SKILL.md",
+      "computedHash": "310dfa5d553ef8fc5a1c61abdb32e942d218c06066410c33aa9d52f16b344285"
+    },
+    "improve-codebase-architecture": {
+      "source": "ishakantony/skills",
+      "sourceType": "github",
+      "skillPath": "improve-codebase-architecture/SKILL.md",
+      "computedHash": "fd86945bac044cae984b0d1763882ce33675f7b65224175f549845857343865f"
+    },
+    "prd-to-issues": {
+      "source": "ishakantony/skills",
+      "sourceType": "github",
+      "skillPath": "prd-to-issues/SKILL.md",
+      "computedHash": "64f353f655e1fe716f2f082fdb1be6fd197c0689bb839d3576b388df46eafe2a"
+    },
+    "qa-fe-web": {
+      "source": "ishakantony/skills",
+      "sourceType": "github",
+      "skillPath": "qa-fe-web/SKILL.md",
+      "computedHash": "973c114c3b24a1fdb2b9ab78e0983e2183fed3e1baee3a4eecbd88842a94da3c"
+    },
+    "tackle-issues": {
+      "source": "ishakantony/skills",
+      "sourceType": "github",
+      "skillPath": "tackle-issues/SKILL.md",
+      "computedHash": "e2e7b6ff52ded6be119e825bf2edfb8a0cf2244efd247e6f263e13c24c5e6c28"
+    },
+    "tdd": {
+      "source": "ishakantony/skills",
+      "sourceType": "github",
+      "skillPath": "tdd/SKILL.md",
+      "computedHash": "ad055544599481182d0079c4198e85da26677cb408a677be2da04915375f0427"
+    },
+    "write-a-prd": {
+      "source": "ishakantony/skills",
+      "sourceType": "github",
+      "skillPath": "write-a-prd/SKILL.md",
+      "computedHash": "aaf496a4cbf2a98ec461f992156ef70ce4c745cd58e1666f0c71d3315a4588f1"
+    }
+  }
+}
