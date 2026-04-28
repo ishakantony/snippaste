@@ -3,8 +3,13 @@ import { useParams } from "react-router-dom";
 import { EditorState } from "@codemirror/state";
 import { EditorView, lineNumbers, keymap } from "@codemirror/view";
 import { defaultKeymap } from "@codemirror/commands";
+import { oneDark } from "@codemirror/theme-one-dark";
 import { AutosaveController, type AutosaveState } from "./autosaveController.js";
 import { Toolbar } from "./Toolbar.js";
+
+function isDarkMode(): boolean {
+  return window.matchMedia("(prefers-color-scheme: dark)").matches;
+}
 
 export function SnipPage() {
   const { name } = useParams<{ name: string }>();
@@ -54,6 +59,21 @@ export function SnipPage() {
       }
     });
 
+    const darkMode = isDarkMode();
+    const themeExtensions = darkMode
+      ? [oneDark]
+      : [
+          EditorView.theme({
+            "&": { background: "var(--bg)", color: "var(--fg)" },
+            ".cm-gutters": {
+              background: "var(--toolbar-bg)",
+              color: "var(--indicator-fg)",
+              border: "none",
+              borderRight: "1px solid var(--border)",
+            },
+          }),
+        ];
+
     const view = new EditorView({
       state: EditorState.create({
         doc: "",
@@ -66,6 +86,7 @@ export function SnipPage() {
             "&": { height: "100%", fontSize: "1rem", fontFamily: "monospace" },
             ".cm-scroller": { overflow: "auto", lineHeight: "1.6" },
           }),
+          ...themeExtensions,
         ],
       }),
       parent: editorContainerRef.current,
@@ -73,8 +94,59 @@ export function SnipPage() {
 
     editorViewRef.current = view;
 
-    return () => {
+    // Listen for OS theme changes and recreate the editor if needed
+    const mediaQuery = window.matchMedia("(prefers-color-scheme: dark)");
+    function handleThemeChange() {
+      // Destroy and signal re-create by updating a state value isn't straightforward here.
+      // Instead, we rebuild the entire view with updated extensions.
+      const currentContent = view.state.doc.toString();
       view.destroy();
+      editorViewRef.current = null;
+
+      if (!editorContainerRef.current) return;
+
+      const newDark = isDarkMode();
+      const newThemeExtensions = newDark
+        ? [oneDark]
+        : [
+            EditorView.theme({
+              "&": { background: "var(--bg)", color: "var(--fg)" },
+              ".cm-gutters": {
+                background: "var(--toolbar-bg)",
+                color: "var(--indicator-fg)",
+                border: "none",
+                borderRight: "1px solid var(--border)",
+              },
+            }),
+          ];
+
+      const newView = new EditorView({
+        state: EditorState.create({
+          doc: currentContent,
+          extensions: [
+            lineNumbers(),
+            EditorView.lineWrapping,
+            keymap.of(defaultKeymap),
+            updateListener,
+            EditorView.theme({
+              "&": { height: "100%", fontSize: "1rem", fontFamily: "monospace" },
+              ".cm-scroller": { overflow: "auto", lineHeight: "1.6" },
+            }),
+            ...newThemeExtensions,
+          ],
+        }),
+        parent: editorContainerRef.current,
+      });
+
+      editorViewRef.current = newView;
+    }
+
+    mediaQuery.addEventListener("change", handleThemeChange);
+
+    return () => {
+      mediaQuery.removeEventListener("change", handleThemeChange);
+      const currentView = editorViewRef.current ?? view;
+      currentView.destroy();
       editorViewRef.current = null;
     };
   }, [slug]);
@@ -126,16 +198,18 @@ export function SnipPage() {
         flexDirection: "column",
         height: "100vh",
         fontFamily: "sans-serif",
+        background: "var(--bg)",
+        color: "var(--fg)",
       }}
     >
       {loadError && (
         <div
           style={{
             padding: "0.25rem 0.75rem",
-            background: "#fff0f0",
-            borderBottom: "1px solid #fcc",
+            background: "var(--load-error-bg)",
+            borderBottom: "1px solid var(--load-error-border)",
             fontSize: "0.8rem",
-            color: "red",
+            color: "var(--error-fg)",
             flexShrink: 0,
           }}
         >

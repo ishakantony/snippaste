@@ -39,12 +39,14 @@ export function LandingPage() {
         height: "100vh",
         fontFamily: "sans-serif",
         gap: "1rem",
+        background: "var(--bg)",
+        color: "var(--fg)",
       }}
     >
       <h1 style={{ margin: 0, fontSize: "2.5rem", fontWeight: 700 }}>
         snippaste
       </h1>
-      <p style={{ margin: 0, color: "#555", fontSize: "1rem" }}>
+      <p style={{ margin: 0, color: "var(--muted-fg)", fontSize: "1rem" }}>
         A tiny place to paste. Pick a name, start typing.
       </p>
       <form
@@ -63,17 +65,19 @@ export function LandingPage() {
             style={{
               padding: "0.5rem 0.75rem",
               fontSize: "1rem",
-              border: "1px solid #ccc",
+              border: "1px solid var(--input-border)",
               borderRadius: "4px",
               width: "220px",
+              background: "var(--input-bg)",
+              color: "var(--input-fg)",
             }}
           />
           <button
             type="submit"
             style={{
               padding: "0.5rem 1.25rem",
-              background: "#0070f3",
-              color: "#fff",
+              background: "var(--accent-bg)",
+              color: "var(--accent-fg)",
               border: "none",
               borderRadius: "4px",
               fontSize: "1rem",
@@ -84,7 +88,7 @@ export function LandingPage() {
           </button>
         </div>
         {error && (
-          <span style={{ color: "red", fontSize: "0.875rem" }}>{error}</span>
+          <span style={{ color: "var(--error-fg)", fontSize: "0.875rem" }}>{error}</span>
         )}
       </form>
     </div>

@@ -10,24 +10,24 @@ function formatTimestamp(ts: number): string {
 function SaveIndicator({ state }: { state: AutosaveState }) {
   if (state.status === "saving") {
     return (
-      <span style={{ color: "#888", fontSize: "0.875rem" }}>Saving…</span>
+      <span style={{ color: "var(--indicator-fg)", fontSize: "0.875rem" }}>Saving…</span>
     );
   }
   if (state.status === "saved") {
     return (
-      <span style={{ color: "green", fontSize: "0.875rem" }}>
+      <span style={{ color: "var(--saved-fg)", fontSize: "0.875rem" }}>
         Saved ✓ {formatTimestamp(state.timestamp)}
       </span>
     );
   }
   if (state.status === "offline") {
     return (
-      <span style={{ color: "#c0392b", fontSize: "0.875rem" }}>Offline ⚠</span>
+      <span style={{ color: "var(--warn-fg)", fontSize: "0.875rem" }}>Offline ⚠</span>
     );
   }
   if (state.status === "too_large") {
     return (
-      <span style={{ color: "#c0392b", fontSize: "0.875rem" }}>Too large ⚠</span>
+      <span style={{ color: "var(--warn-fg)", fontSize: "0.875rem" }}>Too large ⚠</span>
     );
   }
   return null;
@@ -37,10 +37,10 @@ const btnStyle: React.CSSProperties = {
   padding: "0.25rem 0.5rem",
   fontSize: "0.8rem",
   cursor: "pointer",
-  background: "transparent",
-  border: "1px solid #ccc",
+  background: "var(--btn-bg)",
+  border: "1px solid var(--btn-border)",
   borderRadius: "4px",
-  color: "#333",
+  color: "var(--btn-fg)",
   whiteSpace: "nowrap",
 };
 
@@ -88,14 +88,14 @@ export function Toolbar({ slug, saveState, onGetContent, onClear }: ToolbarProps
         alignItems: "center",
         height: "36px",
         padding: "0 0.75rem",
-        borderBottom: "1px solid #ddd",
-        background: "#fafafa",
+        borderBottom: "1px solid var(--toolbar-border)",
+        background: "var(--toolbar-bg)",
         flexShrink: 0,
         gap: "0.5rem",
       }}
     >
       {/* Left: snip name */}
-      <div style={{ flex: "0 0 auto", fontSize: "0.875rem", color: "#333", minWidth: 0 }}>
+      <div style={{ flex: "0 0 auto", fontSize: "0.875rem", color: "var(--fg)", minWidth: 0 }}>
         {slug}
       </div>
 
@@ -123,7 +123,7 @@ export function Toolbar({ slug, saveState, onGetContent, onClear }: ToolbarProps
           ⬇ Download
         </button>
         <button
-          style={{ ...btnStyle, color: "#c0392b", borderColor: "#e0b0b0" }}
+          style={{ ...btnStyle, color: "var(--warn-fg)", borderColor: "var(--btn-border)" }}
           onClick={handleClear}
           title="Clear snip"
         >
