@@ -1,5 +1,6 @@
 import { Hono } from "hono";
 import type { SnipStore } from "./store.js";
+import { SlugValidator } from "./slugValidator.js";
 
 export function buildApp(store: SnipStore) {
   const app = new Hono();
@@ -9,8 +10,12 @@ export function buildApp(store: SnipStore) {
   });
 
   app.get("/api/snips/:slug", (c) => {
-    const slug = c.req.param("slug");
-    const snip = store.get(slug);
+    const result = SlugValidator.validate(c.req.param("slug"));
+    if (!result.ok) {
+      return c.json({ error: result.reason }, 400);
+    }
+
+    const snip = store.get(result.slug);
 
     if (!snip) {
       return c.json({ error: "not_found" }, 404);
@@ -20,10 +25,13 @@ export function buildApp(store: SnipStore) {
   });
 
   app.put("/api/snips/:slug", async (c) => {
-    const slug = c.req.param("slug");
-    const body = await c.req.json<{ content: string }>();
+    const result = SlugValidator.validate(c.req.param("slug"));
+    if (!result.ok) {
+      return c.json({ error: result.reason }, 400);
+    }
 
-    store.upsert(slug, body.content);
+    const body = await c.req.json<{ content: string }>();
+    store.upsert(result.slug, body.content);
 
     return c.body(null, 204);
   });

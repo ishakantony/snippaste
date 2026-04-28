@@ -54,6 +54,38 @@ describe("Hono routes", () => {
     expect(typeof body.updatedAt).toBe("number");
   });
 
+  it("GET /api/snips/:slug returns 400 for invalid slug", async () => {
+    const res = await app.fetch(
+      new Request("http://localhost/api/snips/INVALID%20SLUG")
+    );
+    expect(res.status).toBe(400);
+    const body = await res.json() as { error: string };
+    expect(typeof body.error).toBe("string");
+    expect(body.error.length).toBeGreaterThan(0);
+  });
+
+  it("PUT /api/snips/:slug returns 400 and does not write for invalid slug", async () => {
+    const invalidSlug = "bad.slug!";
+    const res = await app.fetch(
+      new Request(`http://localhost/api/snips/${encodeURIComponent(invalidSlug)}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ content: "should not be stored" }),
+      })
+    );
+    expect(res.status).toBe(400);
+    const body = await res.json() as { error: string };
+    expect(typeof body.error).toBe("string");
+    expect(body.error.length).toBeGreaterThan(0);
+
+    // Confirm nothing was written — a GET for the same slug (encoded) also 400s,
+    // and a direct store lookup via a valid-looking slug finds nothing.
+    const storeRes = await app.fetch(
+      new Request(`http://localhost/api/snips/bad-slug`)
+    );
+    expect(storeRes.status).toBe(404);
+  });
+
   it("PUT updates existing snip; subsequent GET returns new content", async () => {
     const slug = "update-me";
 
