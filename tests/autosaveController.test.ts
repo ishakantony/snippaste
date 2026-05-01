@@ -37,7 +37,8 @@ interface ControllerFixture {
 
 function makeController(
   responses: Array<{ ok: boolean; status?: number } | "reject"> = [{ ok: true }],
-  slug = "test-slug"
+  slug = "test-slug",
+  clientId?: string
 ): ControllerFixture {
   const { fakeFetch, calls: fetchCalls } = makeFakeFetch(responses);
   const states: AutosaveState[] = [];
@@ -48,6 +49,7 @@ function makeController(
     dateNow: () => 1_700_000_000_000,
     url: `/api/snips/${slug}`,
     debounceMs: 800,
+    clientId,
   });
 
   controller.subscribe((s) => states.push(s));
@@ -102,6 +104,26 @@ describe("AutosaveController", () => {
     expect(fakeFetch).toHaveBeenCalledTimes(1);
     const body = JSON.parse(fetchCalls[0].body);
     expect(body.content).toBe("abc");
+  });
+
+  it("includes clientId in save payload when provided", async () => {
+    const { controller, fetchCalls } = makeController([{ ok: true }], "test-slug", "tab-1");
+
+    controller.onChange("hello");
+    await vi.advanceTimersByTimeAsync(800);
+
+    expect(JSON.parse(fetchCalls[0].body)).toEqual({ content: "hello", clientId: "tab-1" });
+  });
+
+  it("flush saves dirty content immediately without waiting for debounce", async () => {
+    const { controller, fakeFetch, fetchCalls, states } = makeController([{ ok: true }]);
+
+    controller.onChange("manual");
+    await controller.flush();
+
+    expect(fakeFetch).toHaveBeenCalledTimes(1);
+    expect(JSON.parse(fetchCalls[0].body).content).toBe("manual");
+    expect(states.map((s) => s.status)).toEqual(["idle", "dirty", "saving", "saved"]);
   });
 
   // -------------------------------------------------------------------------

@@ -3,60 +3,87 @@ import { useParams } from "react-router-dom";
 import { EditorState } from "@codemirror/state";
 import { EditorView, lineNumbers, keymap } from "@codemirror/view";
 import { defaultKeymap } from "@codemirror/commands";
-import { oneDark } from "@codemirror/theme-one-dark";
 import { AutosaveController, type AutosaveState } from "./autosaveController.js";
 import { Toolbar } from "./Toolbar.js";
-
-function isDarkMode(): boolean {
-  return window.matchMedia("(prefers-color-scheme: dark)").matches;
-}
+import { StatusBar } from "./StatusBar.js";
+import { ConfirmDialog } from "./ConfirmDialog.js";
+import { getClientId } from "./clientId.js";
+import { subscribeToSnip } from "./snipStream.js";
+import { useTheme } from "./themeContext.js";
+import { useToast } from "./Toast.js";
 
 const baseEditorTheme = EditorView.theme({
-  "&": { height: "100%", fontSize: "0.875rem", fontFamily: "'JetBrains Mono', 'Courier New', monospace" },
-  ".cm-scroller": { overflow: "auto", lineHeight: "1.65" },
-});
-
-const lightTheme = EditorView.theme({
-  "&": { background: "var(--bg)", color: "var(--fg)" },
+  "&": { height: "100%", fontSize: "13px", fontFamily: "var(--font-mono)" },
+  ".cm-scroller": { overflow: "auto", lineHeight: "22px" },
+  ".cm-content": { padding: "14px 0", caretColor: "var(--accent)" },
+  ".cm-line": { padding: "0 20px" },
   ".cm-gutters": {
-    background: "var(--surface)",
-    color: "var(--fg-muted)",
+    width: "52px",
+    background: "var(--editor-gutter)",
+    color: "var(--muted)",
     border: "none",
     borderRight: "1px solid var(--border)",
+    fontFamily: "var(--font-mono)",
+    fontSize: "12px",
   },
+  ".cm-lineNumbers .cm-gutterElement": { minWidth: "52px", padding: "0 14px 0 0", lineHeight: "22px" },
+  ".cm-activeLineGutter": { background: "var(--editor-active)" },
+  ".cm-activeLine": { background: "var(--editor-active)" },
   ".cm-cursor": { borderLeftColor: "var(--accent)" },
-  ".cm-selectionBackground": { background: "var(--surface-2) !important" },
-  ".cm-focused .cm-selectionBackground": { background: "var(--surface-2) !important" },
-  ".cm-activeLineGutter": { background: "var(--surface-2)" },
-  ".cm-activeLine": { background: "transparent" },
+  ".cm-selectionBackground, .cm-focused .cm-selectionBackground": { background: "var(--selection) !important" },
 });
 
-const darkOverride = EditorView.theme({
-  "&": { background: "var(--bg) !important" },
-  ".cm-gutters": {
-    background: "var(--surface) !important",
-    borderRight: "1px solid var(--border) !important",
-    border: "none !important",
-  },
-  ".cm-cursor": { borderLeftColor: "var(--accent) !important" },
-  ".cm-activeLineGutter": { background: "var(--surface-2) !important" },
+const editorTheme = EditorView.theme({
+  "&": { background: "var(--editor-bg)", color: "var(--fg)" },
 });
 
-function buildExtensions(dark: boolean, updateListener: ReturnType<typeof EditorView.updateListener.of>) {
-  const themeExts = dark ? [oneDark, darkOverride] : [lightTheme];
-  return [lineNumbers(), EditorView.lineWrapping, keymap.of(defaultKeymap), updateListener, baseEditorTheme, ...themeExts];
+function buildExtensions(updateListener: ReturnType<typeof EditorView.updateListener.of>) {
+  return [lineNumbers(), EditorView.lineWrapping, keymap.of(defaultKeymap), updateListener, baseEditorTheme, editorTheme];
 }
 
 export function SnipPage() {
   const { name } = useParams<{ name: string }>();
   const slug = name ?? "untitled";
+  const { theme } = useTheme();
+  const { showToast } = useToast();
 
   const [loadError, setLoadError] = useState(false);
   const [saveState, setSaveState] = useState<AutosaveState>({ status: "idle" });
+  const [content, setContent] = useState("");
+  const [remoteChanged, setRemoteChanged] = useState(false);
+  const [confirm, setConfirm] = useState<null | "clear" | "refresh">(null);
 
   const controllerRef = useRef<AutosaveController | null>(null);
   const editorContainerRef = useRef<HTMLDivElement>(null);
   const editorViewRef = useRef<EditorView | null>(null);
+  const contentRef = useRef("");
+  const suppressChangeRef = useRef(false);
+  const saveStateRef = useRef<AutosaveState>({ status: "idle" });
+  const clientIdRef = useRef(getClientId());
+
+  function replaceEditorContent(next: string, notify = false): void {
+    const view = editorViewRef.current;
+    if (!view) return;
+    suppressChangeRef.current = !notify;
+    view.dispatch({ changes: { from: 0, to: view.state.doc.length, insert: next } });
+    suppressChangeRef.current = false;
+    contentRef.current = next;
+    setContent(next);
+  }
+
+  async function fetchSnip(): Promise<void> {
+    setLoadError(false);
+    const res = await fetch(`/api/snips/${encodeURIComponent(slug)}`);
+    if (res.status === 404) {
+      replaceEditorContent("");
+      setRemoteChanged(false);
+      return;
+    }
+    if (!res.ok) throw new Error("fetch failed");
+    const data = await res.json() as { content: string; updatedAt: number };
+    replaceEditorContent(data.content);
+    setRemoteChanged(false);
+  }
 
   useEffect(() => {
     const controller = new AutosaveController({
@@ -65,11 +92,12 @@ export function SnipPage() {
       clearTimeout: (id) => window.clearTimeout(id),
       dateNow: () => Date.now(),
       url: `/api/snips/${encodeURIComponent(slug)}`,
+      clientId: clientIdRef.current,
     });
 
     controllerRef.current = controller;
-
     const unsub = controller.subscribe((state) => {
+      saveStateRef.current = state;
       setSaveState(state);
     });
 
@@ -83,100 +111,100 @@ export function SnipPage() {
     if (!editorContainerRef.current) return;
 
     const updateListener = EditorView.updateListener.of((update) => {
-      if (update.docChanged) {
-        controllerRef.current?.onChange(update.state.doc.toString());
+      if (!update.docChanged) return;
+      const next = update.state.doc.toString();
+      contentRef.current = next;
+      setContent(next);
+      if (!suppressChangeRef.current) {
+        controllerRef.current?.onChange(next);
       }
     });
 
     const view = new EditorView({
-      state: EditorState.create({
-        doc: "",
-        extensions: buildExtensions(isDarkMode(), updateListener),
-      }),
+      state: EditorState.create({ doc: contentRef.current, extensions: buildExtensions(updateListener) }),
       parent: editorContainerRef.current,
     });
 
     editorViewRef.current = view;
 
-    const mediaQuery = window.matchMedia("(prefers-color-scheme: dark)");
-
-    function handleThemeChange() {
-      const currentContent = view.state.doc.toString();
-      view.destroy();
-      editorViewRef.current = null;
-
-      if (!editorContainerRef.current) return;
-
-      const newView = new EditorView({
-        state: EditorState.create({
-          doc: currentContent,
-          extensions: buildExtensions(isDarkMode(), updateListener),
-        }),
-        parent: editorContainerRef.current,
-      });
-
-      editorViewRef.current = newView;
-    }
-
-    mediaQuery.addEventListener("change", handleThemeChange);
-
     return () => {
-      mediaQuery.removeEventListener("change", handleThemeChange);
-      const currentView = editorViewRef.current ?? view;
-      currentView.destroy();
-      editorViewRef.current = null;
+      view.destroy();
+      if (editorViewRef.current === view) editorViewRef.current = null;
     };
+  }, [slug, theme]);
+
+  useEffect(() => {
+    fetchSnip().catch(() => setLoadError(true));
   }, [slug]);
 
   useEffect(() => {
-    setLoadError(false);
-
-    fetch(`/api/snips/${encodeURIComponent(slug)}`)
-      .then((res) => {
-        if (res.status === 404) return null;
-        if (!res.ok) throw new Error("fetch failed");
-        return res.json() as Promise<{ slug: string; content: string; updatedAt: number }>;
-      })
-      .then((data) => {
-        if (data && editorViewRef.current) {
-          const view = editorViewRef.current;
-          view.dispatch({
-            changes: { from: 0, to: view.state.doc.length, insert: data.content },
-          });
+    const unsubscribe = subscribeToSnip(slug, {
+      onSnapshot: (event) => {
+        if (saveStateRef.current.status === "idle") replaceEditorContent(event.content);
+      },
+      onUpdate: (event) => {
+        if (event.clientId === clientIdRef.current) return;
+        const status = saveStateRef.current.status;
+        if (status === "dirty" || status === "saving") {
+          setRemoteChanged(true);
+          return;
         }
-      })
-      .catch(() => {
-        setLoadError(true);
-      });
+        replaceEditorContent(event.content);
+        setRemoteChanged(false);
+      },
+      onError: () => {},
+    });
+    return unsubscribe;
   }, [slug]);
 
-  function getContent(): string {
-    return editorViewRef.current?.state.doc.toString() ?? "";
+  function handleClear(): void {
+    setConfirm("clear");
   }
 
-  function handleClear(): void {
-    const view = editorViewRef.current;
-    if (!view) return;
-    view.dispatch({
-      changes: { from: 0, to: view.state.doc.length, insert: "" },
-    });
-    controllerRef.current?.onChange("");
+  function handleRefresh(): void {
+    setConfirm("refresh");
+  }
+
+  async function handleSave(): Promise<void> {
+    await controllerRef.current?.flush();
+    showToast("Saved");
+  }
+
+  function handleConfirm(): void {
+    const action = confirm;
+    setConfirm(null);
+    if (action === "clear") {
+      replaceEditorContent("", true);
+      controllerRef.current?.onChange("");
+    }
+    if (action === "refresh") {
+      fetchSnip().catch(() => setLoadError(true));
+    }
   }
 
   return (
     <div className="snip-page">
-      {loadError && (
-        <div className="snip-load-error">load error — could not reach server</div>
-      )}
+      {loadError && <div className="snip-load-error">load error: could not reach server</div>}
 
       <Toolbar
         slug={slug}
         saveState={saveState}
-        onGetContent={getContent}
+        remoteChanged={remoteChanged}
+        onGetContent={() => contentRef.current}
         onClear={handleClear}
+        onRefresh={handleRefresh}
+        onSave={() => { void handleSave(); }}
+        onToast={showToast}
       />
 
       <div ref={editorContainerRef} className="snip-editor" />
+      <StatusBar content={content} />
+      <ConfirmDialog
+        open={confirm !== null}
+        message={confirm === "clear" ? "Clear this snip? Everyone with the URL will see it as empty." : "Refresh from the server? Unsaved local text may be replaced."}
+        onCancel={() => setConfirm(null)}
+        onConfirm={handleConfirm}
+      />
     </div>
   );
 }
