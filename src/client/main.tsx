@@ -8,9 +8,9 @@ const root = document.getElementById("root");
 if (!root) throw new Error("No #root element found");
 
 createRoot(root).render(
-  <StrictMode>
-    <ThemeProvider>
-      <App />
-    </ThemeProvider>
-  </StrictMode>
+	<StrictMode>
+		<ThemeProvider>
+			<App />
+		</ThemeProvider>
+	</StrictMode>,
 );
