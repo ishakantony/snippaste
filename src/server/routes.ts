@@ -1,6 +1,8 @@
 import { Hono } from "hono";
+import { streamSSE } from "hono/streaming";
 import type { SnipStore } from "./store.js";
 import { SlugValidator } from "./slugValidator.js";
+import { snipBus } from "./snipBus.js";
 
 export function buildApp(store: SnipStore) {
   const app = new Hono();
@@ -24,13 +26,51 @@ export function buildApp(store: SnipStore) {
     return c.json(snip, 200);
   });
 
+  app.get("/api/snips/:slug/events", async (c) => {
+    const result = SlugValidator.validate(c.req.param("slug"));
+    if (!result.ok) {
+      return c.json({ error: result.reason }, 400);
+    }
+
+    const snip = store.get(result.slug);
+    if (!snip) {
+      return c.json({ error: "not_found" }, 404);
+    }
+
+    return streamSSE(c, async (stream) => {
+      await stream.writeSSE({
+        event: "snapshot",
+        data: JSON.stringify({ content: snip.content, updatedAt: snip.updatedAt }),
+      });
+
+      const unsubscribe = snipBus.subscribe(result.slug, (event) => {
+        stream.writeSSE({
+          event: "update",
+          data: JSON.stringify(event),
+        }).catch(() => {});
+      });
+
+      const heartbeat = setInterval(() => {
+        stream.writeSSE({ event: "ping", data: "" }).catch(() => {});
+      }, 25_000);
+
+      stream.onAbort(() => {
+        clearInterval(heartbeat);
+        unsubscribe();
+      });
+
+      // Keep the stream alive
+      await new Promise(() => {});
+    });
+  });
+
   app.put("/api/snips/:slug", async (c) => {
     const result = SlugValidator.validate(c.req.param("slug"));
     if (!result.ok) {
       return c.json({ error: result.reason }, 400);
     }
 
-    const body = await c.req.json<{ content: string }>();
+    const body = await c.req.json<{ content: string; clientId?: string }>();
 
     if (Buffer.byteLength(body.content, "utf8") > 1_048_576) {
       return c.json(
@@ -40,6 +80,13 @@ export function buildApp(store: SnipStore) {
     }
 
     store.upsert(result.slug, body.content);
+
+    const snip = store.get(result.slug)!;
+    snipBus.publish(result.slug, {
+      content: snip.content,
+      updatedAt: snip.updatedAt,
+      clientId: typeof body.clientId === "string" ? body.clientId : undefined,
+    });
 
     return c.body(null, 204);
   });

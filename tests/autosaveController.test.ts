@@ -323,4 +323,23 @@ describe("AutosaveController", () => {
 
     expect(states.at(-1)).toEqual({ status: "saved", timestamp: 1_700_000_000_000 });
   });
+
+  // -------------------------------------------------------------------------
+  it("flush bypasses debounce and triggers PUT immediately when dirty", async () => {
+    const { controller, fakeFetch, states } = makeController([{ ok: true }]);
+
+    controller.onChange("hello");
+    expect(states.at(-1)).toEqual({ status: "dirty" });
+    expect(fakeFetch).not.toHaveBeenCalled();
+
+    controller.flush();
+
+    // Should transition to saving immediately
+    expect(states.at(-1)).toEqual({ status: "saving" });
+    expect(fakeFetch).toHaveBeenCalledTimes(1);
+
+    await Promise.resolve();
+
+    expect(states.at(-1)).toEqual({ status: "saved", timestamp: 1_700_000_000_000 });
+  });
 });
