@@ -323,4 +323,59 @@ describe("AutosaveController", () => {
 
     expect(states.at(-1)).toEqual({ status: "saved", timestamp: 1_700_000_000_000 });
   });
+
+  it("flush() saves immediately when dirty, bypassing debounce", async () => {
+    const { controller, fakeFetch, fetchCalls } = makeController([{ ok: true }]);
+
+    controller.onChange("hello");
+    expect(fakeFetch).not.toHaveBeenCalled();
+
+    controller.flush();
+
+    expect(fakeFetch).toHaveBeenCalledTimes(1);
+    const body = JSON.parse(fetchCalls[0].body);
+    expect(body.content).toBe("hello");
+  });
+
+  it("flush() does nothing when idle (not dirty)", async () => {
+    const { controller, fakeFetch } = makeController([{ ok: true }]);
+
+    controller.flush();
+
+    expect(fakeFetch).not.toHaveBeenCalled();
+  });
+
+  it("PUT body includes clientId when provided", async () => {
+    const { fakeFetch, calls: fetchCalls } = makeFakeFetch([{ ok: true }]);
+
+    const controller = new AutosaveController({
+      fetch: fakeFetch,
+      ...timerDeps(),
+      dateNow: () => 1_700_000_000_000,
+      url: "/api/snips/test",
+      debounceMs: 800,
+      clientId: "my-tab-42",
+    });
+
+    controller.onChange("content");
+    await vi.advanceTimersByTimeAsync(800);
+
+    expect(fakeFetch).toHaveBeenCalledTimes(1);
+    const body = JSON.parse(fetchCalls[0].body);
+    expect(body.content).toBe("content");
+    expect(body.clientId).toBe("my-tab-42");
+  });
+
+  it("flush() cancels pending debounce timer", async () => {
+    const { controller, fakeFetch, fetchCalls } = makeController([{ ok: true }]);
+
+    controller.onChange("hello");
+    controller.flush();
+
+    expect(fakeFetch).toHaveBeenCalledTimes(1);
+
+    await vi.advanceTimersByTimeAsync(800);
+
+    expect(fakeFetch).toHaveBeenCalledTimes(1);
+  });
 });

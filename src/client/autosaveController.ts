@@ -19,10 +19,9 @@ export interface AutosaveControllerDeps {
   setTimeout: SetTimeoutLike;
   clearTimeout: ClearTimeoutLike;
   dateNow: () => number;
-  /** URL template: the slug-specific endpoint, e.g. /api/snips/my-slug */
   url: string;
-  /** Debounce window in ms (default 800) */
   debounceMs?: number;
+  clientId?: string;
 }
 
 export class AutosaveController {
@@ -38,6 +37,7 @@ export class AutosaveController {
   private readonly dateNow: () => number;
   private readonly url: string;
   private readonly debounceMs: number;
+  private readonly clientId?: string;
 
   constructor(deps: AutosaveControllerDeps) {
     this.fetch = deps.fetch;
@@ -46,6 +46,7 @@ export class AutosaveController {
     this.dateNow = deps.dateNow;
     this.url = deps.url;
     this.debounceMs = deps.debounceMs ?? 800;
+    this.clientId = deps.clientId;
   }
 
   /** Subscribe to state changes. Returns an unsubscribe function. */
@@ -94,13 +95,31 @@ export class AutosaveController {
     }
   }
 
+  private buildBody(text: string): string {
+    const payload: Record<string, string> = { content: text };
+    if (this.clientId) payload.clientId = this.clientId;
+    return JSON.stringify(payload);
+  }
+
+  flush(): void {
+    const s = this.state.status;
+    if (s !== "dirty" && s !== "offline" && s !== "too_large") return;
+
+    if (this.debounceTimer !== null) {
+      this.clearTimeout(this.debounceTimer ?? undefined);
+      this.debounceTimer = null;
+    }
+
+    this.startSave(this.latestText);
+  }
+
   private startSave(text: string): void {
     this.setState({ status: "saving" });
 
     this.fetch(this.url, {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ content: text }),
+      body: this.buildBody(text),
     }).then(
       (res) => {
         if (res.status === 413) {
