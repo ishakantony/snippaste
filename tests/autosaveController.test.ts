@@ -301,6 +301,88 @@ describe("AutosaveController", () => {
   });
 
   // -------------------------------------------------------------------------
+  it("includes clientId in PUT body when configured", async () => {
+    const { fakeFetch, calls } = makeFakeFetch([{ ok: true }]);
+    const c = new AutosaveController({
+      fetch: fakeFetch,
+      ...timerDeps(),
+      dateNow: () => 0,
+      url: "/api/snips/x",
+      debounceMs: 800,
+      clientId: "tab-42",
+    });
+
+    c.onChange("hello");
+    await vi.advanceTimersByTimeAsync(800);
+    await Promise.resolve();
+
+    expect(calls).toHaveLength(1);
+    const body = JSON.parse(calls[0].body);
+    expect(body.clientId).toBe("tab-42");
+    expect(body.content).toBe("hello");
+  });
+
+  // -------------------------------------------------------------------------
+  it("body has no clientId field when none was configured", async () => {
+    const { controller, fetchCalls } = makeController([{ ok: true }]);
+    controller.onChange("hi");
+    await vi.advanceTimersByTimeAsync(800);
+    await Promise.resolve();
+
+    const body = JSON.parse(fetchCalls[0].body);
+    expect("clientId" in body).toBe(false);
+  });
+
+  // -------------------------------------------------------------------------
+  it("flush(): when dirty, fires PUT immediately bypassing debounce", async () => {
+    const { controller, fakeFetch, fetchCalls } = makeController([{ ok: true }]);
+
+    controller.onChange("immediate");
+    expect(fakeFetch).not.toHaveBeenCalled();
+
+    controller.flush();
+    // No timer advancement
+    expect(fakeFetch).toHaveBeenCalledTimes(1);
+    const body = JSON.parse(fetchCalls[0].body);
+    expect(body.content).toBe("immediate");
+  });
+
+  // -------------------------------------------------------------------------
+  it("flush(): when idle (no changes), is a no-op", () => {
+    const { controller, fakeFetch } = makeController();
+    controller.flush();
+    expect(fakeFetch).not.toHaveBeenCalled();
+  });
+
+  // -------------------------------------------------------------------------
+  it("flush(): when already saving, queues nothing extra", async () => {
+    let resolveFirst!: (v: { ok: boolean; status: number }) => void;
+    const firstFetch = new Promise<{ ok: boolean; status: number }>((res) => {
+      resolveFirst = res;
+    });
+    const fakeFetch = vi.fn(() => firstFetch);
+
+    const c = new AutosaveController({
+      fetch: fakeFetch,
+      ...timerDeps(),
+      dateNow: () => 0,
+      url: "/api/snips/x",
+      debounceMs: 800,
+    });
+
+    c.onChange("first");
+    await vi.advanceTimersByTimeAsync(800);
+    expect(fakeFetch).toHaveBeenCalledTimes(1);
+
+    c.flush();
+    expect(fakeFetch).toHaveBeenCalledTimes(1);
+
+    resolveFirst({ ok: true, status: 204 });
+    await Promise.resolve();
+    await Promise.resolve();
+  });
+
+  // -------------------------------------------------------------------------
   it("too_large → onChange re-tries; recovers to Saved when content becomes valid", async () => {
     // First attempt returns 413, second succeeds
     const { controller, states } = makeController([

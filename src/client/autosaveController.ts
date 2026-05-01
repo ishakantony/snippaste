@@ -23,6 +23,8 @@ export interface AutosaveControllerDeps {
   url: string;
   /** Debounce window in ms (default 800) */
   debounceMs?: number;
+  /** Optional per-tab identifier; when set, included in every PUT body for self-echo filtering. */
+  clientId?: string;
 }
 
 export class AutosaveController {
@@ -38,6 +40,7 @@ export class AutosaveController {
   private readonly dateNow: () => number;
   private readonly url: string;
   private readonly debounceMs: number;
+  private readonly clientId: string | undefined;
 
   constructor(deps: AutosaveControllerDeps) {
     this.fetch = deps.fetch;
@@ -46,6 +49,17 @@ export class AutosaveController {
     this.dateNow = deps.dateNow;
     this.url = deps.url;
     this.debounceMs = deps.debounceMs ?? 800;
+    this.clientId = deps.clientId;
+  }
+
+  /** Bypass the debounce timer and save immediately if dirty. No-op otherwise. */
+  flush(): void {
+    if (this.state.status !== "dirty") return;
+    if (this.debounceTimer !== null) {
+      this.clearTimeout(this.debounceTimer);
+      this.debounceTimer = null;
+    }
+    this.startSave(this.latestText);
   }
 
   /** Subscribe to state changes. Returns an unsubscribe function. */
@@ -97,10 +111,13 @@ export class AutosaveController {
   private startSave(text: string): void {
     this.setState({ status: "saving" });
 
+    const body: { content: string; clientId?: string } = { content: text };
+    if (this.clientId !== undefined) body.clientId = this.clientId;
+
     this.fetch(this.url, {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ content: text }),
+      body: JSON.stringify(body),
     }).then(
       (res) => {
         if (res.status === 413) {
