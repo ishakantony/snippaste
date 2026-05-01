@@ -321,7 +321,7 @@ function SnipPageInner() {
 	const isDirty = saveState.status === "dirty" || saveState.status === "saving";
 
 	return (
-		<div className="snip-page">
+		<div className="flex flex-col h-screen bg-bg">
 			<Toolbar
 				slug={slug}
 				saveState={saveState}
@@ -334,17 +334,17 @@ function SnipPageInner() {
 			/>
 
 			{loadError && (
-				<div className="snip-load-error">
+				<div className="px-4 py-1.5 bg-danger/10 border-b border-danger/30 font-mono text-[11px] tracking-wide text-danger shrink-0">
 					load error — could not reach server
 				</div>
 			)}
 
 			{remoteChanged && (
-				<div className="snip-remote-changed">
+				<div className="px-4 py-1 bg-accent-soft-10 border-b border-accent-soft-18 text-[11px] text-accent-hover shrink-0 flex items-center gap-2">
 					<span>Remote changes available.</span>
 					<button
 						type="button"
-						className="snip-remote-changed-btn"
+						className="bg-transparent border border-accent-soft-20 text-accent-hover px-2 py-0.5 rounded-[5px] text-[11px] font-medium cursor-pointer"
 						onClick={handleRefresh}
 					>
 						Refresh
@@ -352,8 +352,11 @@ function SnipPageInner() {
 				</div>
 			)}
 
-			<div className="snip-editor-wrap">
-				<div ref={editorContainerRef} className="snip-editor" />
+			<div className="flex-1 flex overflow-hidden">
+				<div
+					ref={editorContainerRef}
+					className="flex-1 overflow-hidden flex flex-col"
+				/>
 			</div>
 
 			<StatusBar content={content} />

@@ -1,4 +1,5 @@
 import { useEffect } from "react";
+import { Button } from "./components/ui/Button.js";
 
 export interface ConfirmDialogProps {
 	message: string;
@@ -22,25 +23,28 @@ export function ConfirmDialog({
 	}, [onCancel]);
 
 	return (
-		<div className="confirm-backdrop" role="dialog" aria-modal="true">
-			<div className="confirm-modal">
-				<div className="confirm-title">Are you sure?</div>
-				<div className="confirm-message">{message}</div>
-				<div className="confirm-actions">
-					<button
-						type="button"
-						className="confirm-btn confirm-btn--cancel"
-						onClick={onCancel}
-					>
+		<div
+			className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 animate-[confirm-fade_150ms_ease]"
+			role="dialog"
+			aria-modal="true"
+		>
+			<div className="bg-modal-bg border border-border-2 rounded-xl w-[340px] p-6 shadow-[0_8px_40px_rgba(0,0,0,0.5)]">
+				<div className="text-sm font-semibold text-fg mb-2">Are you sure?</div>
+				<div className="text-[13px] text-fg-2 leading-relaxed mb-5">
+					{message}
+				</div>
+				<div className="flex gap-2 justify-end">
+					<Button variant="ghost" size="md" onClick={onCancel}>
 						Cancel
-					</button>
-					<button
-						type="button"
-						className="confirm-btn confirm-btn--confirm"
+					</Button>
+					<Button
+						variant="danger"
+						size="md"
+						className="bg-danger text-white font-semibold hover:bg-danger/90"
 						onClick={onConfirm}
 					>
 						{confirmLabel}
-					</button>
+					</Button>
 				</div>
 			</div>
 		</div>

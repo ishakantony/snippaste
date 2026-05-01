@@ -7,10 +7,12 @@ export function StatusBar({ content }: StatusBarProps) {
 	const chars = content.length;
 
 	return (
-		<div className="status-bar">
-			<span className="status-bar-item">{lines} lines</span>
-			<span className="status-bar-item">{chars} chars</span>
-			<span className="status-bar-item status-bar-spacer">plain text</span>
+		<div className="h-[26px] shrink-0 bg-surface border-t border-border flex items-center px-3.5 gap-4">
+			<span className="text-[10px] text-fg-3 font-mono">{lines} lines</span>
+			<span className="text-[10px] text-fg-3 font-mono">{chars} chars</span>
+			<span className="text-[10px] text-fg-3 font-mono ml-auto">
+				plain text
+			</span>
 		</div>
 	);
 }
