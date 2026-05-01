@@ -301,6 +301,33 @@ describe("AutosaveController", () => {
   });
 
   // -------------------------------------------------------------------------
+  it("flush bypasses debounce and fires immediately when dirty", async () => {
+    const { controller, fakeFetch, fetchCalls, states } = makeController([{ ok: true }]);
+
+    controller.onChange("hello");
+    expect(states.at(-1)).toEqual({ status: "dirty" });
+    expect(fakeFetch).not.toHaveBeenCalled();
+
+    controller.flush();
+    expect(fakeFetch).toHaveBeenCalledTimes(1);
+    const body = JSON.parse(fetchCalls[0].body);
+    expect(body.content).toBe("hello");
+    expect(states.at(-1)).toEqual({ status: "saving" });
+
+    await Promise.resolve();
+    expect(states.at(-1)).toEqual({ status: "saved", timestamp: 1_700_000_000_000 });
+  });
+
+  // -------------------------------------------------------------------------
+  it("flush is a no-op when idle", async () => {
+    const { controller, fakeFetch, states } = makeController([{ ok: true }]);
+
+    controller.flush();
+    expect(fakeFetch).not.toHaveBeenCalled();
+    expect(states.at(-1)).toEqual({ status: "idle" });
+  });
+
+  // -------------------------------------------------------------------------
   it("too_large → onChange re-tries; recovers to Saved when content becomes valid", async () => {
     // First attempt returns 413, second succeeds
     const { controller, states } = makeController([

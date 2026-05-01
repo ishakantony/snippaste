@@ -36,7 +36,7 @@ export class SnipStore {
     return { slug: row.slug, content: row.content, updatedAt: row.updated_at };
   }
 
-  upsert(slug: string, content: string): void {
+  upsert(slug: string, content: string): number {
     const now = Date.now();
     this.db
       .prepare(
@@ -47,6 +47,7 @@ export class SnipStore {
            updated_at = excluded.updated_at`
       )
       .run(slug, content, now, now);
+    return now;
   }
 
   clearContent(slug: string): void {
