@@ -323,4 +323,53 @@ describe("AutosaveController", () => {
 
     expect(states.at(-1)).toEqual({ status: "saved", timestamp: 1_700_000_000_000 });
   });
+
+  // -------------------------------------------------------------------------
+  it("flush() while dirty fires PUT immediately without waiting for debounce", async () => {
+    const { controller, fakeFetch, states } = makeController([{ ok: true }]);
+
+    controller.onChange("draft text");
+    // Do NOT advance timers — flush should bypass the debounce
+    controller.flush();
+    // Allow the fetch microtask to settle
+    await Promise.resolve();
+    await Promise.resolve();
+
+    expect(fakeFetch).toHaveBeenCalledTimes(1);
+    const body = JSON.parse((fakeFetch.mock.calls[0][1].body as string));
+    expect(body.content).toBe("draft text");
+  });
+
+  // -------------------------------------------------------------------------
+  it("flush() while idle does nothing", () => {
+    const { controller, fakeFetch } = makeController([{ ok: true }]);
+    controller.flush();
+    expect(fakeFetch).not.toHaveBeenCalled();
+  });
+
+  // -------------------------------------------------------------------------
+  it("flush() while already saving does nothing extra", async () => {
+    let resolveSave!: (v: { ok: boolean; status: number }) => void;
+    const fetchPromise = new Promise<{ ok: boolean; status: number }>((res) => {
+      resolveSave = res;
+    });
+    const fakeFetch = vi.fn(() => fetchPromise);
+    const controller = new AutosaveController({
+      fetch: fakeFetch,
+      ...timerDeps(),
+      dateNow: () => 0,
+      url: "/api/snips/flush-test",
+      debounceMs: 800,
+    });
+
+    controller.onChange("text");
+    await vi.advanceTimersByTimeAsync(800);
+    // Now in saving state
+    expect(fakeFetch).toHaveBeenCalledTimes(1);
+
+    controller.flush(); // called while saving — should be a no-op
+    expect(fakeFetch).toHaveBeenCalledTimes(1);
+
+    resolveSave({ ok: true, status: 204 });
+  });
 });
