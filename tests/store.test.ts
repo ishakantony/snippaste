@@ -81,4 +81,30 @@ describe("SnipStore (in-memory SQLite)", () => {
     store.clearContent("clear-me");
     expect(store.get("clear-me")?.content).toBe("");
   });
+
+  it("deleteStale removes only old snips", () => {
+    const db = (store as unknown as { db: import("better-sqlite3").Database }).db;
+    const now = Date.now();
+    const day = 24 * 60 * 60 * 1000;
+
+    db.prepare(
+      "INSERT INTO snips (slug, content, created_at, updated_at) VALUES (?, ?, ?, ?)"
+    ).run("fresh", "content", now, now);
+
+    db.prepare(
+      "INSERT INTO snips (slug, content, created_at, updated_at) VALUES (?, ?, ?, ?)"
+    ).run("stale", "content", now - 31 * day, now - 31 * day);
+
+    const deleted = store.deleteStale(30);
+    expect(deleted).toBe(1);
+    expect(store.get("fresh")).not.toBeNull();
+    expect(store.get("stale")).toBeNull();
+  });
+
+  it("deleteStale returns 0 when nothing is stale", () => {
+    store.upsert("recent", "content");
+    const deleted = store.deleteStale(30);
+    expect(deleted).toBe(0);
+    expect(store.get("recent")).not.toBeNull();
+  });
 });

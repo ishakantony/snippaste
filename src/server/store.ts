@@ -58,6 +58,14 @@ export class SnipStore {
       .run(now, slug);
   }
 
+  deleteStale(maxAgeDays: number): number {
+    const cutoff = Date.now() - maxAgeDays * 24 * 60 * 60 * 1000;
+    const result = this.db
+      .prepare("DELETE FROM snips WHERE updated_at < ?")
+      .run(cutoff);
+    return result.changes;
+  }
+
   close(): void {
     this.db.close();
   }

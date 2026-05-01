@@ -4,6 +4,7 @@ import { serve } from "@hono/node-server";
 import { serveStatic } from "@hono/node-server/serve-static";
 import { SnipStore } from "./store.js";
 import { buildApp } from "./routes.js";
+import { runCleanup, startCleanupJob } from "./cleanup.js";
 
 const PORT = parseInt(process.env.PORT ?? "7777", 10);
 
@@ -23,4 +24,6 @@ const app = buildApp(store, {
 
 serve({ fetch: app.fetch, port: PORT }, (info) => {
   console.log(`Hono server running on http://localhost:${info.port}`);
+  runCleanup(store);
+  startCleanupJob(store);
 });
