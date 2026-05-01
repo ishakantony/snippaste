@@ -1,0 +1,13 @@
+services:
+  app:
+    image: ishakantony/snippaste:latest
+    restart: unless-stopped
+    ports:
+      - '${PORT:-7777}:7777'
+    environment:
+      DB_PATH: /data/snippaste.db
+    volumes:
+      - snipdata:/data
+
+volumes:
+  snipdata:

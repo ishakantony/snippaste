@@ -5,7 +5,13 @@
       "source": "ishakantony/skills",
       "sourceType": "github",
       "skillPath": "discuss/SKILL.md",
-      "computedHash": "310dfa5d553ef8fc5a1c61abdb32e942d218c06066410c33aa9d52f16b344285"
+      "computedHash": "b35cf83256718edfc045f9b7e0f45aba69af799763e05312c36a23e05e4cd693"
+    },
+    "frontend-design": {
+      "source": "anthropics/skills",
+      "sourceType": "github",
+      "skillPath": "skills/frontend-design/SKILL.md",
+      "computedHash": "063a0e6448123cd359ad0044cc46b0e490cc7964d45ef4bb9fd842bd2ffbca67"
     },
     "improve-codebase-architecture": {
       "source": "ishakantony/skills",
@@ -29,7 +35,7 @@
       "source": "ishakantony/skills",
       "sourceType": "github",
       "skillPath": "tackle-issues/SKILL.md",
-      "computedHash": "e2e7b6ff52ded6be119e825bf2edfb8a0cf2244efd247e6f263e13c24c5e6c28"
+      "computedHash": "585d5b2750290c71643188e9aadd7c4769622c808b6d333879a9970531739954"
     },
     "tdd": {
       "source": "ishakantony/skills",

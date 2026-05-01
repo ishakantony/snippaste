@@ -11,6 +11,42 @@ function isDarkMode(): boolean {
   return window.matchMedia("(prefers-color-scheme: dark)").matches;
 }
 
+const baseEditorTheme = EditorView.theme({
+  "&": { height: "100%", fontSize: "0.875rem", fontFamily: "'JetBrains Mono', 'Courier New', monospace" },
+  ".cm-scroller": { overflow: "auto", lineHeight: "1.65" },
+});
+
+const lightTheme = EditorView.theme({
+  "&": { background: "var(--bg)", color: "var(--fg)" },
+  ".cm-gutters": {
+    background: "var(--surface)",
+    color: "var(--fg-muted)",
+    border: "none",
+    borderRight: "1px solid var(--border)",
+  },
+  ".cm-cursor": { borderLeftColor: "var(--accent)" },
+  ".cm-selectionBackground": { background: "var(--surface-2) !important" },
+  ".cm-focused .cm-selectionBackground": { background: "var(--surface-2) !important" },
+  ".cm-activeLineGutter": { background: "var(--surface-2)" },
+  ".cm-activeLine": { background: "transparent" },
+});
+
+const darkOverride = EditorView.theme({
+  "&": { background: "var(--bg) !important" },
+  ".cm-gutters": {
+    background: "var(--surface) !important",
+    borderRight: "1px solid var(--border) !important",
+    border: "none !important",
+  },
+  ".cm-cursor": { borderLeftColor: "var(--accent) !important" },
+  ".cm-activeLineGutter": { background: "var(--surface-2) !important" },
+});
+
+function buildExtensions(dark: boolean, updateListener: ReturnType<typeof EditorView.updateListener.of>) {
+  const themeExts = dark ? [oneDark, darkOverride] : [lightTheme];
+  return [lineNumbers(), EditorView.lineWrapping, keymap.of(defaultKeymap), updateListener, baseEditorTheme, ...themeExts];
+}
+
 export function SnipPage() {
   const { name } = useParams<{ name: string }>();
   const slug = name ?? "untitled";
@@ -18,16 +54,10 @@ export function SnipPage() {
   const [loadError, setLoadError] = useState(false);
   const [saveState, setSaveState] = useState<AutosaveState>({ status: "idle" });
 
-  // Keep a stable ref to the controller so we can call onChange
   const controllerRef = useRef<AutosaveController | null>(null);
-
-  // Ref to the container div that CodeMirror will attach to
   const editorContainerRef = useRef<HTMLDivElement>(null);
-
-  // Ref to the EditorView so we can update content after load
   const editorViewRef = useRef<EditorView | null>(null);
 
-  // Create / re-create the controller whenever the slug changes
   useEffect(() => {
     const controller = new AutosaveController({
       fetch: (url, init) => fetch(url, init),
@@ -49,7 +79,6 @@ export function SnipPage() {
     };
   }, [slug]);
 
-  // Create the CodeMirror editor on mount / slug change
   useEffect(() => {
     if (!editorContainerRef.current) return;
 
@@ -59,81 +88,29 @@ export function SnipPage() {
       }
     });
 
-    const darkMode = isDarkMode();
-    const themeExtensions = darkMode
-      ? [oneDark]
-      : [
-          EditorView.theme({
-            "&": { background: "var(--bg)", color: "var(--fg)" },
-            ".cm-gutters": {
-              background: "var(--toolbar-bg)",
-              color: "var(--indicator-fg)",
-              border: "none",
-              borderRight: "1px solid var(--border)",
-            },
-          }),
-        ];
-
     const view = new EditorView({
       state: EditorState.create({
         doc: "",
-        extensions: [
-          lineNumbers(),
-          EditorView.lineWrapping,
-          keymap.of(defaultKeymap),
-          updateListener,
-          EditorView.theme({
-            "&": { height: "100%", fontSize: "1rem", fontFamily: "monospace" },
-            ".cm-scroller": { overflow: "auto", lineHeight: "1.6" },
-          }),
-          ...themeExtensions,
-        ],
+        extensions: buildExtensions(isDarkMode(), updateListener),
       }),
       parent: editorContainerRef.current,
     });
 
     editorViewRef.current = view;
 
-    // Listen for OS theme changes and recreate the editor if needed
     const mediaQuery = window.matchMedia("(prefers-color-scheme: dark)");
+
     function handleThemeChange() {
-      // Destroy and signal re-create by updating a state value isn't straightforward here.
-      // Instead, we rebuild the entire view with updated extensions.
       const currentContent = view.state.doc.toString();
       view.destroy();
       editorViewRef.current = null;
 
       if (!editorContainerRef.current) return;
 
-      const newDark = isDarkMode();
-      const newThemeExtensions = newDark
-        ? [oneDark]
-        : [
-            EditorView.theme({
-              "&": { background: "var(--bg)", color: "var(--fg)" },
-              ".cm-gutters": {
-                background: "var(--toolbar-bg)",
-                color: "var(--indicator-fg)",
-                border: "none",
-                borderRight: "1px solid var(--border)",
-              },
-            }),
-          ];
-
       const newView = new EditorView({
         state: EditorState.create({
           doc: currentContent,
-          extensions: [
-            lineNumbers(),
-            EditorView.lineWrapping,
-            keymap.of(defaultKeymap),
-            updateListener,
-            EditorView.theme({
-              "&": { height: "100%", fontSize: "1rem", fontFamily: "monospace" },
-              ".cm-scroller": { overflow: "auto", lineHeight: "1.6" },
-            }),
-            ...newThemeExtensions,
-          ],
+          extensions: buildExtensions(isDarkMode(), updateListener),
         }),
         parent: editorContainerRef.current,
       });
@@ -151,7 +128,6 @@ export function SnipPage() {
     };
   }, [slug]);
 
-  // Load content from the server on mount / slug change
   useEffect(() => {
     setLoadError(false);
 
@@ -165,11 +141,7 @@ export function SnipPage() {
         if (data && editorViewRef.current) {
           const view = editorViewRef.current;
           view.dispatch({
-            changes: {
-              from: 0,
-              to: view.state.doc.length,
-              insert: data.content,
-            },
+            changes: { from: 0, to: view.state.doc.length, insert: data.content },
           });
         }
       })
@@ -192,29 +164,9 @@ export function SnipPage() {
   }
 
   return (
-    <div
-      style={{
-        display: "flex",
-        flexDirection: "column",
-        height: "100vh",
-        fontFamily: "sans-serif",
-        background: "var(--bg)",
-        color: "var(--fg)",
-      }}
-    >
+    <div className="snip-page">
       {loadError && (
-        <div
-          style={{
-            padding: "0.25rem 0.75rem",
-            background: "var(--load-error-bg)",
-            borderBottom: "1px solid var(--load-error-border)",
-            fontSize: "0.8rem",
-            color: "var(--error-fg)",
-            flexShrink: 0,
-          }}
-        >
-          Load error
-        </div>
+        <div className="snip-load-error">load error — could not reach server</div>
       )}
 
       <Toolbar
@@ -224,15 +176,7 @@ export function SnipPage() {
         onClear={handleClear}
       />
 
-      <div
-        ref={editorContainerRef}
-        style={{
-          flex: 1,
-          overflow: "hidden",
-          display: "flex",
-          flexDirection: "column",
-        }}
-      />
+      <div ref={editorContainerRef} className="snip-editor" />
     </div>
   );
 }

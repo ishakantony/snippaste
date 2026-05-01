@@ -1,15 +1,17 @@
 # syntax=docker/dockerfile:1
 
-# ── Build stage ───────────────────────────────────────────────────────────────
-FROM node:20-alpine AS build
+# ── build stage ───────────────────────────────────────────────────────────────
+FROM node:24-slim AS build
 
 WORKDIR /app
 
-# Install all dependencies (including dev) for building
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    python3 make g++ \
+ && rm -rf /var/lib/apt/lists/*
+
 COPY package.json package-lock.json ./
 RUN npm ci
 
-# Copy source and config files
 COPY src/ src/
 COPY public/ public/
 COPY index.html ./
@@ -17,34 +19,31 @@ COPY vite.config.ts ./
 COPY tsconfig.json ./
 COPY tsconfig.server.json ./
 
-# Build frontend (Vite → dist/client/)
 RUN npm run build
-
-# Compile backend TypeScript (tsc → dist/server/)
 RUN npx tsc -p tsconfig.server.json
-
-# Strip dev dependencies
 RUN npm prune --omit=dev
 
-# ── Runtime stage ─────────────────────────────────────────────────────────────
-FROM node:20-alpine AS runtime
+# ── runtime stage ─────────────────────────────────────────────────────────────
+FROM node:24-slim AS runtime
+
+ENV NODE_ENV=production
 
 WORKDIR /app
 
-# Create data directory for SQLite
-RUN mkdir -p /data
+RUN groupadd --system --gid 1001 nodejs \
+ && useradd  --system --uid 1001 -g nodejs snippaste
 
-# Copy compiled output and production node_modules
-COPY --from=build /app/dist/ dist/
-COPY --from=build /app/node_modules/ node_modules/
+RUN mkdir -p /data && chown snippaste:nodejs /data
 
-# Environment defaults
+COPY --from=build --chown=snippaste:nodejs /app/dist/ dist/
+COPY --from=build --chown=snippaste:nodejs /app/node_modules/ node_modules/
+
 ENV PORT=7777
 ENV DB_PATH=/data/snippaste.db
 
+USER snippaste
 EXPOSE 7777
 
-# Persist SQLite data
 VOLUME ["/data"]
 
 CMD ["node", "dist/server/server/index.js"]

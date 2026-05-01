@@ -3,3 +3,5 @@ dist/
 *.db
 .env
 .DS_Store
+snippaste.db*
+issues/

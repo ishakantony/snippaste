@@ -14,8 +14,7 @@ export function LandingPage() {
     const trimmed = name.trim().toLowerCase();
 
     if (trimmed === "") {
-      const generated = SlugGenerator.generate();
-      navigate(`/s/${generated}`);
+      navigate(`/s/${SlugGenerator.generate()}`);
       return;
     }
 
@@ -30,30 +29,14 @@ export function LandingPage() {
   }
 
   return (
-    <div
-      style={{
-        display: "flex",
-        flexDirection: "column",
-        alignItems: "center",
-        justifyContent: "center",
-        height: "100vh",
-        fontFamily: "sans-serif",
-        gap: "1rem",
-        background: "var(--bg)",
-        color: "var(--fg)",
-      }}
-    >
-      <h1 style={{ margin: 0, fontSize: "2.5rem", fontWeight: 700 }}>
-        snippaste
-      </h1>
-      <p style={{ margin: 0, color: "var(--muted-fg)", fontSize: "1rem" }}>
-        A tiny place to paste. Pick a name, start typing.
-      </p>
-      <form
-        onSubmit={handleSubmit}
-        style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: "0.5rem" }}
-      >
-        <div style={{ display: "flex", gap: "0.5rem" }}>
+    <div className="landing">
+      <header className="landing-header">
+        <h1 className="landing-title">snippaste</h1>
+        <p className="landing-tagline">a tiny place to paste.</p>
+      </header>
+
+      <form className="landing-form" onSubmit={handleSubmit}>
+        <div className="landing-input-row">
           <input
             type="text"
             value={name}
@@ -62,34 +45,16 @@ export function LandingPage() {
               setError(null);
             }}
             placeholder="name (optional)"
-            style={{
-              padding: "0.5rem 0.75rem",
-              fontSize: "1rem",
-              border: "1px solid var(--input-border)",
-              borderRadius: "4px",
-              width: "220px",
-              background: "var(--input-bg)",
-              color: "var(--input-fg)",
-            }}
+            className="landing-input"
+            spellCheck={false}
+            autoCapitalize="off"
+            autoCorrect="off"
           />
-          <button
-            type="submit"
-            style={{
-              padding: "0.5rem 1.25rem",
-              background: "var(--accent-bg)",
-              color: "var(--accent-fg)",
-              border: "none",
-              borderRadius: "4px",
-              fontSize: "1rem",
-              cursor: "pointer",
-            }}
-          >
-            snip
+          <button type="submit" className="landing-btn">
+            snip →
           </button>
         </div>
-        {error && (
-          <span style={{ color: "var(--error-fg)", fontSize: "0.875rem" }}>{error}</span>
-        )}
+        {error && <p className="landing-error">{error}</p>}
       </form>
     </div>
   );

@@ -7,42 +7,41 @@ function formatTimestamp(ts: number): string {
   return `${hh}:${mm}`;
 }
 
-function SaveIndicator({ state }: { state: AutosaveState }) {
+function SaveStatus({ state }: { state: AutosaveState }) {
   if (state.status === "saving") {
     return (
-      <span style={{ color: "var(--indicator-fg)", fontSize: "0.875rem" }}>Saving…</span>
+      <span className="toolbar-status">
+        <span className="toolbar-dot toolbar-dot--saving" />
+        saving
+      </span>
     );
   }
   if (state.status === "saved") {
     return (
-      <span style={{ color: "var(--saved-fg)", fontSize: "0.875rem" }}>
-        Saved ✓ {formatTimestamp(state.timestamp)}
+      <span className="toolbar-status">
+        <span className="toolbar-dot toolbar-dot--saved" />
+        saved {formatTimestamp(state.timestamp)}
       </span>
     );
   }
   if (state.status === "offline") {
     return (
-      <span style={{ color: "var(--warn-fg)", fontSize: "0.875rem" }}>Offline ⚠</span>
+      <span className="toolbar-status">
+        <span className="toolbar-dot toolbar-dot--warn" />
+        offline
+      </span>
     );
   }
   if (state.status === "too_large") {
     return (
-      <span style={{ color: "var(--warn-fg)", fontSize: "0.875rem" }}>Too large ⚠</span>
+      <span className="toolbar-status">
+        <span className="toolbar-dot toolbar-dot--error" />
+        too large
+      </span>
     );
   }
   return null;
 }
-
-const btnStyle: React.CSSProperties = {
-  padding: "0.25rem 0.5rem",
-  fontSize: "0.8rem",
-  cursor: "pointer",
-  background: "var(--btn-bg)",
-  border: "1px solid var(--btn-border)",
-  borderRadius: "4px",
-  color: "var(--btn-fg)",
-  whiteSpace: "nowrap",
-};
 
 export interface ToolbarProps {
   slug: string;
@@ -82,52 +81,32 @@ export function Toolbar({ slug, saveState, onGetContent, onClear }: ToolbarProps
   }
 
   return (
-    <div
-      style={{
-        display: "flex",
-        alignItems: "center",
-        height: "36px",
-        padding: "0 0.75rem",
-        borderBottom: "1px solid var(--toolbar-border)",
-        background: "var(--toolbar-bg)",
-        flexShrink: 0,
-        gap: "0.5rem",
-      }}
-    >
-      {/* Left: snip name */}
-      <div style={{ flex: "0 0 auto", fontSize: "0.875rem", color: "var(--fg)", minWidth: 0 }}>
-        {slug}
+    <div className="toolbar">
+      <div className="toolbar-id">
+        <span className="toolbar-brand">snippaste</span>
+        <span className="toolbar-slash">/</span>
+        <span className="toolbar-slug">{slug}</span>
       </div>
 
-      {/* Center: save indicator */}
-      <div
-        style={{
-          flex: 1,
-          display: "flex",
-          justifyContent: "center",
-          alignItems: "center",
-        }}
-      >
-        <SaveIndicator state={saveState} />
+      <div className="toolbar-center">
+        <SaveStatus state={saveState} />
       </div>
 
-      {/* Right: action buttons */}
-      <div style={{ flex: "0 0 auto", display: "flex", gap: "0.35rem", alignItems: "center" }}>
-        <button style={btnStyle} onClick={handleCopyUrl} title="Copy URL">
-          Copy URL
+      <div className="toolbar-actions">
+        <button className="toolbar-btn" onClick={handleCopyUrl} title="Copy URL">
+          copy url
         </button>
-        <button style={btnStyle} onClick={handleCopyContent} title="Copy content">
-          Copy
+        <span className="toolbar-divider">·</span>
+        <button className="toolbar-btn" onClick={handleCopyContent} title="Copy content">
+          copy
         </button>
-        <button style={btnStyle} onClick={handleDownload} title="Download">
-          ⬇ Download
+        <span className="toolbar-divider">·</span>
+        <button className="toolbar-btn" onClick={handleDownload} title="Download">
+          ↓ save
         </button>
-        <button
-          style={{ ...btnStyle, color: "var(--warn-fg)", borderColor: "var(--btn-border)" }}
-          onClick={handleClear}
-          title="Clear snip"
-        >
-          ✕ Clear
+        <span className="toolbar-divider">·</span>
+        <button className="toolbar-btn toolbar-btn--danger" onClick={handleClear} title="Clear snip">
+          clear
         </button>
       </div>
     </div>
