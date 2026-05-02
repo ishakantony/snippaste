@@ -1,6 +1,12 @@
 {
 	"version": 1,
 	"skills": {
+		"commit": {
+			"source": "ishakantony/skills",
+			"sourceType": "github",
+			"skillPath": "commit/SKILL.md",
+			"computedHash": "60ca2ef550d82bab70fa0967a2808530fccc5c4424f60a3553b195fca2439fd8"
+		},
 		"discuss": {
 			"source": "ishakantony/skills",
 			"sourceType": "github",
