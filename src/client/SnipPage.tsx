@@ -2,7 +2,7 @@ import { defaultKeymap } from "@codemirror/commands";
 import { EditorState } from "@codemirror/state";
 import { oneDark } from "@codemirror/theme-one-dark";
 import { EditorView, keymap, lineNumbers } from "@codemirror/view";
-import { useEffect, useRef, useState } from "react";
+import { lazy, Suspense, useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useParams } from "react-router-dom";
 import {
@@ -11,7 +11,6 @@ import {
 } from "@/client/autosaveController.js";
 import { ConfirmDialog } from "@/client/ConfirmDialog.js";
 import { getClientId } from "@/client/clientId.js";
-import { QrModal } from "@/client/components/QrModal.js";
 import { useFeatureFlag } from "@/client/featureFlagsContext.js";
 import { useDocumentLanguage } from "@/client/hooks/useDocumentLanguage.js";
 import { StatusBar } from "@/client/StatusBar.js";
@@ -19,6 +18,12 @@ import { subscribe as subscribeStream } from "@/client/snipStream.js";
 import { ToastProvider, useToast } from "@/client/Toast.js";
 import { Toolbar } from "@/client/Toolbar.js";
 import { useTheme } from "@/client/themeContext.js";
+
+const QrModal = lazy(() =>
+	import("@/client/components/QrModal.js").then((m) => ({
+		default: m.QrModal,
+	})),
+);
 
 const baseEditorTheme = EditorView.theme({
 	"&": { height: "100%", fontSize: "13px", fontFamily: "var(--font-mono)" },
@@ -393,12 +398,14 @@ function SnipPageInner() {
 			)}
 
 			{showQr && qrEnabled && (
-				<QrModal
-					url={getSnipUrl()}
-					slug={slug}
-					onClose={() => setShowQr(false)}
-					onToast={toast.show}
-				/>
+				<Suspense fallback={null}>
+					<QrModal
+						url={getSnipUrl()}
+						slug={slug}
+						onClose={() => setShowQr(false)}
+						onToast={toast.show}
+					/>
+				</Suspense>
 			)}
 		</div>
 	);

@@ -40,6 +40,19 @@ export default defineConfig(({ mode }) => {
 		},
 		build: {
 			outDir: "dist/client",
+			rollupOptions: {
+				output: {
+					manualChunks: {
+						"vendor-react": ["react", "react-dom", "react-router-dom"],
+						"vendor-codemirror": [
+							"@codemirror/commands",
+							"@codemirror/state",
+							"@codemirror/theme-one-dark",
+							"@codemirror/view",
+						],
+					},
+				},
+			},
 		},
 		server: {
 			port: 5173,
