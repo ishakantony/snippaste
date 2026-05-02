@@ -51,6 +51,28 @@ npm run lint:fix     # Auto-fix lint and formatting issues
 npm run build        # Production build (outputs to dist/client/)
 ```
 
+## Local E2E tests
+
+Install the Chromium browser once before running Playwright locally:
+
+```sh
+npx playwright install chromium
+```
+
+Run the browser E2E suite headlessly:
+
+```sh
+npm run test:e2e
+```
+
+Run the visible management demo with slowed browser actions:
+
+```sh
+npm run test:e2e:demo
+```
+
+E2E tests build the client and server, start the compiled Hono server on a test port, and use a disposable SQLite database under `test-results/e2e/`. They are intentionally local-only and are not part of `npm test`, hooks, or CI/CD.
+
 ## Environment variables
 
 | Variable | Default | Description |

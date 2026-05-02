@@ -1,7 +1,13 @@
 {
 	"$schema": "https://biomejs.dev/schemas/2.4.13/schema.json",
 	"files": {
-		"includes": ["**", "!!**/dist", "!!**/coverage", "!**/*.md"]
+		"includes": [
+			"**",
+			"!!**/dist",
+			"!!**/coverage",
+			"!!**/test-results",
+			"!**/*.md"
+		]
 	},
 	"linter": {
 		"enabled": true,

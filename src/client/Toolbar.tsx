@@ -70,7 +70,7 @@ function StatusPill({
 	}
 
 	return (
-		<Pill variant="default">
+		<Pill variant="default" data-testid="save-status">
 			<Icon
 				name="clock"
 				size={11}

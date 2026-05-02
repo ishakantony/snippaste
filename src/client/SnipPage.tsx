@@ -570,6 +570,7 @@ function SnipPageInner() {
 				<div className="flex-1 flex overflow-hidden">
 					<div
 						ref={editorContainerRef}
+						data-testid="snip-editor"
 						className="flex-1 overflow-hidden flex flex-col"
 					/>
 				</div>
