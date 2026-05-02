@@ -5,7 +5,12 @@ import {
 	useEffect,
 	useState,
 } from "react";
-import { applyTheme, loadTheme, saveTheme, type Theme } from "./theme.js";
+import {
+	applyTheme,
+	loadTheme,
+	saveTheme,
+	type Theme,
+} from "@/client/theme.js";
 
 interface ThemeContextValue {
 	theme: Theme;

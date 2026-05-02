@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
-import { SnipStore } from "../src/server/store.js";
+import { SnipStore } from "@/server/store.js";
 
 describe("SnipStore (in-memory SQLite)", () => {
 	let store: SnipStore;

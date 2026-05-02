@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from "vitest";
-import { applyTheme, loadTheme, saveTheme } from "../src/client/theme.js";
+import { applyTheme, loadTheme, saveTheme } from "@/client/theme.js";
 
 function fakeStorage(initial?: Record<string, string>) {
 	const data = new Map(Object.entries(initial ?? {}));

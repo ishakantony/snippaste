@@ -1,9 +1,9 @@
 import { Link } from "react-router-dom";
-import type { AutosaveState } from "./autosaveController.js";
-import { Button } from "./components/ui/Button.js";
-import { Pill } from "./components/ui/Pill.js";
-import { Icon } from "./Icon.js";
-import { useTheme } from "./themeContext.js";
+import type { AutosaveState } from "@/client/autosaveController.js";
+import { Button } from "@/client/components/ui/Button.js";
+import { Pill } from "@/client/components/ui/Pill.js";
+import { Icon } from "@/client/Icon.js";
+import { useTheme } from "@/client/themeContext.js";
 
 function relativeTime(ts: number): string {
 	const diff = Math.floor((Date.now() - ts) / 1000);

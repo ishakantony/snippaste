@@ -7,14 +7,14 @@ import { useParams } from "react-router-dom";
 import {
 	AutosaveController,
 	type AutosaveState,
-} from "./autosaveController.js";
-import { ConfirmDialog } from "./ConfirmDialog.js";
-import { getClientId } from "./clientId.js";
-import { StatusBar } from "./StatusBar.js";
-import { subscribe as subscribeStream } from "./snipStream.js";
-import { ToastProvider, useToast } from "./Toast.js";
-import { Toolbar } from "./Toolbar.js";
-import { useTheme } from "./themeContext.js";
+} from "@/client/autosaveController.js";
+import { ConfirmDialog } from "@/client/ConfirmDialog.js";
+import { getClientId } from "@/client/clientId.js";
+import { StatusBar } from "@/client/StatusBar.js";
+import { subscribe as subscribeStream } from "@/client/snipStream.js";
+import { ToastProvider, useToast } from "@/client/Toast.js";
+import { Toolbar } from "@/client/Toolbar.js";
+import { useTheme } from "@/client/themeContext.js";
 
 const baseEditorTheme = EditorView.theme({
 	"&": { height: "100%", fontSize: "13px", fontFamily: "var(--font-mono)" },

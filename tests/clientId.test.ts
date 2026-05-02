@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from "vitest";
-import { createClientId } from "../src/client/clientId.js";
+import { createClientId } from "@/client/clientId.js";
 
 describe("clientId", () => {
 	it("returns a non-empty string", () => {

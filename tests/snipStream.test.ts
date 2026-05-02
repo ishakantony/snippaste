@@ -3,7 +3,7 @@ import {
 	type EventSourceLike,
 	type SnipStreamHandlers,
 	subscribe,
-} from "../src/client/snipStream.js";
+} from "@/client/snipStream.js";
 
 class FakeEventSource implements EventSourceLike {
 	url: string;

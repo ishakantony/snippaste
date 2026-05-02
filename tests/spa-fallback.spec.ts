@@ -1,6 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
-import { buildApp } from "../src/server/routes.js";
-import { SnipStore } from "../src/server/store.js";
+import { buildApp } from "@/server/routes.js";
+import { SnipStore } from "@/server/store.js";
 
 const SPA_SHELL = `<!doctype html><html><body><div id="root"></div></body></html>`;
 

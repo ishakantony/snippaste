@@ -1,10 +1,10 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { SlugValidator } from "../shared/slugValidator.js";
-import { Button } from "./components/ui/Button.js";
-import { Icon } from "./Icon.js";
-import { SlugGenerator } from "./slugGenerator.js";
-import { useTheme } from "./themeContext.js";
+import { Button } from "@/client/components/ui/Button.js";
+import { Icon } from "@/client/Icon.js";
+import { SlugGenerator } from "@/client/slugGenerator.js";
+import { useTheme } from "@/client/themeContext.js";
+import { SlugValidator } from "@/shared/slugValidator.js";
 
 const FEATURES = [
 	{ icon: "zap", label: "Instant", desc: "Shareable URL in one click" },

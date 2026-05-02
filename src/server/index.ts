@@ -3,10 +3,11 @@ import { resolve } from "node:path";
 import { serve } from "@hono/node-server";
 import { serveStatic } from "@hono/node-server/serve-static";
 import { runCleanup, startCleanupJob } from "./cleanup.js";
+import { env } from "./env.js";
 import { buildApp } from "./routes.js";
 import { SnipStore } from "./store.js";
 
-const PORT = parseInt(process.env.PORT ?? "7777", 10);
+const PORT = env.PORT;
 
 const SHELL_PATH = resolve("./dist/client/index.html");
 let spaShell: string | undefined;

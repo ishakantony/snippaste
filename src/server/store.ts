@@ -1,4 +1,5 @@
 import Database from "better-sqlite3";
+import { env } from "./env.js";
 
 export interface SnipDTO {
 	slug: string;
@@ -18,7 +19,7 @@ CREATE TABLE IF NOT EXISTS snips (
 export class SnipStore {
 	private db: Database.Database;
 
-	constructor(dbPath: string = process.env.DB_PATH ?? "/data/snippaste.db") {
+	constructor(dbPath: string = env.DB_PATH) {
 		this.db = new Database(dbPath);
 		this.db.pragma("journal_mode = WAL");
 		this.db.exec(SCHEMA);

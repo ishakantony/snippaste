@@ -7,8 +7,8 @@ import {
 	useRef,
 	useState,
 } from "react";
-import { Icon } from "./Icon.js";
-import { cn } from "./lib/cn.js";
+import { Icon } from "@/client/Icon.js";
+import { cn } from "@/client/lib/cn.js";
 
 interface ToastContextValue {
 	show: (msg: string) => void;

@@ -1,26 +1,89 @@
-# snippaste
+# Snippaste
 
-A lightweight, self-hosted snippet / paste tool. Snippets are stored in SQLite and accessed by short slug (e.g. `http://localhost:7777/my-snippet`).
+A lightweight, self-hosted snippet/paste tool. Create and share code snippets with real-time collaborative editing via Server-Sent Events.
+
+Snippets are stored in SQLite and accessed by short slug (e.g. `http://localhost:7777/my-snippet`).
+
+## Quick start
+
+```sh
+npm install
+npm run dev
+```
+
+- **Frontend**: http://localhost:5173 (Vite dev server)
+- **API**: http://localhost:7777 (Hono server, proxied through Vite in dev)
+
+## Tech stack
+
+| Layer | Technology |
+|---|---|
+| Frontend | React 18, CodeMirror 6, Tailwind CSS v4 |
+| Backend | Hono.js on Node.js |
+| Database | SQLite (better-sqlite3) |
+| Real-time | Server-Sent Events (SSE) |
+| Build | Vite 6 (client), tsc (server) |
+| Validation | Zod schemas (shared between client/server) |
+
+## Architecture
+
+```
+src/
+  client/    React SPA — components, editor, themes, SSE client
+  server/    Hono.js API — routes, store, pub/sub bus, env config
+  shared/    Shared Zod schemas and validators
+```
+
+- `src/shared/schemas.ts` defines the API contract (slug validation, request bodies)
+- `src/server/env.ts` validates environment variables at startup
+- Server uses relative imports (NodeNext). Client/tests use `@/` path aliases
+
+## Commands
+
+```sh
+npm run dev          # Start client + server concurrently
+npm run dev:client   # Vite dev server only (port 5173)
+npm run dev:server   # Hono server only (port 7777)
+npm test             # Run Vitest unit tests
+npm run typecheck    # TypeScript type checking
+npm run lint         # Biome lint + format check
+npm run lint:fix     # Auto-fix lint and formatting issues
+npm run build        # Production build (outputs to dist/client/)
+```
+
+## Environment variables
+
+| Variable | Default | Description |
+|---|---|---|
+| `PORT` | `7777` | Server listen port |
+| `DB_PATH` | `/data/snippaste.db` | SQLite database path |
+
+## API routes
+
+| Method | Path | Description |
+|---|---|---|
+| GET | `/api/health` | Health check |
+| GET | `/api/snips/:slug` | Get snippet |
+| PUT | `/api/snips/:slug` | Create/update snippet (max 1 MB) |
+| GET | `/api/snips/:slug/events` | SSE stream for real-time updates |
 
 ---
 
-## Docker usage
+## Docker deployment
 
-### Throwaway instance (data lost on container stop)
+### Throwaway instance
 
 ```sh
 docker run -p 7777:7777 ishakantony/snippaste
 ```
 
-App is reachable at <http://localhost:7777>.
-
-### Persistent instance (data survives restarts)
+### Persistent instance
 
 ```sh
 docker run -v snippaste-data:/data -p 7777:7777 ishakantony/snippaste
 ```
 
-SQLite is stored at `/data/snippaste.db` inside the container, mounted from the named volume `snippaste-data`.
+SQLite is stored at `/data/snippaste.db` inside the container.
 
 ### Custom port
 
@@ -34,14 +97,12 @@ docker run -e PORT=8080 -p 8080:8080 ishakantony/snippaste
 docker run -v /host/path:/mydata -e DB_PATH=/mydata/snippaste.db -p 7777:7777 ishakantony/snippaste
 ```
 
----
-
-## Reverse proxy (snippaste.ishak.stream)
+## Reverse proxy
 
 ### Caddy
 
 ```caddyfile
-snippaste.ishak.stream {
+snippaste.example.com {
     reverse_proxy localhost:7777
 }
 ```
@@ -51,7 +112,7 @@ snippaste.ishak.stream {
 ```nginx
 server {
     listen 80;
-    server_name snippaste.ishak.stream;
+    server_name snippaste.example.com;
 
     location / {
         proxy_pass http://localhost:7777;
@@ -63,14 +124,9 @@ server {
 }
 ```
 
----
-
 ## Build and publish (maintainer)
 
 ```sh
-# Build image
 docker build -t ishakantony/snippaste .
-
-# Push to Docker Hub
 docker push ishakantony/snippaste
 ```

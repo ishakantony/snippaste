@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { Button } from "./components/ui/Button.js";
+import { Button } from "@/client/components/ui/Button.js";
 
 export interface ConfirmDialogProps {
 	message: string;

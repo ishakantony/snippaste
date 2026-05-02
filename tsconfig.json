@@ -12,7 +12,10 @@
 		"allowImportingTsExtensions": true,
 		"resolveJsonModule": true,
 		"outDir": "dist",
-		"baseUrl": "."
+		"baseUrl": ".",
+		"paths": {
+			"@/*": ["src/*"]
+		}
 	},
 	"include": ["src", "tests", "vite.config.ts"],
 	"exclude": ["node_modules", "dist"]

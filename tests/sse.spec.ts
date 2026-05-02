@@ -1,7 +1,7 @@
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
-import { buildApp } from "../src/server/routes.js";
-import { SnipBus, type SnipUpdate } from "../src/server/snipBus.js";
-import { SnipStore } from "../src/server/store.js";
+import { buildApp } from "@/server/routes.js";
+import { SnipBus, type SnipUpdate } from "@/server/snipBus.js";
+import { SnipStore } from "@/server/store.js";
 
 describe("SSE / broadcast on PUT", () => {
 	let store: SnipStore;

@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { SnipBus, type SnipUpdate } from "../src/server/snipBus.js";
+import { SnipBus, type SnipUpdate } from "@/server/snipBus.js";
 
 describe("SnipBus", () => {
 	it("publish notifies subscribers for the matching slug", () => {

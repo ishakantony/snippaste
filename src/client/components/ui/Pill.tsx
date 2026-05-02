@@ -1,4 +1,4 @@
-import { cn } from "../../lib/cn.js";
+import { cn } from "@/client/lib/cn.js";
 
 export interface PillProps extends React.HTMLAttributes<HTMLSpanElement> {
 	variant?: "accent" | "default" | "status";
