@@ -117,6 +117,7 @@ function SnipPageInner() {
 	const [confirmRefresh, setConfirmRefresh] = useState(false);
 	const [remoteChanged, setRemoteChanged] = useState(false);
 	const [showQr, setShowQr] = useState(false);
+	const [updatedAt, setUpdatedAt] = useState<number | undefined>(undefined);
 
 	const controllerRef = useRef<AutosaveController | null>(null);
 	const editorContainerRef = useRef<HTMLDivElement>(null);
@@ -201,6 +202,7 @@ function SnipPageInner() {
 			})
 			.then((data) => {
 				if (!data) return;
+				setUpdatedAt(data.updatedAt);
 				const view = editorViewRef.current;
 				if (!view) return;
 				applyingRef.current = true;
@@ -226,7 +228,13 @@ function SnipPageInner() {
 		const myClientId = clientIdRef.current;
 
 		const unsub = subscribeStream(slug, {
+			onSnapshot: (event) => {
+				if (event.updatedAt > 0) {
+					setUpdatedAt(event.updatedAt);
+				}
+			},
 			onUpdate: (event) => {
+				setUpdatedAt(event.updatedAt);
 				if (event.clientId === myClientId) return; // self-echo
 				const status = controllerRef.current?.getState().status;
 				const isLocallyDirty = status === "dirty" || status === "saving";
@@ -343,6 +351,7 @@ function SnipPageInner() {
 				slug={slug}
 				saveState={saveState}
 				isDirty={isDirty}
+				updatedAt={updatedAt}
 				onCopyUrl={handleCopyUrl}
 				onCopyContent={handleCopyContent}
 				onSave={handleSave}

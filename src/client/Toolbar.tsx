@@ -1,3 +1,4 @@
+import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Link } from "react-router-dom";
 import type { AutosaveState } from "@/client/autosaveController.js";
@@ -6,6 +7,7 @@ import { Button } from "@/client/components/ui/Button.js";
 import { Pill } from "@/client/components/ui/Pill.js";
 import { useFeatureFlag } from "@/client/featureFlagsContext.js";
 import { Icon } from "@/client/Icon.js";
+import { getExpirationInfo } from "@/client/lib/expirationCountdown.js";
 import { useTheme } from "@/client/themeContext.js";
 
 function relativeTime(
@@ -40,7 +42,7 @@ function StatusPill({ state }: { state: AutosaveState }) {
 	}
 
 	return (
-		<Pill variant="status">
+		<Pill variant="default">
 			<Icon
 				name="clock"
 				size={11}
@@ -58,10 +60,43 @@ function StatusPill({ state }: { state: AutosaveState }) {
 	);
 }
 
+function ExpirationPill({ updatedAt }: { updatedAt: number }) {
+	const [info, setInfo] = useState(() =>
+		getExpirationInfo(updatedAt, Date.now()),
+	);
+
+	useEffect(() => {
+		setInfo(getExpirationInfo(updatedAt, Date.now()));
+		const id = setInterval(() => {
+			setInfo(getExpirationInfo(updatedAt, Date.now()));
+		}, 60_000);
+		return () => clearInterval(id);
+	}, [updatedAt]);
+
+	const colorMap = {
+		green: "var(--ok)",
+		yellow: "var(--warn)",
+		red: "var(--danger)",
+	};
+
+	return (
+		<Pill variant="default">
+			<Icon name="calendar" size={11} color={colorMap[info.color]} />
+			<span
+				className="text-xs font-medium whitespace-nowrap"
+				style={{ color: colorMap[info.color] }}
+			>
+				{info.text}
+			</span>
+		</Pill>
+	);
+}
+
 export interface ToolbarProps {
 	slug: string;
 	saveState: AutosaveState;
 	isDirty: boolean;
+	updatedAt?: number;
 	onCopyUrl: () => void;
 	onCopyContent: () => void;
 	onSave: () => void;
@@ -74,6 +109,7 @@ export function Toolbar({
 	slug,
 	saveState,
 	isDirty,
+	updatedAt,
 	onCopyUrl,
 	onCopyContent,
 	onSave,
@@ -119,9 +155,15 @@ export function Toolbar({
 						title={t("toolbar.unsavedChanges")}
 					/>
 				)}
+
+				<StatusPill state={saveState} />
 			</div>
 
-			<StatusPill state={saveState} />
+			{updatedAt !== undefined && (
+				<div className="absolute left-1/2 -translate-x-1/2">
+					<ExpirationPill updatedAt={updatedAt} />
+				</div>
+			)}
 
 			<div className="flex items-center gap-2">
 				<div className="flex items-center border border-border-2 rounded-7 overflow-hidden bg-surface-2">

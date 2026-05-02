@@ -1,5 +1,6 @@
 import {
 	ArrowRight,
+	Calendar,
 	Check,
 	Clock,
 	Copy,
@@ -37,6 +38,7 @@ const ICONS: Record<string, React.FC<LucideProps>> = {
 	x: X,
 	qr: QrCode,
 	globe: Globe,
+	calendar: Calendar,
 };
 
 export interface IconProps {
