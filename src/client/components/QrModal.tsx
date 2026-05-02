@@ -1,6 +1,7 @@
 import { useEffect, useRef } from "react";
 import { useTranslation } from "react-i18next";
 import { Button } from "@/client/components/ui/Button.js";
+import { Modal } from "@/client/components/ui/Modal.js";
 import { Icon } from "@/client/Icon.js";
 import { createQrCode } from "@/client/lib/qrCode.js";
 
@@ -25,14 +26,6 @@ export function QrModal({ url, slug, onClose, onToast }: QrModalProps) {
 		};
 	}, [url]);
 
-	useEffect(() => {
-		function onKey(e: KeyboardEvent) {
-			if (e.key === "Escape") onClose();
-		}
-		window.addEventListener("keydown", onKey);
-		return () => window.removeEventListener("keydown", onKey);
-	}, [onClose]);
-
 	async function handleDownload() {
 		await qrInstanceRef.current?.download({
 			name: `snippaste-${slug}`,
@@ -50,17 +43,7 @@ export function QrModal({ url, slug, onClose, onToast }: QrModalProps) {
 	}
 
 	return (
-		<div
-			className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 animate-[confirm-fade_150ms_ease]"
-			role="dialog"
-			aria-modal="true"
-			onClick={(e) => {
-				if (e.target === e.currentTarget) onClose();
-			}}
-			onKeyDown={(e) => {
-				if (e.key === "Enter" && e.target === e.currentTarget) onClose();
-			}}
-		>
+		<Modal onClose={onClose}>
 			<div className="bg-modal-bg border border-border-2 rounded-xl w-90 p-6 shadow-[0_8px_40px_rgba(0,0,0,0.5)] flex flex-col items-center gap-5">
 				<div className="flex items-center justify-between w-full">
 					<div className="flex items-center gap-2">
@@ -105,6 +88,6 @@ export function QrModal({ url, slug, onClose, onToast }: QrModalProps) {
 					</Button>
 				</div>
 			</div>
-		</div>
+		</Modal>
 	);
 }

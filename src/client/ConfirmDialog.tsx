@@ -1,6 +1,6 @@
-import { useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import { Button } from "@/client/components/ui/Button.js";
+import { Modal } from "@/client/components/ui/Modal.js";
 
 export interface ConfirmDialogProps {
 	message: string;
@@ -18,20 +18,8 @@ export function ConfirmDialog({
 	const { t } = useTranslation();
 	const label = confirmLabel ?? t("common.confirm");
 
-	useEffect(() => {
-		function onKey(e: KeyboardEvent) {
-			if (e.key === "Escape") onCancel();
-		}
-		window.addEventListener("keydown", onKey);
-		return () => window.removeEventListener("keydown", onKey);
-	}, [onCancel]);
-
 	return (
-		<div
-			className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 animate-[confirm-fade_150ms_ease]"
-			role="dialog"
-			aria-modal="true"
-		>
+		<Modal onClose={onCancel}>
 			<div className="bg-modal-bg border border-border-2 rounded-xl w-85 p-6 shadow-[0_8px_40px_rgba(0,0,0,0.5)]">
 				<div className="text-sm font-semibold text-fg mb-2">
 					{t("editor.areYouSure")}
@@ -51,6 +39,6 @@ export function ConfirmDialog({
 					</Button>
 				</div>
 			</div>
-		</div>
+		</Modal>
 	);
 }
