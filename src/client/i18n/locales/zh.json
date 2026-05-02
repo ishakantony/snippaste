@@ -1,0 +1,99 @@
+{
+	"common": {
+		"cancel": "取消",
+		"confirm": "确认",
+		"reloadPage": "重新加载页面",
+		"lightMode": "浅色模式",
+		"darkMode": "深色模式",
+		"toggleTheme": "切换主题"
+	},
+	"landing": {
+		"heading1": "分享文本。",
+		"heading2": "即刻分享。",
+		"description": "创建一个 snip，获取链接。分享代码片段、笔记或任何纯文本内容——无需注册，无需设置。",
+		"tagPlain": "仅纯文本",
+		"tagInstant": "即时链接",
+		"tagNoAccount": "无需账号",
+		"tagExpiry": "30天过期",
+		"newSnip": "新建 snip",
+		"formDesc": "您将立即获得一个可分享的链接。在编辑器中开始输入。",
+		"snipName": "Snip 名称",
+		"placeholder": "例如 my-config（可选）",
+		"helper": "留空以获取随机 ID",
+		"createSnip": "创建 snip",
+		"disclaimer": "Snips 是公开的。请勿粘贴敏感数据。内容将在30天后过期并删除。",
+		"featureInstantLabel": "即时",
+		"featureInstantDesc": "一键获取可分享链接",
+		"featurePlainLabel": "纯文本",
+		"featurePlainDesc": "无标记，无杂乱",
+		"featureEphemeralLabel": "临时",
+		"featureEphemeralDesc": "Snips 在30天后过期"
+	},
+	"toolbar": {
+		"home": "首页",
+		"unsavedChanges": "未保存的更改",
+		"copyUrl": "复制链接",
+		"qrCode": "二维码",
+		"qr": "二维码",
+		"copy": "复制",
+		"save": "保存",
+		"clear": "清除",
+		"refresh": "刷新"
+	},
+	"status": {
+		"saving": "保存中…",
+		"autoSaved": "已自动保存",
+		"offline": "离线",
+		"tooLarge": "内容过大",
+		"ready": "就绪",
+		"justNow": "刚刚",
+		"secondsAgo": "{{count}}秒前",
+		"minutesAgo": "{{count}}分钟前",
+		"hoursAgo": "{{count}}小时前",
+		"lines_one": "{{count}} 行",
+		"lines_other": "{{count}} 行",
+		"chars_one": "{{count}} 个字符",
+		"chars_other": "{{count}} 个字符",
+		"plainText": "纯文本"
+	},
+	"editor": {
+		"pageTitle": "{{slug}} — Snippaste",
+		"copiedUrl": "已复制链接：/s/{{slug}}",
+		"copiedClipboard": "已复制到剪贴板",
+		"saved": "已保存",
+		"snipCleared": "Snip 已清除",
+		"reloaded": "已重新加载",
+		"loadError": "加载错误 — 无法连接服务器",
+		"remoteChanges": "有远程更改可用。",
+		"confirmClearMessage": "这将清除此 snip 的所有内容。此操作无法撤销。",
+		"confirmClearLabel": "清除",
+		"confirmRefreshMessage": "重新加载上次保存的版本？未保存的更改将丢失。",
+		"confirmRefreshLabel": "刷新",
+		"areYouSure": "确定吗？"
+	},
+	"qrModal": {
+		"heading": "二维码",
+		"qrCopied": "二维码已复制到剪贴板",
+		"downloadPng": "下载 PNG",
+		"copyImage": "复制图片"
+	},
+	"errorBoundary": {
+		"title": "出了点问题",
+		"message": "发生了意外错误。请尝试重新加载页面。"
+	},
+	"snipFallback": {
+		"title": "编辑器错误",
+		"message": "编辑器遇到错误。请尝试重新加载。"
+	},
+	"errors": {
+		"slugEmpty": "slug 不能为空",
+		"slugTooLong": "slug 最多 {{max}} 个字符",
+		"slugInvalidChars": "slug 只能包含小写字母、数字和连字符"
+	},
+	"languageSwitcher": {
+		"label": "语言",
+		"en": "English",
+		"zh": "简体中文",
+		"id": "Bahasa Indonesia"
+	}
+}

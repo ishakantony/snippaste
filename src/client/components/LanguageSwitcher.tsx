@@ -5,7 +5,11 @@ import { Icon } from "@/client/Icon.js";
 import i18n, { STORAGE_KEY } from "@/client/i18n/index.js";
 import { cn } from "@/client/lib/cn.js";
 
-const LANGUAGES = [{ code: "en", label: "English" }] as const;
+const LANGUAGES = [
+	{ code: "en", label: "English" },
+	{ code: "zh", label: "简体中文" },
+	{ code: "id", label: "Bahasa Indonesia" },
+] as const;
 
 interface LanguageSwitcherProps {
 	variant?: ButtonProps["variant"];

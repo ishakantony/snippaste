@@ -1,0 +1,99 @@
+{
+	"common": {
+		"cancel": "Batal",
+		"confirm": "Konfirmasi",
+		"reloadPage": "Muat ulang halaman",
+		"lightMode": "mode terang",
+		"darkMode": "mode gelap",
+		"toggleTheme": "Ubah tema"
+	},
+	"landing": {
+		"heading1": "Bagikan teks.",
+		"heading2": "Instan.",
+		"description": "Buat snip, dapatkan link. Bagikan cuplikan kode, catatan, atau apapun dalam teks polos — tanpa daftar, tanpa pengaturan.",
+		"tagPlain": "Teks polos saja",
+		"tagInstant": "Link instan",
+		"tagNoAccount": "Tanpa akun",
+		"tagExpiry": "Kedaluwarsa 30 hari",
+		"newSnip": "Snip baru",
+		"formDesc": "Anda akan langsung mendapatkan URL yang bisa dibagikan. Mulai ketik di editor.",
+		"snipName": "Nama snip",
+		"placeholder": "cth. konfigurasi-saya (opsional)",
+		"helper": "Kosongkan untuk mendapatkan ID acak",
+		"createSnip": "Buat snip",
+		"disclaimer": "Snip bersifat publik. Jangan menempelkan data sensitif. Konten akan kedaluwarsa dan dihapus setelah 30 hari.",
+		"featureInstantLabel": "Instan",
+		"featureInstantDesc": "URL yang bisa dibagikan dalam satu klik",
+		"featurePlainLabel": "Teks polos",
+		"featurePlainDesc": "Tanpa markup, tanpa keruwetan",
+		"featureEphemeralLabel": "Sementara",
+		"featureEphemeralDesc": "Snip kedaluwarsa setelah 30 hari"
+	},
+	"toolbar": {
+		"home": "Beranda",
+		"unsavedChanges": "Perubahan belum disimpan",
+		"copyUrl": "Salin URL",
+		"qrCode": "Kode QR",
+		"qr": "QR",
+		"copy": "Salin",
+		"save": "Simpan",
+		"clear": "Hapus",
+		"refresh": "Segarkan"
+	},
+	"status": {
+		"saving": "menyimpan…",
+		"autoSaved": "tersimpan otomatis",
+		"offline": "offline",
+		"tooLarge": "terlalu besar",
+		"ready": "siap",
+		"justNow": "baru saja",
+		"secondsAgo": "{{count}} dtk lalu",
+		"minutesAgo": "{{count}} mnt lalu",
+		"hoursAgo": "{{count}} jam lalu",
+		"lines_one": "{{count}} baris",
+		"lines_other": "{{count}} baris",
+		"chars_one": "{{count}} karakter",
+		"chars_other": "{{count}} karakter",
+		"plainText": "teks polos"
+	},
+	"editor": {
+		"pageTitle": "{{slug}} — Snippaste",
+		"copiedUrl": "URL disalin: /s/{{slug}}",
+		"copiedClipboard": "Disalin ke clipboard",
+		"saved": "Tersimpan",
+		"snipCleared": "Snip dihapus",
+		"reloaded": "Dimuat ulang",
+		"loadError": "kesalahan muat — tidak dapat terhubung ke server",
+		"remoteChanges": "Perubahan remote tersedia.",
+		"confirmClearMessage": "Ini akan menghapus semua konten dalam snip ini. Tindakan ini tidak bisa dibatalkan.",
+		"confirmClearLabel": "Hapus",
+		"confirmRefreshMessage": "Muat ulang versi terakhir yang disimpan? Perubahan yang belum disimpan akan hilang.",
+		"confirmRefreshLabel": "Segarkan",
+		"areYouSure": "Apakah Anda yakin?"
+	},
+	"qrModal": {
+		"heading": "Kode QR",
+		"qrCopied": "Kode QR disalin ke clipboard",
+		"downloadPng": "Unduh PNG",
+		"copyImage": "Salin gambar"
+	},
+	"errorBoundary": {
+		"title": "Terjadi kesalahan",
+		"message": "Terjadi kesalahan tak terduga. Silakan coba muat ulang halaman."
+	},
+	"snipFallback": {
+		"title": "Kesalahan editor",
+		"message": "Editor mengalami kesalahan. Coba muat ulang."
+	},
+	"errors": {
+		"slugEmpty": "slug tidak boleh kosong",
+		"slugTooLong": "slug maksimal {{max}} karakter",
+		"slugInvalidChars": "slug hanya boleh berisi huruf kecil, angka, dan tanda hubung"
+	},
+	"languageSwitcher": {
+		"label": "Bahasa",
+		"en": "English",
+		"zh": "简体中文",
+		"id": "Bahasa Indonesia"
+	}
+}
