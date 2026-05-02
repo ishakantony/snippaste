@@ -1,0 +1,97 @@
+{
+	"common": {
+		"cancel": "Cancel",
+		"confirm": "Confirm",
+		"reloadPage": "Reload page",
+		"lightMode": "light mode",
+		"darkMode": "dark mode",
+		"toggleTheme": "Toggle theme"
+	},
+	"landing": {
+		"heading1": "Share text.",
+		"heading2": "Instantly.",
+		"description": "Create a snip, get a link. Share code snippets, notes, or anything in plain text — no signup, no setup.",
+		"tagPlain": "Plain text only",
+		"tagInstant": "Instant links",
+		"tagNoAccount": "No account",
+		"tagExpiry": "30-day expiry",
+		"newSnip": "New snip",
+		"formDesc": "You'll get a shareable URL right away. Start typing in the editor.",
+		"snipName": "Snip name",
+		"placeholder": "e.g. my-config (optional)",
+		"helper": "Leave blank to get a random ID",
+		"createSnip": "Create snip",
+		"disclaimer": "Snips are public. Do not paste sensitive data. Content expires and is removed after 30 days.",
+		"featureInstantLabel": "Instant",
+		"featureInstantDesc": "Shareable URL in one click",
+		"featurePlainLabel": "Plain text",
+		"featurePlainDesc": "No markup, no clutter",
+		"featureEphemeralLabel": "Ephemeral",
+		"featureEphemeralDesc": "Snips expire after 30 days"
+	},
+	"toolbar": {
+		"home": "Home",
+		"unsavedChanges": "Unsaved changes",
+		"copyUrl": "Copy URL",
+		"qrCode": "QR Code",
+		"qr": "QR",
+		"copy": "Copy",
+		"save": "Save",
+		"clear": "Clear",
+		"refresh": "Refresh"
+	},
+	"status": {
+		"saving": "saving…",
+		"autoSaved": "auto-saved",
+		"offline": "offline",
+		"tooLarge": "too large",
+		"ready": "ready",
+		"justNow": "just now",
+		"secondsAgo": "{{count}}s ago",
+		"minutesAgo": "{{count}}m ago",
+		"hoursAgo": "{{count}}h ago",
+		"lines_one": "{{count}} line",
+		"lines_other": "{{count}} lines",
+		"chars_one": "{{count}} char",
+		"chars_other": "{{count}} chars",
+		"plainText": "plain text"
+	},
+	"editor": {
+		"pageTitle": "{{slug}} — Snippaste",
+		"copiedUrl": "Copied URL: /s/{{slug}}",
+		"copiedClipboard": "Copied to clipboard",
+		"saved": "Saved",
+		"snipCleared": "Snip cleared",
+		"reloaded": "Reloaded",
+		"loadError": "load error — could not reach server",
+		"remoteChanges": "Remote changes available.",
+		"confirmClearMessage": "This will erase all content in this snip. This cannot be undone.",
+		"confirmClearLabel": "Clear",
+		"confirmRefreshMessage": "Reload the last saved version? Any unsaved changes will be lost.",
+		"confirmRefreshLabel": "Refresh",
+		"areYouSure": "Are you sure?"
+	},
+	"qrModal": {
+		"heading": "QR Code",
+		"qrCopied": "QR code copied to clipboard",
+		"downloadPng": "Download PNG",
+		"copyImage": "Copy image"
+	},
+	"errorBoundary": {
+		"title": "Something went wrong",
+		"message": "An unexpected error occurred. Please try reloading the page."
+	},
+	"snipFallback": {
+		"title": "Editor error",
+		"message": "The editor encountered an error. Try reloading."
+	},
+	"errors": {
+		"slugEmpty": "slug must not be empty",
+		"slugTooLong": "slug must be at most {{max}} characters",
+		"slugInvalidChars": "slug may only contain lowercase letters, digits, and hyphens"
+	},
+	"languageSwitcher": {
+		"label": "Language",
+		"en": "English"
+	}
+}

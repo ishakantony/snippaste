@@ -1,4 +1,5 @@
 import { useEffect, useRef } from "react";
+import { useTranslation } from "react-i18next";
 import { Button } from "@/client/components/ui/Button.js";
 import { Icon } from "@/client/Icon.js";
 import { createQrCode } from "@/client/lib/qrCode.js";
@@ -13,6 +14,7 @@ export interface QrModalProps {
 export function QrModal({ url, slug, onClose, onToast }: QrModalProps) {
 	const qrRef = useRef<HTMLDivElement>(null);
 	const qrInstanceRef = useRef<ReturnType<typeof createQrCode> | null>(null);
+	const { t } = useTranslation();
 
 	useEffect(() => {
 		if (!qrRef.current) return;
@@ -44,7 +46,7 @@ export function QrModal({ url, slug, onClose, onToast }: QrModalProps) {
 		const blob =
 			raw instanceof Blob ? raw : new Blob([raw as unknown as BlobPart]);
 		await navigator.clipboard.write([new ClipboardItem({ "image/png": blob })]);
-		onToast("QR code copied to clipboard");
+		onToast(t("qrModal.qrCopied"));
 	}
 
 	return (
@@ -63,7 +65,9 @@ export function QrModal({ url, slug, onClose, onToast }: QrModalProps) {
 				<div className="flex items-center justify-between w-full">
 					<div className="flex items-center gap-2">
 						<Icon name="qr" size={14} color="var(--accent)" />
-						<span className="text-sm font-semibold text-fg">QR Code</span>
+						<span className="text-sm font-semibold text-fg">
+							{t("qrModal.heading")}
+						</span>
 					</div>
 					<button
 						type="button"
@@ -89,7 +93,7 @@ export function QrModal({ url, slug, onClose, onToast }: QrModalProps) {
 						className="flex-1"
 						onClick={handleDownload}
 					>
-						Download PNG
+						{t("qrModal.downloadPng")}
 					</Button>
 					<Button
 						variant="ghost"
@@ -97,7 +101,7 @@ export function QrModal({ url, slug, onClose, onToast }: QrModalProps) {
 						className="flex-1 border border-border-2"
 						onClick={handleCopy}
 					>
-						Copy image
+						{t("qrModal.copyImage")}
 					</Button>
 				</div>
 			</div>

@@ -3,6 +3,7 @@ import { EditorState } from "@codemirror/state";
 import { oneDark } from "@codemirror/theme-one-dark";
 import { EditorView, keymap, lineNumbers } from "@codemirror/view";
 import { useEffect, useRef, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { useParams } from "react-router-dom";
 import {
 	AutosaveController,
@@ -11,6 +12,7 @@ import {
 import { ConfirmDialog } from "@/client/ConfirmDialog.js";
 import { getClientId } from "@/client/clientId.js";
 import { QrModal } from "@/client/components/QrModal.js";
+import { useDocumentLanguage } from "@/client/hooks/useDocumentLanguage.js";
 import { StatusBar } from "@/client/StatusBar.js";
 import { subscribe as subscribeStream } from "@/client/snipStream.js";
 import { ToastProvider, useToast } from "@/client/Toast.js";
@@ -97,6 +99,9 @@ function SnipPageInner() {
 	const { theme } = useTheme();
 	const dark = theme === "dark";
 	const toast = useToast();
+	const { t } = useTranslation();
+
+	useDocumentLanguage(slug);
 
 	const [loadError, setLoadError] = useState(false);
 	const [saveState, setSaveState] = useState<AutosaveState>({ status: "idle" });
@@ -119,11 +124,6 @@ function SnipPageInner() {
 	// update, refresh, clear) — suppresses the autosave trigger so we don't
 	// PUT remote content back to the server.
 	const applyingRef = useRef<boolean>(false);
-
-	// Page title
-	useEffect(() => {
-		document.title = `${slug} — Snippaste`;
-	}, [slug]);
 
 	// Autosave controller
 	useEffect(() => {
@@ -271,7 +271,7 @@ function SnipPageInner() {
 	function handleCopyUrl() {
 		const url = `${window.location.origin}/s/${slug}`;
 		navigator.clipboard.writeText(url).catch(() => {});
-		toast.show(`Copied URL: /s/${slug}`);
+		toast.show(t("editor.copiedUrl", { slug }));
 	}
 
 	function handleQr() {
@@ -284,12 +284,12 @@ function SnipPageInner() {
 
 	function handleCopyContent() {
 		navigator.clipboard.writeText(getContent()).catch(() => {});
-		toast.show("Copied to clipboard");
+		toast.show(t("editor.copiedClipboard"));
 	}
 
 	function handleSave() {
 		controllerRef.current?.flush();
-		toast.show("Saved");
+		toast.show(t("editor.saved"));
 	}
 
 	function handleClear() {
@@ -299,7 +299,7 @@ function SnipPageInner() {
 	function doClear() {
 		applyContent("");
 		setConfirmClear(false);
-		toast.show("Snip cleared");
+		toast.show(t("editor.snipCleared"));
 	}
 
 	function handleRefresh() {
@@ -321,7 +321,7 @@ function SnipPageInner() {
 			.then((data) => {
 				applyContent(data?.content ?? "", { silent: true });
 				setRemoteChanged(false);
-				toast.show("Reloaded");
+				toast.show(t("editor.reloaded"));
 			})
 			.catch(() => {
 				setLoadError(true);
@@ -346,19 +346,19 @@ function SnipPageInner() {
 
 			{loadError && (
 				<div className="px-4 py-1.5 bg-danger/10 border-b border-danger/30 font-mono text-xs tracking-wide text-danger shrink-0">
-					load error — could not reach server
+					{t("editor.loadError")}
 				</div>
 			)}
 
 			{remoteChanged && (
 				<div className="px-4 py-1 bg-accent-soft-10 border-b border-accent-soft-18 text-xs text-accent-hover shrink-0 flex items-center gap-2">
-					<span>Remote changes available.</span>
+					<span>{t("editor.remoteChanges")}</span>
 					<button
 						type="button"
 						className="bg-transparent border border-accent-soft-20 text-accent-hover px-2 py-0.5 rounded-5 text-xs font-medium cursor-pointer"
 						onClick={handleRefresh}
 					>
-						Refresh
+						{t("toolbar.refresh")}
 					</button>
 				</div>
 			)}
@@ -374,8 +374,8 @@ function SnipPageInner() {
 
 			{confirmClear && (
 				<ConfirmDialog
-					message="This will erase all content in this snip. This cannot be undone."
-					confirmLabel="Clear"
+					message={t("editor.confirmClearMessage")}
+					confirmLabel={t("editor.confirmClearLabel")}
 					onConfirm={doClear}
 					onCancel={() => setConfirmClear(false)}
 				/>
@@ -383,8 +383,8 @@ function SnipPageInner() {
 
 			{confirmRefresh && (
 				<ConfirmDialog
-					message="Reload the last saved version? Any unsaved changes will be lost."
-					confirmLabel="Refresh"
+					message={t("editor.confirmRefreshMessage")}
+					confirmLabel={t("editor.confirmRefreshLabel")}
 					onConfirm={doRefresh}
 					onCancel={() => setConfirmRefresh(false)}
 				/>

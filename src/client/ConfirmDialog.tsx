@@ -1,4 +1,5 @@
 import { useEffect } from "react";
+import { useTranslation } from "react-i18next";
 import { Button } from "@/client/components/ui/Button.js";
 
 export interface ConfirmDialogProps {
@@ -10,10 +11,13 @@ export interface ConfirmDialogProps {
 
 export function ConfirmDialog({
 	message,
-	confirmLabel = "Confirm",
+	confirmLabel,
 	onConfirm,
 	onCancel,
 }: ConfirmDialogProps) {
+	const { t } = useTranslation();
+	const label = confirmLabel ?? t("common.confirm");
+
 	useEffect(() => {
 		function onKey(e: KeyboardEvent) {
 			if (e.key === "Escape") onCancel();
@@ -29,11 +33,13 @@ export function ConfirmDialog({
 			aria-modal="true"
 		>
 			<div className="bg-modal-bg border border-border-2 rounded-xl w-85 p-6 shadow-[0_8px_40px_rgba(0,0,0,0.5)]">
-				<div className="text-sm font-semibold text-fg mb-2">Are you sure?</div>
+				<div className="text-sm font-semibold text-fg mb-2">
+					{t("editor.areYouSure")}
+				</div>
 				<div className="text-sm text-fg-2 leading-relaxed mb-5">{message}</div>
 				<div className="flex gap-2 justify-end">
 					<Button variant="ghost" size="md" onClick={onCancel}>
-						Cancel
+						{t("common.cancel")}
 					</Button>
 					<Button
 						variant="danger"
@@ -41,7 +47,7 @@ export function ConfirmDialog({
 						className="bg-danger text-white font-semibold hover:bg-danger/90"
 						onClick={onConfirm}
 					>
-						{confirmLabel}
+						{label}
 					</Button>
 				</div>
 			</div>

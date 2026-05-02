@@ -10,21 +10,15 @@ export const SlugValidator = {
 		const slug = input.trim().toLowerCase();
 
 		if (slug.length === 0) {
-			return { ok: false, reason: "slug must not be empty" };
+			return { ok: false, reason: "slugEmpty" };
 		}
 
 		if (slug.length > MAX_LENGTH) {
-			return {
-				ok: false,
-				reason: `slug must be at most ${MAX_LENGTH} characters`,
-			};
+			return { ok: false, reason: "slugTooLong" };
 		}
 
 		if (!VALID_SLUG_RE.test(slug)) {
-			return {
-				ok: false,
-				reason: "slug may only contain lowercase letters, digits, and hyphens",
-			};
+			return { ok: false, reason: "slugInvalidChars" };
 		}
 
 		return { ok: true, slug };

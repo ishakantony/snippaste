@@ -4,12 +4,9 @@ export const slugSchema = z
 	.string()
 	.trim()
 	.toLowerCase()
-	.min(1, "slug must not be empty")
-	.max(64, "slug must be at most 64 characters")
-	.regex(
-		/^[a-z0-9-]+$/,
-		"slug may only contain lowercase letters, digits, and hyphens",
-	);
+	.min(1, "slugEmpty")
+	.max(64, "slugTooLong")
+	.regex(/^[a-z0-9-]+$/, "slugInvalidChars");
 
 export const snipPutBodySchema = z.object({
 	content: z.string(),

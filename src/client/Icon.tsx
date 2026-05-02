@@ -3,6 +3,7 @@ import {
 	Check,
 	Clock,
 	Copy,
+	Globe,
 	Home,
 	Link,
 	type LucideProps,
@@ -35,6 +36,7 @@ const ICONS: Record<string, React.FC<LucideProps>> = {
 	home: Home,
 	x: X,
 	qr: QrCode,
+	globe: Globe,
 };
 
 export interface IconProps {
