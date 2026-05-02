@@ -1,7 +1,7 @@
 # syntax=docker/dockerfile:1
 
 # ── build stage ───────────────────────────────────────────────────────────────
-FROM node:24-slim AS build
+FROM node:25-slim AS build
 
 WORKDIR /app
 
@@ -24,7 +24,7 @@ RUN npx tsc -p tsconfig.server.json
 RUN npm prune --omit=dev
 
 # ── runtime stage ─────────────────────────────────────────────────────────────
-FROM node:24-slim AS runtime
+FROM node:25-slim AS runtime
 
 ENV NODE_ENV=production
 
