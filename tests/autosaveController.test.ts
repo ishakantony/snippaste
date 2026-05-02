@@ -445,3 +445,66 @@ describe("AutosaveController", () => {
 		});
 	});
 });
+
+describe("AutosaveController — enabled flag", () => {
+	function makeController(opts: { enabled?: boolean } = {}) {
+		const timeouts: Array<{ fn: () => void; ms: number }> = [];
+		const fakeSetTimeout = vi.fn((fn: () => void, ms: number) => {
+			timeouts.push({ fn, ms });
+			return timeouts.length;
+		});
+		const fakeClearTimeout = vi.fn();
+		const states: AutosaveState[] = [];
+
+		const { fakeFetch } = makeFakeFetch([{ ok: true }]);
+
+		const controller = new AutosaveController({
+			fetch: fakeFetch,
+			setTimeout: fakeSetTimeout,
+			clearTimeout: fakeClearTimeout,
+			dateNow: () => 0,
+			url: "/api/snips/test",
+			...opts,
+		});
+
+		controller.subscribe((s) => states.push(s));
+		return { controller, states, timeouts, fakeFetch };
+	}
+
+	it("defaults to enabled (backward compatible)", () => {
+		const { controller, states } = makeController();
+		controller.onChange("hello");
+		expect(states.at(-1)).toEqual({ status: "dirty" });
+	});
+
+	it("when disabled, onChange sets dirty but does not start timer", () => {
+		const { controller, states, timeouts } = makeController({ enabled: false });
+		controller.onChange("hello");
+
+		expect(states.at(-1)).toEqual({ status: "dirty" });
+		expect(timeouts).toHaveLength(0);
+	});
+
+	it("when disabled, flush still triggers immediate save", async () => {
+		const { controller, states, fakeFetch } = makeController({
+			enabled: false,
+		});
+		controller.onChange("hello");
+		controller.flush();
+
+		expect(states.at(-1)).toEqual({ status: "saving" });
+		expect(fakeFetch).toHaveBeenCalledTimes(1);
+
+		await Promise.resolve();
+		expect(states.at(-1)).toEqual({ status: "saved", timestamp: 0 });
+	});
+
+	it("when disabled, multiple onChange calls do not start timer", () => {
+		const { controller, timeouts } = makeController({ enabled: false });
+		controller.onChange("a");
+		controller.onChange("b");
+		controller.onChange("c");
+
+		expect(timeouts).toHaveLength(0);
+	});
+});

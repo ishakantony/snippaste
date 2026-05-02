@@ -9,6 +9,7 @@ export const envBoolSchema = z.preprocess((val) => {
 export const featureFlagsSchema = z.object({
 	qrCode: z.boolean().default(true),
 	languageSwitcher: z.boolean().default(true),
+	autoSave: z.boolean().default(true),
 });
 
 export type FeatureFlags = z.infer<typeof featureFlagsSchema>;

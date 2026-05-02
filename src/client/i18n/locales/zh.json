@@ -8,6 +8,7 @@
 		"toggleTheme": "切换主题"
 	},
 	"landing": {
+		"pageTitle": "Snippaste",
 		"heading1": "分享文本。",
 		"heading2": "即刻分享。",
 		"description": "创建一个 snip，获取链接。分享代码片段、笔记或任何纯文本内容——无需注册，无需设置。",
@@ -38,11 +39,14 @@
 		"copy": "复制",
 		"save": "保存",
 		"clear": "清除",
-		"refresh": "刷新"
+		"refresh": "刷新",
+		"settings": "设置"
 	},
 	"status": {
 		"saving": "保存中…",
 		"autoSaved": "已自动保存",
+		"unsaved": "未保存",
+		"saved": "已保存",
 		"offline": "离线",
 		"tooLarge": "内容过大",
 		"ready": "就绪",
@@ -54,7 +58,10 @@
 		"lines_other": "{{count}} 行",
 		"chars_one": "{{count}} 个字符",
 		"chars_other": "{{count}} 个字符",
-		"plainText": "纯文本"
+		"plainText": "纯文本",
+		"expired": "已过期",
+		"daysLeft_one": "剩余 {{count}} 天",
+		"daysLeft_other": "剩余 {{count}} 天"
 	},
 	"editor": {
 		"pageTitle": "{{slug}} — Snippaste",
@@ -89,6 +96,11 @@
 		"slugEmpty": "slug 不能为空",
 		"slugTooLong": "slug 最多 {{max}} 个字符",
 		"slugInvalidChars": "slug 只能包含小写字母、数字和连字符"
+	},
+	"settings": {
+		"title": "设置",
+		"autoSave": "自动保存",
+		"autoSaveDescription": "输入时自动保存"
 	},
 	"languageSwitcher": {
 		"label": "语言",

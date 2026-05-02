@@ -13,6 +13,7 @@ import {
 	RefreshCw,
 	Save,
 	Scissors,
+	Settings,
 	Shield,
 	Sun,
 	Trash2,
@@ -39,6 +40,7 @@ const ICONS: Record<string, React.FC<LucideProps>> = {
 	qr: QrCode,
 	globe: Globe,
 	calendar: Calendar,
+	settings: Settings,
 };
 
 export interface IconProps {

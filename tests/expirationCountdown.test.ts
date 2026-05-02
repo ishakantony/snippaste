@@ -7,7 +7,7 @@ describe("getExpirationInfo", () => {
 		const updatedAt = now - 24 * 60 * 60 * 1000; // 1 day ago
 		const info = getExpirationInfo(updatedAt, now);
 		expect(info.daysRemaining).toBe(29);
-		expect(info.text).toBe("29d left");
+		expect(info.isExpired).toBe(false);
 		expect(info.color).toBe("green");
 	});
 
@@ -16,7 +16,7 @@ describe("getExpirationInfo", () => {
 		const updatedAt = now - 25 * 24 * 60 * 60 * 1000; // 25 days ago
 		const info = getExpirationInfo(updatedAt, now);
 		expect(info.daysRemaining).toBe(5);
-		expect(info.text).toBe("5d left");
+		expect(info.isExpired).toBe(false);
 		expect(info.color).toBe("yellow");
 	});
 
@@ -25,7 +25,7 @@ describe("getExpirationInfo", () => {
 		const updatedAt = now - 28 * 24 * 60 * 60 * 1000; // 28 days ago
 		const info = getExpirationInfo(updatedAt, now);
 		expect(info.daysRemaining).toBe(2);
-		expect(info.text).toBe("2d left");
+		expect(info.isExpired).toBe(false);
 		expect(info.color).toBe("red");
 	});
 
@@ -34,7 +34,7 @@ describe("getExpirationInfo", () => {
 		const updatedAt = now - 30 * 24 * 60 * 60 * 1000;
 		const info = getExpirationInfo(updatedAt, now);
 		expect(info.daysRemaining).toBe(0);
-		expect(info.text).toBe("expired");
+		expect(info.isExpired).toBe(true);
 		expect(info.color).toBe("red");
 	});
 
@@ -43,7 +43,7 @@ describe("getExpirationInfo", () => {
 		const updatedAt = now - 31 * 24 * 60 * 60 * 1000;
 		const info = getExpirationInfo(updatedAt, now);
 		expect(info.daysRemaining).toBe(-1);
-		expect(info.text).toBe("expired");
+		expect(info.isExpired).toBe(true);
 		expect(info.color).toBe("red");
 	});
 

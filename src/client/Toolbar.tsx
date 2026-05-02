@@ -1,13 +1,17 @@
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Link } from "react-router-dom";
-import type { AutosaveState } from "@/client/autosaveController.js";
+import {
+	AUTOSAVE_STATUS,
+	type AutosaveState,
+} from "@/client/autosaveController.js";
 import { LanguageSwitcher } from "@/client/components/LanguageSwitcher.js";
 import { Button } from "@/client/components/ui/Button.js";
 import { Pill } from "@/client/components/ui/Pill.js";
 import { useFeatureFlag } from "@/client/featureFlagsContext.js";
 import { Icon } from "@/client/Icon.js";
 import { getExpirationInfo } from "@/client/lib/expirationCountdown.js";
+import { THEME } from "@/client/theme.js";
 import { useTheme } from "@/client/themeContext.js";
 
 function relativeTime(
@@ -22,23 +26,43 @@ function relativeTime(
 	return t("status.hoursAgo", { count: Math.floor(diff / 3600) });
 }
 
-function StatusPill({ state }: { state: AutosaveState }) {
+function StatusPill({
+	state,
+	autoSaveEnabled,
+}: {
+	state: AutosaveState;
+	autoSaveEnabled: boolean;
+}) {
 	const { t } = useTranslation();
-	const isSaving = state.status === "saving" || state.status === "dirty";
+	const isSaving =
+		state.status === AUTOSAVE_STATUS.SAVING ||
+		state.status === AUTOSAVE_STATUS.DIRTY;
 
 	let label: string;
 	let timeLabel: string | null = null;
-	if (state.status === "saving" || state.status === "dirty") {
-		label = t("status.saving");
-	} else if (state.status === "saved") {
-		label = t("status.autoSaved");
-		timeLabel = relativeTime(state.timestamp, t);
-	} else if (state.status === "offline") {
-		label = t("status.offline");
-	} else if (state.status === "too_large") {
-		label = t("status.tooLarge");
-	} else {
-		label = t("status.ready");
+	switch (state.status) {
+		case AUTOSAVE_STATUS.SAVING:
+		case AUTOSAVE_STATUS.DIRTY: {
+			label = autoSaveEnabled ? t("status.saving") : t("status.unsaved");
+			break;
+		}
+		case AUTOSAVE_STATUS.SAVED: {
+			label = autoSaveEnabled ? t("status.autoSaved") : t("status.saved");
+			timeLabel = relativeTime(state.timestamp, t);
+			break;
+		}
+		case AUTOSAVE_STATUS.OFFLINE: {
+			label = t("status.offline");
+			break;
+		}
+		case AUTOSAVE_STATUS.TOO_LARGE: {
+			label = t("status.tooLarge");
+			break;
+		}
+		default: {
+			label = t("status.ready");
+			break;
+		}
 	}
 
 	return (
@@ -61,6 +85,7 @@ function StatusPill({ state }: { state: AutosaveState }) {
 }
 
 function ExpirationPill({ updatedAt }: { updatedAt: number }) {
+	const { t } = useTranslation();
 	const [info, setInfo] = useState(() =>
 		getExpirationInfo(updatedAt, Date.now()),
 	);
@@ -79,6 +104,10 @@ function ExpirationPill({ updatedAt }: { updatedAt: number }) {
 		red: "var(--danger)",
 	};
 
+	const text = info.isExpired
+		? t("status.expired")
+		: t("status.daysLeft", { count: info.daysRemaining });
+
 	return (
 		<Pill variant="default">
 			<Icon name="calendar" size={11} color={colorMap[info.color]} />
@@ -86,7 +115,7 @@ function ExpirationPill({ updatedAt }: { updatedAt: number }) {
 				className="text-xs font-medium whitespace-nowrap"
 				style={{ color: colorMap[info.color] }}
 			>
-				{info.text}
+				{text}
 			</span>
 		</Pill>
 	);
@@ -103,6 +132,9 @@ export interface ToolbarProps {
 	onClear: () => void;
 	onRefresh: () => void;
 	onQr: () => void;
+	onSettings: () => void;
+	autoSaveEnabled: boolean;
+	autoSaveFeatureEnabled: boolean;
 }
 
 export function Toolbar({
@@ -116,10 +148,13 @@ export function Toolbar({
 	onClear,
 	onRefresh,
 	onQr,
+	onSettings,
+	autoSaveEnabled,
+	autoSaveFeatureEnabled,
 }: ToolbarProps) {
 	const { theme, toggle } = useTheme();
 	const { t } = useTranslation();
-	const dark = theme === "dark";
+	const dark = theme === THEME.DARK;
 	const qrEnabled = useFeatureFlag("qrCode");
 	const langEnabled = useFeatureFlag("languageSwitcher");
 
@@ -156,7 +191,7 @@ export function Toolbar({
 					/>
 				)}
 
-				<StatusPill state={saveState} />
+				<StatusPill state={saveState} autoSaveEnabled={autoSaveEnabled} />
 			</div>
 
 			{updatedAt !== undefined && (
@@ -244,6 +279,21 @@ export function Toolbar({
 								size="sm"
 								className="rounded-none border-none px-2"
 							/>
+							<div className="w-px h-5 bg-border-2 shrink-0" />
+						</>
+					)}
+					{autoSaveFeatureEnabled && (
+						<>
+							<Button
+								variant="ghost"
+								size="sm"
+								className="rounded-none border-none px-2"
+								onClick={onSettings}
+								aria-label={t("toolbar.settings")}
+								title={t("toolbar.settings")}
+							>
+								<Icon name="settings" size={13} />
+							</Button>
 							<div className="w-px h-5 bg-border-2 shrink-0" />
 						</>
 					)}

@@ -12,7 +12,7 @@ export function useDocumentLanguage(slug?: string) {
 		if (slug !== undefined) {
 			document.title = t("editor.pageTitle", { slug });
 		} else {
-			document.title = "Snippaste";
+			document.title = t("landing.pageTitle");
 		}
 	}, [slug, t]);
 }

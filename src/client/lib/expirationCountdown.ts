@@ -1,6 +1,6 @@
 export interface ExpirationInfo {
 	daysRemaining: number;
-	text: string;
+	isExpired: boolean;
 	color: "green" | "yellow" | "red";
 }
 
@@ -21,7 +21,5 @@ export function getExpirationInfo(
 		color = "red";
 	}
 
-	const text = daysRemaining > 0 ? `${daysRemaining}d left` : "expired";
-
-	return { daysRemaining, text, color };
+	return { daysRemaining, isExpired: daysRemaining <= 0, color };
 }

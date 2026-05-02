@@ -8,6 +8,7 @@
 		"toggleTheme": "Ubah tema"
 	},
 	"landing": {
+		"pageTitle": "Snippaste",
 		"heading1": "Bagikan teks.",
 		"heading2": "Instan.",
 		"description": "Buat snip, dapatkan link. Bagikan cuplikan kode, catatan, atau apapun dalam teks polos — tanpa daftar, tanpa pengaturan.",
@@ -38,11 +39,14 @@
 		"copy": "Salin",
 		"save": "Simpan",
 		"clear": "Hapus",
-		"refresh": "Segarkan"
+		"refresh": "Segarkan",
+		"settings": "Pengaturan"
 	},
 	"status": {
 		"saving": "menyimpan…",
 		"autoSaved": "tersimpan otomatis",
+		"unsaved": "belum disimpan",
+		"saved": "tersimpan",
 		"offline": "offline",
 		"tooLarge": "terlalu besar",
 		"ready": "siap",
@@ -54,7 +58,10 @@
 		"lines_other": "{{count}} baris",
 		"chars_one": "{{count}} karakter",
 		"chars_other": "{{count}} karakter",
-		"plainText": "teks polos"
+		"plainText": "teks polos",
+		"expired": "kedaluwarsa",
+		"daysLeft_one": "{{count}} hari tersisa",
+		"daysLeft_other": "{{count}} hari tersisa"
 	},
 	"editor": {
 		"pageTitle": "{{slug}} — Snippaste",
@@ -89,6 +96,11 @@
 		"slugEmpty": "slug tidak boleh kosong",
 		"slugTooLong": "slug maksimal {{max}} karakter",
 		"slugInvalidChars": "slug hanya boleh berisi huruf kecil, angka, dan tanda hubung"
+	},
+	"settings": {
+		"title": "Pengaturan",
+		"autoSave": "Simpan otomatis",
+		"autoSaveDescription": "Simpan secara otomatis saat Anda mengetik"
 	},
 	"languageSwitcher": {
 		"label": "Bahasa",

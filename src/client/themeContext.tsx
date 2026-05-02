@@ -9,6 +9,7 @@ import {
 	applyTheme,
 	loadTheme,
 	saveTheme,
+	THEME,
 	type Theme,
 } from "@/client/theme.js";
 
@@ -30,7 +31,7 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
 	}, [theme]);
 
 	function toggle() {
-		setTheme((t) => (t === "dark" ? "light" : "dark"));
+		setTheme((t) => (t === THEME.DARK ? THEME.LIGHT : THEME.DARK));
 	}
 
 	return (

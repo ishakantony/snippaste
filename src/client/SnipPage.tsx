@@ -2,21 +2,32 @@ import { defaultKeymap } from "@codemirror/commands";
 import { EditorState } from "@codemirror/state";
 import { oneDark } from "@codemirror/theme-one-dark";
 import { EditorView, keymap, lineNumbers } from "@codemirror/view";
-import { lazy, Suspense, useEffect, useRef, useState } from "react";
+import {
+	lazy,
+	Suspense,
+	useCallback,
+	useEffect,
+	useRef,
+	useState,
+} from "react";
 import { useTranslation } from "react-i18next";
 import { useParams } from "react-router-dom";
+import { useAutoSaveSettings } from "@/client/autoSaveSettingsContext.js";
 import {
+	AUTOSAVE_STATUS,
 	AutosaveController,
 	type AutosaveState,
 } from "@/client/autosaveController.js";
 import { ConfirmDialog } from "@/client/ConfirmDialog.js";
 import { getClientId } from "@/client/clientId.js";
+import { SettingsModal } from "@/client/components/SettingsModal.js";
 import { useFeatureFlag } from "@/client/featureFlagsContext.js";
 import { useDocumentLanguage } from "@/client/hooks/useDocumentLanguage.js";
 import { StatusBar } from "@/client/StatusBar.js";
 import { subscribe as subscribeStream } from "@/client/snipStream.js";
 import { ToastProvider, useToast } from "@/client/Toast.js";
 import { Toolbar } from "@/client/Toolbar.js";
+import { THEME } from "@/client/theme.js";
 import { useTheme } from "@/client/themeContext.js";
 
 const QrModal = lazy(() =>
@@ -103,20 +114,26 @@ function SnipPageInner() {
 	const { name } = useParams<{ name: string }>();
 	const slug = name ?? "untitled";
 	const { theme } = useTheme();
-	const dark = theme === "dark";
+	const dark = theme === THEME.DARK;
 	const toast = useToast();
 	const { t } = useTranslation();
 	const qrEnabled = useFeatureFlag("qrCode");
+	const autoSaveFeatureEnabled = useFeatureFlag("autoSave");
+	const { enabled: autoSaveEnabled, toggle: toggleAutoSave } =
+		useAutoSaveSettings();
 
 	useDocumentLanguage(slug);
 
 	const [loadError, setLoadError] = useState(false);
-	const [saveState, setSaveState] = useState<AutosaveState>({ status: "idle" });
+	const [saveState, setSaveState] = useState<AutosaveState>({
+		status: AUTOSAVE_STATUS.IDLE,
+	});
 	const [content, setContent] = useState("");
 	const [confirmClear, setConfirmClear] = useState(false);
 	const [confirmRefresh, setConfirmRefresh] = useState(false);
 	const [remoteChanged, setRemoteChanged] = useState(false);
 	const [showQr, setShowQr] = useState(false);
+	const [showSettings, setShowSettings] = useState(false);
 	const [updatedAt, setUpdatedAt] = useState<number | undefined>(undefined);
 
 	const controllerRef = useRef<AutosaveController | null>(null);
@@ -142,6 +159,7 @@ function SnipPageInner() {
 			dateNow: () => Date.now(),
 			url: `/api/snips/${encodeURIComponent(slug)}`,
 			clientId: clientIdRef.current,
+			enabled: autoSaveEnabled,
 		});
 
 		controllerRef.current = controller;
@@ -152,7 +170,7 @@ function SnipPageInner() {
 			unsub();
 			controllerRef.current = null;
 		};
-	}, [slug]);
+	}, [slug, autoSaveEnabled]);
 
 	// CodeMirror editor — re-create on theme change to apply new tokens.
 	// docRef survives across the cleanup so content persists through the rebuild.
@@ -237,7 +255,8 @@ function SnipPageInner() {
 				setUpdatedAt(event.updatedAt);
 				if (event.clientId === myClientId) return; // self-echo
 				const status = controllerRef.current?.getState().status;
-				const isLocallyDirty = status === "dirty" || status === "saving";
+				const isLocallyDirty =
+					status === AUTOSAVE_STATUS.DIRTY || status === AUTOSAVE_STATUS.SAVING;
 
 				if (isLocallyDirty) {
 					setRemoteChanged(true);
@@ -265,6 +284,43 @@ function SnipPageInner() {
 
 		return () => unsub();
 	}, [slug]);
+
+	// beforeunload warning when auto-save is off and there are unsaved changes
+	useEffect(() => {
+		if (autoSaveEnabled) return;
+
+		function onBeforeUnload(e: BeforeUnloadEvent) {
+			const status = controllerRef.current?.getState().status;
+			if (
+				status === AUTOSAVE_STATUS.DIRTY ||
+				status === AUTOSAVE_STATUS.SAVING
+			) {
+				e.preventDefault();
+				e.returnValue = "";
+			}
+		}
+
+		window.addEventListener("beforeunload", onBeforeUnload);
+		return () => window.removeEventListener("beforeunload", onBeforeUnload);
+	}, [autoSaveEnabled]);
+
+	const handleSave = useCallback(() => {
+		controllerRef.current?.flush();
+		toast.show(t("editor.saved"));
+	}, [toast, t]);
+
+	// Ctrl+S / Cmd+S to manually save when auto-save is off
+	useEffect(() => {
+		function onKeyDown(e: KeyboardEvent) {
+			if ((e.ctrlKey || e.metaKey) && e.key === "s") {
+				e.preventDefault();
+				handleSave();
+			}
+		}
+
+		window.addEventListener("keydown", onKeyDown);
+		return () => window.removeEventListener("keydown", onKeyDown);
+	}, [handleSave]);
 
 	function getContent(): string {
 		return editorViewRef.current?.state.doc.toString() ?? "";
@@ -300,11 +356,6 @@ function SnipPageInner() {
 	function handleCopyContent() {
 		navigator.clipboard.writeText(getContent()).catch(() => {});
 		toast.show(t("editor.copiedClipboard"));
-	}
-
-	function handleSave() {
-		controllerRef.current?.flush();
-		toast.show(t("editor.saved"));
 	}
 
 	function handleClear() {
@@ -343,7 +394,9 @@ function SnipPageInner() {
 			});
 	}
 
-	const isDirty = saveState.status === "dirty" || saveState.status === "saving";
+	const isDirty =
+		saveState.status === AUTOSAVE_STATUS.DIRTY ||
+		saveState.status === AUTOSAVE_STATUS.SAVING;
 
 	return (
 		<div className="flex flex-col h-screen bg-bg">
@@ -358,6 +411,9 @@ function SnipPageInner() {
 				onClear={handleClear}
 				onRefresh={handleRefresh}
 				onQr={handleQr}
+				onSettings={() => setShowSettings(true)}
+				autoSaveEnabled={autoSaveEnabled}
+				autoSaveFeatureEnabled={autoSaveFeatureEnabled}
 			/>
 
 			{loadError && (
@@ -415,6 +471,15 @@ function SnipPageInner() {
 						onToast={toast.show}
 					/>
 				</Suspense>
+			)}
+
+			{autoSaveFeatureEnabled && (
+				<SettingsModal
+					open={showSettings}
+					enabled={autoSaveEnabled}
+					onToggle={toggleAutoSave}
+					onClose={() => setShowSettings(false)}
+				/>
 			)}
 		</div>
 	);

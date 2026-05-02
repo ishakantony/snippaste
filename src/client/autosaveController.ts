@@ -2,13 +2,22 @@
 // States: Idle | Dirty | Saving | Saved | Offline
 // All side-effectful dependencies are injected for testability.
 
+export const AUTOSAVE_STATUS = {
+	IDLE: "idle",
+	DIRTY: "dirty",
+	SAVING: "saving",
+	SAVED: "saved",
+	OFFLINE: "offline",
+	TOO_LARGE: "too_large",
+} as const;
+
 export type AutosaveState =
-	| { status: "idle" }
-	| { status: "dirty" }
-	| { status: "saving" }
-	| { status: "saved"; timestamp: number }
-	| { status: "offline" }
-	| { status: "too_large" };
+	| { status: typeof AUTOSAVE_STATUS.IDLE }
+	| { status: typeof AUTOSAVE_STATUS.DIRTY }
+	| { status: typeof AUTOSAVE_STATUS.SAVING }
+	| { status: typeof AUTOSAVE_STATUS.SAVED; timestamp: number }
+	| { status: typeof AUTOSAVE_STATUS.OFFLINE }
+	| { status: typeof AUTOSAVE_STATUS.TOO_LARGE };
 
 export type FetchLike = (
 	url: string,
@@ -28,10 +37,12 @@ export interface AutosaveControllerDeps {
 	debounceMs?: number;
 	/** Optional per-tab identifier; when set, included in every PUT body for self-echo filtering. */
 	clientId?: string;
+	/** When false, onChange tracks text and sets dirty state but never auto-saves. flush() still works. Default true. */
+	enabled?: boolean;
 }
 
 export class AutosaveController {
-	private state: AutosaveState = { status: "idle" };
+	private state: AutosaveState = { status: AUTOSAVE_STATUS.IDLE };
 	private listeners: Array<(state: AutosaveState) => void> = [];
 	private debounceTimer: number | null = null;
 	private pendingText: string | null = null;
@@ -44,6 +55,7 @@ export class AutosaveController {
 	private readonly url: string;
 	private readonly debounceMs: number;
 	private readonly clientId: string | undefined;
+	private readonly enabled: boolean;
 
 	constructor(deps: AutosaveControllerDeps) {
 		this.fetch = deps.fetch;
@@ -53,11 +65,12 @@ export class AutosaveController {
 		this.url = deps.url;
 		this.debounceMs = deps.debounceMs ?? 800;
 		this.clientId = deps.clientId;
+		this.enabled = deps.enabled ?? true;
 	}
 
 	/** Bypass the debounce timer and save immediately if dirty. No-op otherwise. */
 	flush(): void {
-		if (this.state.status !== "dirty") return;
+		if (this.state.status !== AUTOSAVE_STATUS.DIRTY) return;
 		if (this.debounceTimer !== null) {
 			this.clearTimeout(this.debounceTimer);
 			this.debounceTimer = null;
@@ -85,26 +98,28 @@ export class AutosaveController {
 		const s = this.state.status;
 
 		if (
-			s === "idle" ||
-			s === "dirty" ||
-			s === "saved" ||
-			s === "offline" ||
-			s === "too_large"
+			s === AUTOSAVE_STATUS.IDLE ||
+			s === AUTOSAVE_STATUS.DIRTY ||
+			s === AUTOSAVE_STATUS.SAVED ||
+			s === AUTOSAVE_STATUS.OFFLINE ||
+			s === AUTOSAVE_STATUS.TOO_LARGE
 		) {
-			// Reset/start debounce timer
-			if (this.debounceTimer !== null) {
-				this.clearTimeout(this.debounceTimer ?? undefined);
-				this.debounceTimer = null;
+			if (this.enabled) {
+				// Reset/start debounce timer
+				if (this.debounceTimer !== null) {
+					this.clearTimeout(this.debounceTimer ?? undefined);
+					this.debounceTimer = null;
+				}
+				this.debounceTimer = this.setTimeout(() => {
+					this.debounceTimer = null;
+					this.startSave(this.latestText);
+				}, this.debounceMs);
 			}
-			this.debounceTimer = this.setTimeout(() => {
-				this.debounceTimer = null;
-				this.startSave(this.latestText);
-			}, this.debounceMs);
 
-			if (s !== "dirty") {
-				this.setState({ status: "dirty" });
+			if (s !== AUTOSAVE_STATUS.DIRTY) {
+				this.setState({ status: AUTOSAVE_STATUS.DIRTY });
 			}
-		} else if (s === "saving") {
+		} else if (s === AUTOSAVE_STATUS.SAVING) {
 			// Don't start a new request — store as pending
 			this.pendingText = text;
 		}
@@ -118,7 +133,7 @@ export class AutosaveController {
 	}
 
 	private startSave(text: string): void {
-		this.setState({ status: "saving" });
+		this.setState({ status: AUTOSAVE_STATUS.SAVING });
 
 		const body: { content: string; clientId?: string } = { content: text };
 		if (this.clientId !== undefined) body.clientId = this.clientId;
@@ -153,7 +168,10 @@ export class AutosaveController {
 			// There was a change while saving — save the pending content immediately
 			this.startSave(pending);
 		} else {
-			this.setState({ status: "saved", timestamp: this.dateNow() });
+			this.setState({
+				status: AUTOSAVE_STATUS.SAVED,
+				timestamp: this.dateNow(),
+			});
 		}
 	}
 
@@ -167,7 +185,7 @@ export class AutosaveController {
 			this.latestText = pending;
 		}
 
-		this.setState({ status: "offline" });
+		this.setState({ status: AUTOSAVE_STATUS.OFFLINE });
 	}
 
 	private handlePayloadTooLarge(): void {
@@ -178,6 +196,6 @@ export class AutosaveController {
 			this.latestText = pending;
 		}
 
-		this.setState({ status: "too_large" });
+		this.setState({ status: AUTOSAVE_STATUS.TOO_LARGE });
 	}
 }

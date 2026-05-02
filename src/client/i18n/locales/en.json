@@ -8,6 +8,7 @@
 		"toggleTheme": "Toggle theme"
 	},
 	"landing": {
+		"pageTitle": "Snippaste",
 		"heading1": "Share text.",
 		"heading2": "Instantly.",
 		"description": "Create a snip, get a link. Share code snippets, notes, or anything in plain text — no signup, no setup.",
@@ -38,11 +39,14 @@
 		"copy": "Copy",
 		"save": "Save",
 		"clear": "Clear",
-		"refresh": "Refresh"
+		"refresh": "Refresh",
+		"settings": "Settings"
 	},
 	"status": {
 		"saving": "saving…",
 		"autoSaved": "auto-saved",
+		"unsaved": "unsaved",
+		"saved": "saved",
 		"offline": "offline",
 		"tooLarge": "too large",
 		"ready": "ready",
@@ -54,7 +58,10 @@
 		"lines_other": "{{count}} lines",
 		"chars_one": "{{count}} char",
 		"chars_other": "{{count}} chars",
-		"plainText": "plain text"
+		"plainText": "plain text",
+		"expired": "expired",
+		"daysLeft_one": "{{count}}d left",
+		"daysLeft_other": "{{count}}d left"
 	},
 	"editor": {
 		"pageTitle": "{{slug}} — Snippaste",
@@ -89,6 +96,11 @@
 		"slugEmpty": "slug must not be empty",
 		"slugTooLong": "slug must be at most {{max}} characters",
 		"slugInvalidChars": "slug may only contain lowercase letters, digits, and hyphens"
+	},
+	"settings": {
+		"title": "Settings",
+		"autoSave": "Auto-save",
+		"autoSaveDescription": "Save automatically as you type"
 	},
 	"languageSwitcher": {
 		"label": "Language",

@@ -25,6 +25,7 @@ if (spaShell) {
 	const flags = featureFlagsSchema.parse({
 		qrCode: env.FEATURE_QR_CODE,
 		languageSwitcher: env.FEATURE_LANGUAGE_SWITCHER,
+		autoSave: env.FEATURE_AUTO_SAVE,
 	});
 	spaShell = spaShell.replace(
 		FLAGS_PLACEHOLDER,

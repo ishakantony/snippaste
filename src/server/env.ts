@@ -8,6 +8,7 @@ export const env = createEnv({
 		DB_PATH: z.string().default("/data/snippaste.db"),
 		FEATURE_QR_CODE: envBoolSchema,
 		FEATURE_LANGUAGE_SWITCHER: envBoolSchema,
+		FEATURE_AUTO_SAVE: envBoolSchema,
 	},
 	runtimeEnv: process.env,
 });

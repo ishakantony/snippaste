@@ -6,6 +6,7 @@ import { Button } from "@/client/components/ui/Button.js";
 import { useFeatureFlag } from "@/client/featureFlagsContext.js";
 import { Icon } from "@/client/Icon.js";
 import { SlugGenerator } from "@/client/slugGenerator.js";
+import { THEME } from "@/client/theme.js";
 import { useTheme } from "@/client/themeContext.js";
 import { SlugValidator } from "@/shared/slugValidator.js";
 
@@ -15,7 +16,7 @@ export function LandingPage() {
 	const navigate = useNavigate();
 	const { theme, toggle } = useTheme();
 	const { t } = useTranslation();
-	const dark = theme === "dark";
+	const dark = theme === THEME.DARK;
 	const langEnabled = useFeatureFlag("languageSwitcher");
 
 	const FEATURES = [

@@ -1,4 +1,9 @@
-export type Theme = "light" | "dark";
+export const THEME = {
+	LIGHT: "light",
+	DARK: "dark",
+} as const;
+
+export type Theme = typeof THEME.LIGHT | typeof THEME.DARK;
 
 const STORAGE_KEY = "snip-theme";
 
@@ -9,8 +14,8 @@ export interface ThemeStorage {
 
 export function loadTheme(storage: ThemeStorage): Theme {
 	const raw = storage.getItem(STORAGE_KEY);
-	if (raw === "light" || raw === "dark") return raw;
-	return "dark";
+	if (raw === THEME.LIGHT || raw === THEME.DARK) return raw;
+	return THEME.DARK;
 }
 
 export function saveTheme(storage: ThemeStorage, theme: Theme): void {
