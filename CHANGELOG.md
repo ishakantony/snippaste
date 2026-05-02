@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [0.1.2](https://github.com/ishakantony/snippaste/compare/v0.1.1...v0.1.2) (2026-05-02)
+
+
+### Features
+
+* add i18n support with language switcher and group toolbar controls ([17426e6](https://github.com/ishakantony/snippaste/commit/17426e660c55c87768e780fbc0dc6535167e6c05))
+* **flags:** add client-side feature flag system via env vars ([a15d3e0](https://github.com/ishakantony/snippaste/commit/a15d3e0c4b60dacd5b430f11601c11c59598a5fc))
+* **i18n:** add simplified chinese and indonesian translations ([3b1f6cb](https://github.com/ishakantony/snippaste/commit/3b1f6cb7bdf4a0d5ebd7f09faaf92bc00ff5e467))
+
 ## 0.1.1 (2026-05-02)
 
 
