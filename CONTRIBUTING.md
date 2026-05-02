@@ -7,7 +7,7 @@ npm install
 npm run dev
 ```
 
-This starts both the Vite dev server (port 5173) and the Hono API server (port 7777).
+This starts both the Vite dev server (port 7776) and the Hono API server (port 7777).
 
 ## Development workflow
 

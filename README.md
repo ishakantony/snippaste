@@ -11,7 +11,7 @@ npm install
 npm run dev
 ```
 
-- **Frontend**: http://localhost:5173 (Vite dev server)
+- **Frontend**: http://localhost:7776 (Vite dev server)
 - **API**: http://localhost:7777 (Hono server, proxied through Vite in dev)
 
 ## Tech stack
@@ -42,7 +42,7 @@ src/
 
 ```sh
 npm run dev          # Start client + server concurrently
-npm run dev:client   # Vite dev server only (port 5173)
+npm run dev:client   # Vite dev server only (port 7776)
 npm run dev:server   # Hono server only (port 7777)
 npm test             # Run Vitest unit tests
 npm run typecheck    # TypeScript type checking

@@ -24,7 +24,7 @@ src/
 
 ```bash
 npm install          # Install dependencies
-npm run dev          # Start both client (5173) and server (7777)
+npm run dev          # Start both client (7776) and server (7777)
 npm run dev:client   # Start Vite dev server only
 npm run dev:server   # Start Hono server only
 npm test             # Run vitest unit tests
