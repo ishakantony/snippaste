@@ -102,6 +102,9 @@
 		"title": "编辑器错误",
 		"message": "编辑器遇到错误。请尝试重新加载。"
 	},
+	"snipLoading": {
+		"title": "正在加载编辑器..."
+	},
 	"errors": {
 		"slugEmpty": "slug 不能为空",
 		"slugTooLong": "slug 最多 {{max}} 个字符",

@@ -102,6 +102,9 @@
 		"title": "Kesalahan editor",
 		"message": "Editor mengalami kesalahan. Coba muat ulang."
 	},
+	"snipLoading": {
+		"title": "Memuat editor..."
+	},
 	"errors": {
 		"slugEmpty": "slug tidak boleh kosong",
 		"slugTooLong": "slug maksimal {{max}} karakter",

@@ -1,7 +1,8 @@
 import { lazy, Suspense } from "react";
 import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
 import { ErrorBoundary } from "@/client/components/ErrorBoundary.js";
-import { SnipPageFallback } from "@/client/components/SnipPageFallback.js";
+import { SnipPageErrorFallback } from "@/client/components/SnipPageErrorFallback.js";
+import { SnipPageLoadingFallback } from "@/client/components/SnipPageLoadingFallback.js";
 import { useDocumentLanguage } from "@/client/hooks/useDocumentLanguage.js";
 import { LandingPage } from "@/client/LandingPage.js";
 
@@ -22,8 +23,8 @@ export function App() {
 				<Route
 					path="/s/:name"
 					element={
-						<ErrorBoundary fallback={<SnipPageFallback />}>
-							<Suspense fallback={<SnipPageFallback />}>
+						<ErrorBoundary fallback={<SnipPageErrorFallback />}>
+							<Suspense fallback={<SnipPageLoadingFallback />}>
 								<SnipPage />
 							</Suspense>
 						</ErrorBoundary>

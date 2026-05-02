@@ -1,6 +1,6 @@
 import i18n from "@/client/i18n/index.js";
 
-export function SnipPageFallback() {
+export function SnipPageErrorFallback() {
 	const t = i18n.t.bind(i18n);
 	return (
 		<div className="flex min-h-screen items-center justify-center bg-gray-50 dark:bg-gray-900">

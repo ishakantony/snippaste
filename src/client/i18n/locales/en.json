@@ -102,6 +102,9 @@
 		"title": "Editor error",
 		"message": "The editor encountered an error. Try reloading."
 	},
+	"snipLoading": {
+		"title": "Loading editor..."
+	},
 	"errors": {
 		"slugEmpty": "slug must not be empty",
 		"slugTooLong": "slug must be at most {{max}} characters",
