@@ -9,6 +9,7 @@ export const AUTOSAVE_STATUS = {
 	SAVED: "saved",
 	OFFLINE: "offline",
 	TOO_LARGE: "too_large",
+	LOCKED: "locked",
 } as const;
 
 export type AutosaveState =
@@ -17,7 +18,8 @@ export type AutosaveState =
 	| { status: typeof AUTOSAVE_STATUS.SAVING }
 	| { status: typeof AUTOSAVE_STATUS.SAVED; timestamp: number }
 	| { status: typeof AUTOSAVE_STATUS.OFFLINE }
-	| { status: typeof AUTOSAVE_STATUS.TOO_LARGE };
+	| { status: typeof AUTOSAVE_STATUS.TOO_LARGE }
+	| { status: typeof AUTOSAVE_STATUS.LOCKED };
 
 export type FetchLike = (
 	url: string,
@@ -46,6 +48,7 @@ export class AutosaveController {
 	private listeners: Array<(state: AutosaveState) => void> = [];
 	private debounceTimer: number | null = null;
 	private pendingText: string | null = null;
+	private pendingInitialPassword: string | null = null;
 	private latestText = "";
 
 	private readonly fetch: FetchLike;
@@ -92,6 +95,10 @@ export class AutosaveController {
 		return this.state;
 	}
 
+	setInitialPassword(password: string | null): void {
+		this.pendingInitialPassword = password;
+	}
+
 	onChange(text: string): void {
 		this.latestText = text;
 
@@ -102,7 +109,8 @@ export class AutosaveController {
 			s === AUTOSAVE_STATUS.DIRTY ||
 			s === AUTOSAVE_STATUS.SAVED ||
 			s === AUTOSAVE_STATUS.OFFLINE ||
-			s === AUTOSAVE_STATUS.TOO_LARGE
+			s === AUTOSAVE_STATUS.TOO_LARGE ||
+			s === AUTOSAVE_STATUS.LOCKED
 		) {
 			if (this.enabled) {
 				// Reset/start debounce timer
@@ -135,8 +143,13 @@ export class AutosaveController {
 	private startSave(text: string): void {
 		this.setState({ status: AUTOSAVE_STATUS.SAVING });
 
-		const body: { content: string; clientId?: string } = { content: text };
+		const body: { content: string; clientId?: string; password?: string } = {
+			content: text,
+		};
 		if (this.clientId !== undefined) body.clientId = this.clientId;
+		if (this.pendingInitialPassword !== null) {
+			body.password = this.pendingInitialPassword;
+		}
 
 		this.fetch(this.url, {
 			method: "PUT",
@@ -146,6 +159,10 @@ export class AutosaveController {
 			(res) => {
 				if (res.status === 413) {
 					this.handlePayloadTooLarge();
+					return;
+				}
+				if (res.status === 401) {
+					this.handleLocked();
 					return;
 				}
 				if (!res.ok) {
@@ -168,6 +185,7 @@ export class AutosaveController {
 			// There was a change while saving — save the pending content immediately
 			this.startSave(pending);
 		} else {
+			this.pendingInitialPassword = null;
 			this.setState({
 				status: AUTOSAVE_STATUS.SAVED,
 				timestamp: this.dateNow(),
@@ -197,5 +215,16 @@ export class AutosaveController {
 		}
 
 		this.setState({ status: AUTOSAVE_STATUS.TOO_LARGE });
+	}
+
+	private handleLocked(): void {
+		const pending = this.pendingText;
+		this.pendingText = null;
+
+		if (pending !== null) {
+			this.latestText = pending;
+		}
+
+		this.setState({ status: AUTOSAVE_STATUS.LOCKED });
 	}
 }

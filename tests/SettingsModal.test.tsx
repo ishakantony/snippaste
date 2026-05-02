@@ -77,4 +77,55 @@ describe("SettingsModal", () => {
 
 		expect(screen.queryByRole("dialog")).toBeNull();
 	});
+
+	it("renders password protection controls when enabled", async () => {
+		const onSetPassword = vi.fn();
+		const onRemovePassword = vi.fn();
+		const onLock = vi.fn();
+		render(
+			<SettingsModal
+				open={true}
+				enabled={false}
+				onToggle={vi.fn()}
+				onClose={vi.fn()}
+				passwordProtectionEnabled={true}
+				isProtected={true}
+				onSetPassword={onSetPassword}
+				onRemovePassword={onRemovePassword}
+				onLock={onLock}
+			/>,
+		);
+
+		expect(screen.getByText(/password protection/i)).toBeDefined();
+		await userEvent.type(screen.getByLabelText(/new password/i), "new-pass");
+		await userEvent.click(
+			screen.getByRole("button", { name: /change password/i }),
+		);
+		expect(onSetPassword).toHaveBeenCalledWith("new-pass");
+
+		await userEvent.click(
+			screen.getByRole("button", { name: /remove protection/i }),
+		);
+		expect(onRemovePassword).toHaveBeenCalledTimes(1);
+
+		await userEvent.click(screen.getByRole("button", { name: /lock now/i }));
+		expect(onLock).toHaveBeenCalledTimes(1);
+	});
+
+	it("hides auto-save controls when the auto-save feature is disabled", () => {
+		render(
+			<SettingsModal
+				open={true}
+				enabled={false}
+				onToggle={vi.fn()}
+				onClose={vi.fn()}
+				autoSaveFeatureEnabled={false}
+				passwordProtectionEnabled={true}
+			/>,
+		);
+
+		expect(screen.queryByRole("switch")).toBeNull();
+		expect(screen.queryByText(/auto-save/i)).toBeNull();
+		expect(screen.getByText(/password protection/i)).toBeDefined();
+	});
 });

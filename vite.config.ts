@@ -17,6 +17,10 @@ function featureFlagsPlugin(envVars: Record<string, string>): Plugin {
 				languageSwitcher: envBoolSchema.parse(
 					envVars.FEATURE_LANGUAGE_SWITCHER,
 				),
+				autoSave: envBoolSchema.parse(envVars.FEATURE_AUTO_SAVE),
+				passwordProtection: envBoolSchema.parse(
+					envVars.FEATURE_PASSWORD_PROTECTION,
+				),
 			});
 			return html.replace(
 				FLAGS_PLACEHOLDER,

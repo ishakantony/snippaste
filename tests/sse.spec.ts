@@ -3,6 +3,8 @@ import { buildApp } from "@/server/routes.js";
 import { SnipBus, type SnipUpdate } from "@/server/snipBus.js";
 import { SnipStore } from "@/server/store.js";
 
+const TEST_SESSION_SECRET = "test-session-secret";
+
 describe("SSE / broadcast on PUT", () => {
 	let store: SnipStore;
 	let bus: SnipBus;
@@ -11,7 +13,7 @@ describe("SSE / broadcast on PUT", () => {
 	beforeEach(() => {
 		store = new SnipStore(":memory:");
 		bus = new SnipBus();
-		app = buildApp(store, { bus });
+		app = buildApp(store, { bus, sessionSecret: TEST_SESSION_SECRET });
 	});
 
 	afterEach(() => {
@@ -125,7 +127,7 @@ describe("SSE event stream", () => {
 	beforeEach(() => {
 		store = new SnipStore(":memory:");
 		bus = new SnipBus();
-		app = buildApp(store, { bus });
+		app = buildApp(store, { bus, sessionSecret: TEST_SESSION_SECRET });
 	});
 
 	afterEach(() => {
@@ -149,6 +151,36 @@ describe("SSE event stream", () => {
 
 		// Cancel the stream to release the request
 		if (res.body) await res.body.cancel();
+	});
+
+	it("GET /api/snips/:slug/events rejects protected snips until unlocked", async () => {
+		await app.fetch(
+			new Request("http://localhost/api/snips/protected-stream", {
+				method: "PUT",
+				headers: { "Content-Type": "application/json" },
+				body: JSON.stringify({ content: "secret", password: "open-sesame" }),
+			}),
+		);
+
+		const locked = await app.fetch(
+			new Request("http://localhost/api/snips/protected-stream/events"),
+		);
+		expect(locked.status).toBe(401);
+
+		const unlock = await app.fetch(
+			new Request("http://localhost/api/snips/protected-stream/unlock", {
+				method: "POST",
+				headers: { "Content-Type": "application/json" },
+				body: JSON.stringify({ password: "open-sesame" }),
+			}),
+		);
+		const unlocked = await app.fetch(
+			new Request("http://localhost/api/snips/protected-stream/events", {
+				headers: { Cookie: unlock.headers.get("set-cookie") ?? "" },
+			}),
+		);
+		expect(unlocked.status).toBe(200);
+		if (unlocked.body) await unlocked.body.cancel();
 	});
 
 	it("PUT after subscription delivers an update event on the stream", async () => {

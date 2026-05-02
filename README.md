@@ -57,6 +57,11 @@ npm run build        # Production build (outputs to dist/client/)
 |---|---|---|
 | `PORT` | `7777` | Server listen port |
 | `DB_PATH` | `/data/snippaste.db` | SQLite database path |
+| `FEATURE_QR_CODE` | `true` | Enable QR code modal in the editor |
+| `FEATURE_LANGUAGE_SWITCHER` | `true` | Enable language switcher in the toolbar |
+| `FEATURE_AUTO_SAVE` | `true` | Enable auto-save controls |
+| `FEATURE_PASSWORD_PROTECTION` | `true` | Enable password protection UI and management endpoints |
+| `SESSION_SECRET` | generated at startup | Secret used to sign unlock cookies. Set this in production so unlock sessions survive server restarts. |
 
 ## API routes
 
@@ -66,6 +71,10 @@ npm run build        # Production build (outputs to dist/client/)
 | GET | `/api/snips/:slug` | Get snippet |
 | PUT | `/api/snips/:slug` | Create/update snippet (max 1 MB) |
 | GET | `/api/snips/:slug/events` | SSE stream for real-time updates |
+| POST | `/api/snips/:slug/unlock` | Unlock a protected snippet |
+| POST | `/api/snips/:slug/lock` | Clear current browser unlock session |
+| PUT | `/api/snips/:slug/password` | Set or change snippet password |
+| DELETE | `/api/snips/:slug/password` | Remove snippet password |
 
 ---
 

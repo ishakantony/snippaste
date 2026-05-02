@@ -8,6 +8,9 @@ services:
       DB_PATH: /data/snippaste.db
       FEATURE_QR_CODE: "true"
       FEATURE_LANGUAGE_SWITCHER: "true"
+      FEATURE_AUTO_SAVE: "true"
+      FEATURE_PASSWORD_PROTECTION: "true"
+      SESSION_SECRET: "change-this-to-a-long-random-secret"
     volumes:
       - snipdata:/data
 

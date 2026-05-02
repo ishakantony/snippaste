@@ -75,6 +75,9 @@ Validated at server startup via `@t3-oss/env-core` + Zod in `src/server/env.ts`:
 | `DB_PATH` | `/data/snippaste.db` | SQLite database file path |
 | `FEATURE_QR_CODE` | `true` | Enable QR code modal in the editor |
 | `FEATURE_LANGUAGE_SWITCHER` | `true` | Enable language switcher in the toolbar |
+| `FEATURE_AUTO_SAVE` | `true` | Enable auto-save controls |
+| `FEATURE_PASSWORD_PROTECTION` | `true` | Enable password protection UI and management endpoints |
+| `SESSION_SECRET` | generated at startup | Secret used to sign unlock cookies. Set this in production so unlock sessions survive server restarts. |
 
 ## Guardrails
 

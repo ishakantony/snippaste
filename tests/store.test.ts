@@ -19,9 +19,31 @@ describe("SnipStore (in-memory SQLite)", () => {
 	it("upsert inserts, then updates the content", () => {
 		store.upsert("hello", "world");
 		expect(store.get("hello")?.content).toBe("world");
+		expect(store.get("hello")?.protected).toBe(false);
 
 		store.upsert("hello", "updated");
 		expect(store.get("hello")?.content).toBe("updated");
+	});
+
+	it("stores password metadata without exposing the password hash in get()", () => {
+		store.upsert("secret", "content", "encoded-hash");
+		const snip = store.get("secret");
+
+		expect(snip?.protected).toBe(true);
+		expect(typeof snip?.passwordUpdatedAt).toBe("number");
+		expect("passwordHash" in (snip ?? {})).toBe(false);
+		expect(store.getPasswordHash("secret")).toBe("encoded-hash");
+	});
+
+	it("can change and remove password protection", () => {
+		store.upsert("secret", "content", "old-hash");
+		store.setPassword("secret", "new-hash");
+		expect(store.get("secret")?.protected).toBe(true);
+		expect(store.getPasswordHash("secret")).toBe("new-hash");
+
+		store.removePassword("secret");
+		expect(store.get("secret")?.protected).toBe(false);
+		expect(store.getPasswordHash("secret")).toBeNull();
 	});
 
 	it("preserves created_at across updates", () => {

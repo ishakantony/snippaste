@@ -3,6 +3,7 @@ import { buildApp } from "@/server/routes.js";
 import { SnipStore } from "@/server/store.js";
 
 const SPA_SHELL = `<!doctype html><html><body><div id="root"></div></body></html>`;
+const TEST_SESSION_SECRET = "test-session-secret";
 
 describe("SPA fallback", () => {
 	let store: SnipStore;
@@ -10,7 +11,10 @@ describe("SPA fallback", () => {
 
 	beforeEach(() => {
 		store = new SnipStore(":memory:");
-		app = buildApp(store, { spaShell: SPA_SHELL });
+		app = buildApp(store, {
+			spaShell: SPA_SHELL,
+			sessionSecret: TEST_SESSION_SECRET,
+		});
 	});
 
 	afterEach(() => {

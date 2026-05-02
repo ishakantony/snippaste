@@ -12,6 +12,7 @@ describe("featureFlagsSchema", () => {
 			qrCode: true,
 			languageSwitcher: true,
 			autoSave: true,
+			passwordProtection: true,
 		});
 	});
 
@@ -20,11 +21,13 @@ describe("featureFlagsSchema", () => {
 			qrCode: true,
 			languageSwitcher: true,
 			autoSave: true,
+			passwordProtection: true,
 		});
 		expect(result).toEqual({
 			qrCode: true,
 			languageSwitcher: true,
 			autoSave: true,
+			passwordProtection: true,
 		});
 	});
 
@@ -33,11 +36,13 @@ describe("featureFlagsSchema", () => {
 			qrCode: false,
 			languageSwitcher: false,
 			autoSave: false,
+			passwordProtection: false,
 		});
 		expect(result).toEqual({
 			qrCode: false,
 			languageSwitcher: false,
 			autoSave: false,
+			passwordProtection: false,
 		});
 	});
 
@@ -47,6 +52,7 @@ describe("featureFlagsSchema", () => {
 			qrCode: false,
 			languageSwitcher: true,
 			autoSave: true,
+			passwordProtection: true,
 		});
 	});
 
@@ -59,6 +65,7 @@ describe("featureFlagsSchema", () => {
 			qrCode: true,
 			languageSwitcher: true,
 			autoSave: true,
+			passwordProtection: true,
 		});
 		expect("unknownFlag" in result).toBe(false);
 	});
@@ -68,6 +75,7 @@ describe("featureFlagsSchema", () => {
 			qrCode: true,
 			languageSwitcher: false,
 			autoSave: true,
+			passwordProtection: true,
 		};
 		expect(flags.qrCode).toBe(true);
 		expect(flags.languageSwitcher).toBe(false);
@@ -81,13 +89,14 @@ describe("FLAGS_PLACEHOLDER injection", () => {
 			qrCode: true,
 			languageSwitcher: false,
 			autoSave: true,
+			passwordProtection: true,
 		};
 		const result = html.replace(
 			FLAGS_PLACEHOLDER,
 			`<script>window.__FLAGS__ = ${JSON.stringify(flags)}</script>`,
 		);
 		expect(result).toBe(
-			`<!DOCTYPE html><head><script>window.__FLAGS__ = {"qrCode":true,"languageSwitcher":false,"autoSave":true}</script></head><body></body>`,
+			`<!DOCTYPE html><head><script>window.__FLAGS__ = {"qrCode":true,"languageSwitcher":false,"autoSave":true,"passwordProtection":true}</script></head><body></body>`,
 		);
 	});
 
@@ -97,6 +106,7 @@ describe("FLAGS_PLACEHOLDER injection", () => {
 			qrCode: true,
 			languageSwitcher: true,
 			autoSave: true,
+			passwordProtection: true,
 		};
 		const result = html.replace(
 			FLAGS_PLACEHOLDER,
@@ -110,6 +120,7 @@ describe("FLAGS_PLACEHOLDER injection", () => {
 			qrCode: false,
 			languageSwitcher: true,
 			autoSave: true,
+			passwordProtection: false,
 		};
 		const json = JSON.stringify(flags);
 		const parsed = featureFlagsSchema.parse(JSON.parse(json));

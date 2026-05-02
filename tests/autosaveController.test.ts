@@ -335,6 +335,40 @@ describe("AutosaveController", () => {
 	});
 
 	// -------------------------------------------------------------------------
+	it("401 response transitions to locked state", async () => {
+		const { controller, states } = makeController([{ ok: false, status: 401 }]);
+
+		controller.onChange("protected edit");
+		await vi.advanceTimersByTimeAsync(800);
+		await Promise.resolve();
+
+		expect(states.at(-1)).toEqual({ status: "locked" });
+	});
+
+	// -------------------------------------------------------------------------
+	it("includes a pending initial password on the next save only", async () => {
+		const { fakeFetch, calls } = makeFakeFetch([{ ok: true }, { ok: true }]);
+		const c = new AutosaveController({
+			fetch: fakeFetch,
+			...timerDeps(),
+			dateNow: () => 0,
+			url: "/api/snips/x",
+			debounceMs: 800,
+		});
+
+		c.setInitialPassword("open-sesame");
+		c.onChange("first");
+		await vi.advanceTimersByTimeAsync(800);
+		await Promise.resolve();
+		c.onChange("second");
+		await vi.advanceTimersByTimeAsync(800);
+		await Promise.resolve();
+
+		expect(JSON.parse(calls[0].body).password).toBe("open-sesame");
+		expect("password" in JSON.parse(calls[1].body)).toBe(false);
+	});
+
+	// -------------------------------------------------------------------------
 	it("includes clientId in PUT body when configured", async () => {
 		const { fakeFetch, calls } = makeFakeFetch([{ ok: true }]);
 		const c = new AutosaveController({

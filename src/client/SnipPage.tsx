@@ -3,6 +3,7 @@ import { EditorState } from "@codemirror/state";
 import { oneDark } from "@codemirror/theme-one-dark";
 import { EditorView, keymap, lineNumbers } from "@codemirror/view";
 import {
+	type FormEvent,
 	lazy,
 	Suspense,
 	useCallback,
@@ -119,8 +120,10 @@ function SnipPageInner() {
 	const { t } = useTranslation();
 	const qrEnabled = useFeatureFlag("qrCode");
 	const autoSaveFeatureEnabled = useFeatureFlag("autoSave");
+	const passwordProtectionEnabled = useFeatureFlag("passwordProtection");
 	const { enabled: autoSaveEnabled, toggle: toggleAutoSave } =
 		useAutoSaveSettings();
+	const autoSaveActive = autoSaveFeatureEnabled && autoSaveEnabled;
 
 	useDocumentLanguage(slug);
 
@@ -135,6 +138,10 @@ function SnipPageInner() {
 	const [showQr, setShowQr] = useState(false);
 	const [showSettings, setShowSettings] = useState(false);
 	const [updatedAt, setUpdatedAt] = useState<number | undefined>(undefined);
+	const [isLocked, setIsLocked] = useState(false);
+	const [isProtected, setIsProtected] = useState(false);
+	const [unlockPassword, setUnlockPassword] = useState("");
+	const [unlockError, setUnlockError] = useState<string | null>(null);
 
 	const controllerRef = useRef<AutosaveController | null>(null);
 	const editorContainerRef = useRef<HTMLDivElement>(null);
@@ -159,22 +166,26 @@ function SnipPageInner() {
 			dateNow: () => Date.now(),
 			url: `/api/snips/${encodeURIComponent(slug)}`,
 			clientId: clientIdRef.current,
-			enabled: autoSaveEnabled,
+			enabled: autoSaveActive,
 		});
 
 		controllerRef.current = controller;
 
-		const unsub = controller.subscribe((state) => setSaveState(state));
+		const unsub = controller.subscribe((state) => {
+			setSaveState(state);
+			if (state.status === AUTOSAVE_STATUS.LOCKED) setIsLocked(true);
+		});
 
 		return () => {
 			unsub();
 			controllerRef.current = null;
 		};
-	}, [slug, autoSaveEnabled]);
+	}, [slug, autoSaveActive]);
 
 	// CodeMirror editor — re-create on theme change to apply new tokens.
 	// docRef survives across the cleanup so content persists through the rebuild.
 	useEffect(() => {
+		if (isLocked) return;
 		if (!editorContainerRef.current) return;
 
 		const updateListener = EditorView.updateListener.of((update) => {
@@ -202,24 +213,33 @@ function SnipPageInner() {
 			view.destroy();
 			if (editorViewRef.current === view) editorViewRef.current = null;
 		};
-	}, [dark]);
+	}, [dark, isLocked]);
 
 	// Initial fetch
 	useEffect(() => {
 		setLoadError(false);
+		setUnlockError(null);
 
 		fetch(`/api/snips/${encodeURIComponent(slug)}`)
 			.then((res) => {
 				if (res.status === 404) return null;
+				if (res.status === 401) {
+					setIsLocked(true);
+					setIsProtected(true);
+					return null;
+				}
 				if (!res.ok) throw new Error("fetch failed");
 				return res.json() as Promise<{
 					slug: string;
 					content: string;
 					updatedAt: number;
+					protected: boolean;
 				}>;
 			})
 			.then((data) => {
 				if (!data) return;
+				setIsLocked(false);
+				setIsProtected(data.protected);
 				setUpdatedAt(data.updatedAt);
 				const view = editorViewRef.current;
 				if (!view) return;
@@ -243,6 +263,7 @@ function SnipPageInner() {
 
 	// SSE subscription — receive remote updates
 	useEffect(() => {
+		if (isLocked) return;
 		const myClientId = clientIdRef.current;
 
 		const unsub = subscribeStream(slug, {
@@ -283,11 +304,11 @@ function SnipPageInner() {
 		});
 
 		return () => unsub();
-	}, [slug]);
+	}, [slug, isLocked]);
 
 	// beforeunload warning when auto-save is off and there are unsaved changes
 	useEffect(() => {
-		if (autoSaveEnabled) return;
+		if (autoSaveActive) return;
 
 		function onBeforeUnload(e: BeforeUnloadEvent) {
 			const status = controllerRef.current?.getState().status;
@@ -302,7 +323,7 @@ function SnipPageInner() {
 
 		window.addEventListener("beforeunload", onBeforeUnload);
 		return () => window.removeEventListener("beforeunload", onBeforeUnload);
-	}, [autoSaveEnabled]);
+	}, [autoSaveActive]);
 
 	const handleSave = useCallback(() => {
 		controllerRef.current?.flush();
@@ -377,6 +398,10 @@ function SnipPageInner() {
 		fetch(`/api/snips/${encodeURIComponent(slug)}`)
 			.then((res) => {
 				if (res.status === 404) return null;
+				if (res.status === 401) {
+					setIsLocked(true);
+					return null;
+				}
 				if (!res.ok) throw new Error("fetch failed");
 				return res.json() as Promise<{
 					slug: string;
@@ -392,6 +417,78 @@ function SnipPageInner() {
 			.catch(() => {
 				setLoadError(true);
 			});
+	}
+
+	async function handleUnlock(e?: FormEvent) {
+		e?.preventDefault();
+		setUnlockError(null);
+		const res = await fetch(`/api/snips/${encodeURIComponent(slug)}/unlock`, {
+			method: "POST",
+			headers: { "Content-Type": "application/json" },
+			body: JSON.stringify({ password: unlockPassword }),
+		});
+		if (!res.ok) {
+			setUnlockError(
+				res.status === 429
+					? t("editor.unlockRateLimited")
+					: t("editor.unlockFailed"),
+			);
+			return;
+		}
+		setUnlockPassword("");
+		setIsLocked(false);
+		setIsProtected(true);
+		doRefresh();
+	}
+
+	async function handleSetPassword(password: string) {
+		if (updatedAt === undefined && !isProtected) {
+			controllerRef.current?.setInitialPassword(password);
+			setIsProtected(true);
+			toast.show(t("editor.protectionUpdated"));
+			return;
+		}
+
+		const res = await fetch(`/api/snips/${encodeURIComponent(slug)}/password`, {
+			method: "PUT",
+			headers: { "Content-Type": "application/json" },
+			body: JSON.stringify({ password }),
+		});
+		if (!res.ok) {
+			if (res.status === 401) setIsLocked(true);
+			setLoadError(true);
+			return;
+		}
+		await fetch(`/api/snips/${encodeURIComponent(slug)}/unlock`, {
+			method: "POST",
+			headers: { "Content-Type": "application/json" },
+			body: JSON.stringify({ password }),
+		});
+		setIsProtected(true);
+		toast.show(t("editor.protectionUpdated"));
+	}
+
+	async function handleRemovePassword() {
+		const res = await fetch(`/api/snips/${encodeURIComponent(slug)}/password`, {
+			method: "DELETE",
+		});
+		if (!res.ok) {
+			if (res.status === 401) setIsLocked(true);
+			setLoadError(true);
+			return;
+		}
+		controllerRef.current?.setInitialPassword(null);
+		setIsProtected(false);
+		toast.show(t("editor.protectionRemoved"));
+	}
+
+	async function handleLock() {
+		await fetch(`/api/snips/${encodeURIComponent(slug)}/lock`, {
+			method: "POST",
+		});
+		setIsLocked(isProtected);
+		setShowSettings(false);
+		toast.show(t("editor.lockedNow"));
 	}
 
 	const isDirty =
@@ -412,7 +509,7 @@ function SnipPageInner() {
 				onRefresh={handleRefresh}
 				onQr={handleQr}
 				onSettings={() => setShowSettings(true)}
-				autoSaveEnabled={autoSaveEnabled}
+				autoSaveEnabled={autoSaveActive}
 				autoSaveFeatureEnabled={autoSaveFeatureEnabled}
 			/>
 
@@ -435,12 +532,48 @@ function SnipPageInner() {
 				</div>
 			)}
 
-			<div className="flex-1 flex overflow-hidden">
-				<div
-					ref={editorContainerRef}
-					className="flex-1 overflow-hidden flex flex-col"
-				/>
-			</div>
+			{isLocked ? (
+				<div className="flex-1 flex items-center justify-center px-6">
+					<form
+						className="w-full max-w-sm bg-surface border border-border rounded-xl p-6 shadow-sm"
+						onSubmit={handleUnlock}
+					>
+						<h2 className="text-lg font-bold text-fg mb-2">
+							{t("editor.lockedTitle")}
+						</h2>
+						<p className="text-sm text-fg-3 mb-5">
+							{t("editor.lockedDescription", { slug })}
+						</p>
+						<label htmlFor="unlock-password" className="text-xs text-fg-2">
+							{t("editor.password")}
+						</label>
+						<input
+							id="unlock-password"
+							type="password"
+							value={unlockPassword}
+							onChange={(e) => setUnlockPassword(e.target.value)}
+							className="mt-1 w-full h-10 px-3 bg-input-bg border border-border-2 rounded-lg text-fg outline-none focus:border-accent"
+						/>
+						{unlockError && (
+							<div className="text-xs text-danger mt-2">{unlockError}</div>
+						)}
+						<button
+							type="submit"
+							className="mt-4 w-full h-10 rounded-lg bg-accent text-white text-sm font-semibold disabled:opacity-50"
+							disabled={unlockPassword.length < 4}
+						>
+							{t("editor.unlock")}
+						</button>
+					</form>
+				</div>
+			) : (
+				<div className="flex-1 flex overflow-hidden">
+					<div
+						ref={editorContainerRef}
+						className="flex-1 overflow-hidden flex flex-col"
+					/>
+				</div>
+			)}
 
 			<StatusBar content={content} />
 
@@ -473,12 +606,18 @@ function SnipPageInner() {
 				</Suspense>
 			)}
 
-			{autoSaveFeatureEnabled && (
+			{(autoSaveFeatureEnabled || passwordProtectionEnabled) && (
 				<SettingsModal
 					open={showSettings}
 					enabled={autoSaveEnabled}
 					onToggle={toggleAutoSave}
 					onClose={() => setShowSettings(false)}
+					autoSaveFeatureEnabled={autoSaveFeatureEnabled}
+					passwordProtectionEnabled={passwordProtectionEnabled}
+					isProtected={isProtected}
+					onSetPassword={handleSetPassword}
+					onRemovePassword={handleRemovePassword}
+					onLock={handleLock}
 				/>
 			)}
 		</div>

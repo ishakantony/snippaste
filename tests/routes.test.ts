@@ -2,13 +2,15 @@ import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import { buildApp } from "@/server/routes.js";
 import { SnipStore } from "@/server/store.js";
 
+const TEST_SESSION_SECRET = "test-session-secret";
+
 describe("Hono routes", () => {
 	let store: SnipStore;
 	let app: ReturnType<typeof buildApp>;
 
 	beforeEach(() => {
 		store = new SnipStore(":memory:");
-		app = buildApp(store);
+		app = buildApp(store, { sessionSecret: TEST_SESSION_SECRET });
 	});
 
 	afterEach(() => {
@@ -52,10 +54,238 @@ describe("Hono routes", () => {
 			slug: string;
 			content: string;
 			updatedAt: number;
+			protected: boolean;
 		};
 		expect(body.slug).toBe(slug);
 		expect(body.content).toBe(content);
 		expect(typeof body.updatedAt).toBe("number");
+		expect(body.protected).toBe(false);
+	});
+
+	it("protects a snip created with a password until it is unlocked", async () => {
+		const slug = "locked-snip";
+		const content = "secret content";
+
+		const putRes = await app.fetch(
+			new Request(`http://localhost/api/snips/${slug}`, {
+				method: "PUT",
+				headers: { "Content-Type": "application/json" },
+				body: JSON.stringify({ content, password: "open-sesame" }),
+			}),
+		);
+		expect(putRes.status).toBe(204);
+
+		const lockedGet = await app.fetch(
+			new Request(`http://localhost/api/snips/${slug}`),
+		);
+		expect(lockedGet.status).toBe(401);
+		expect(await lockedGet.json()).toEqual({ error: "locked" });
+
+		const wrongUnlock = await app.fetch(
+			new Request(`http://localhost/api/snips/${slug}/unlock`, {
+				method: "POST",
+				headers: { "Content-Type": "application/json" },
+				body: JSON.stringify({ password: "wrong-password" }),
+			}),
+		);
+		expect(wrongUnlock.status).toBe(401);
+
+		const unlock = await app.fetch(
+			new Request(`http://localhost/api/snips/${slug}/unlock`, {
+				method: "POST",
+				headers: { "Content-Type": "application/json" },
+				body: JSON.stringify({ password: "open-sesame" }),
+			}),
+		);
+		expect(unlock.status).toBe(204);
+		const cookie = unlock.headers.get("set-cookie");
+		expect(cookie).toContain("snip_unlock_locked-snip=");
+
+		const unlockedGet = await app.fetch(
+			new Request(`http://localhost/api/snips/${slug}`, {
+				headers: { Cookie: cookie ?? "" },
+			}),
+		);
+		expect(unlockedGet.status).toBe(200);
+		const body = (await unlockedGet.json()) as {
+			content: string;
+			protected: boolean;
+		};
+		expect(body.content).toBe(content);
+		expect(body.protected).toBe(true);
+	});
+
+	it("requires unlock for writes to protected snips and supports lock", async () => {
+		const slug = "write-locked";
+		await app.fetch(
+			new Request(`http://localhost/api/snips/${slug}`, {
+				method: "PUT",
+				headers: { "Content-Type": "application/json" },
+				body: JSON.stringify({ content: "first", password: "open-sesame" }),
+			}),
+		);
+
+		const lockedWrite = await app.fetch(
+			new Request(`http://localhost/api/snips/${slug}`, {
+				method: "PUT",
+				headers: { "Content-Type": "application/json" },
+				body: JSON.stringify({ content: "second" }),
+			}),
+		);
+		expect(lockedWrite.status).toBe(401);
+
+		const unlock = await app.fetch(
+			new Request(`http://localhost/api/snips/${slug}/unlock`, {
+				method: "POST",
+				headers: { "Content-Type": "application/json" },
+				body: JSON.stringify({ password: "open-sesame" }),
+			}),
+		);
+		const cookie = unlock.headers.get("set-cookie") ?? "";
+
+		const unlockedWrite = await app.fetch(
+			new Request(`http://localhost/api/snips/${slug}`, {
+				method: "PUT",
+				headers: { "Content-Type": "application/json", Cookie: cookie },
+				body: JSON.stringify({ content: "second" }),
+			}),
+		);
+		expect(unlockedWrite.status).toBe(204);
+
+		const lock = await app.fetch(
+			new Request(`http://localhost/api/snips/${slug}/lock`, {
+				method: "POST",
+				headers: { Cookie: cookie },
+			}),
+		);
+		expect(lock.status).toBe(204);
+		expect(lock.headers.get("set-cookie")).toContain("Max-Age=0");
+	});
+
+	it("changes and removes password protection for an unlocked snip", async () => {
+		const slug = "manage-password";
+		await app.fetch(
+			new Request(`http://localhost/api/snips/${slug}`, {
+				method: "PUT",
+				headers: { "Content-Type": "application/json" },
+				body: JSON.stringify({ content: "secret", password: "old-pass" }),
+			}),
+		);
+		const unlock = await app.fetch(
+			new Request(`http://localhost/api/snips/${slug}/unlock`, {
+				method: "POST",
+				headers: { "Content-Type": "application/json" },
+				body: JSON.stringify({ password: "old-pass" }),
+			}),
+		);
+		const cookie = unlock.headers.get("set-cookie") ?? "";
+
+		const change = await app.fetch(
+			new Request(`http://localhost/api/snips/${slug}/password`, {
+				method: "PUT",
+				headers: { "Content-Type": "application/json", Cookie: cookie },
+				body: JSON.stringify({ password: "new-pass" }),
+			}),
+		);
+		expect(change.status).toBe(204);
+
+		const oldCookieGet = await app.fetch(
+			new Request(`http://localhost/api/snips/${slug}`, {
+				headers: { Cookie: cookie },
+			}),
+		);
+		expect(oldCookieGet.status).toBe(401);
+
+		const newUnlock = await app.fetch(
+			new Request(`http://localhost/api/snips/${slug}/unlock`, {
+				method: "POST",
+				headers: { "Content-Type": "application/json" },
+				body: JSON.stringify({ password: "new-pass" }),
+			}),
+		);
+		const newCookie = newUnlock.headers.get("set-cookie") ?? "";
+
+		const remove = await app.fetch(
+			new Request(`http://localhost/api/snips/${slug}/password`, {
+				method: "DELETE",
+				headers: { Cookie: newCookie },
+			}),
+		);
+		expect(remove.status).toBe(204);
+
+		const publicGet = await app.fetch(
+			new Request(`http://localhost/api/snips/${slug}`),
+		);
+		expect(publicGet.status).toBe(200);
+		expect(((await publicGet.json()) as { protected: boolean }).protected).toBe(
+			false,
+		);
+	});
+
+	it("rate-limits repeated failed unlock attempts per snip and IP", async () => {
+		const slug = "rate-limited";
+		await app.fetch(
+			new Request(`http://localhost/api/snips/${slug}`, {
+				method: "PUT",
+				headers: { "Content-Type": "application/json" },
+				body: JSON.stringify({ content: "secret", password: "open-sesame" }),
+			}),
+		);
+
+		for (let i = 0; i < 5; i++) {
+			const res = await app.fetch(
+				new Request(`http://localhost/api/snips/${slug}/unlock`, {
+					method: "POST",
+					headers: {
+						"Content-Type": "application/json",
+						"x-forwarded-for": "203.0.113.10",
+					},
+					body: JSON.stringify({ password: "wrong" }),
+				}),
+			);
+			expect(res.status).toBe(401);
+		}
+
+		const limited = await app.fetch(
+			new Request(`http://localhost/api/snips/${slug}/unlock`, {
+				method: "POST",
+				headers: {
+					"Content-Type": "application/json",
+					"x-forwarded-for": "203.0.113.10",
+				},
+				body: JSON.stringify({ password: "open-sesame" }),
+			}),
+		);
+		expect(limited.status).toBe(429);
+	});
+
+	it("does not allow setting new passwords when the feature flag is disabled", async () => {
+		app = buildApp(store, { passwordProtectionEnabled: false });
+		const res = await app.fetch(
+			new Request("http://localhost/api/snips/flag-disabled", {
+				method: "PUT",
+				headers: { "Content-Type": "application/json" },
+				body: JSON.stringify({ content: "public", password: "ignored" }),
+			}),
+		);
+		expect(res.status).toBe(204);
+
+		const get = await app.fetch(
+			new Request("http://localhost/api/snips/flag-disabled"),
+		);
+		expect(get.status).toBe(200);
+		expect(((await get.json()) as { protected: boolean }).protected).toBe(
+			false,
+		);
+
+		const passwordEndpoint = await app.fetch(
+			new Request("http://localhost/api/snips/flag-disabled/password", {
+				method: "PUT",
+				headers: { "Content-Type": "application/json" },
+				body: JSON.stringify({ password: "new-pass" }),
+			}),
+		);
+		expect(passwordEndpoint.status).toBe(404);
 	});
 
 	it("GET /api/snips/:slug returns 400 for invalid slug", async () => {

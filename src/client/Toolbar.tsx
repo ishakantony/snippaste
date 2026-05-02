@@ -59,6 +59,10 @@ function StatusPill({
 			label = t("status.tooLarge");
 			break;
 		}
+		case AUTOSAVE_STATUS.LOCKED: {
+			label = t("status.locked");
+			break;
+		}
 		default: {
 			label = t("status.ready");
 			break;
@@ -157,6 +161,7 @@ export function Toolbar({
 	const dark = theme === THEME.DARK;
 	const qrEnabled = useFeatureFlag("qrCode");
 	const langEnabled = useFeatureFlag("languageSwitcher");
+	const passwordProtectionEnabled = useFeatureFlag("passwordProtection");
 
 	return (
 		<div className="flex items-center h-12 px-4 gap-3 bg-surface border-b border-border shrink-0 relative z-10">
@@ -282,7 +287,7 @@ export function Toolbar({
 							<div className="w-px h-5 bg-border-2 shrink-0" />
 						</>
 					)}
-					{autoSaveFeatureEnabled && (
+					{(autoSaveFeatureEnabled || passwordProtectionEnabled) && (
 						<>
 							<Button
 								variant="ghost"
