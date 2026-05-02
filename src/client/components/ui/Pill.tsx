@@ -15,7 +15,7 @@ export function Pill({
 			className={cn(
 				"inline-flex items-center gap-1.5 shrink-0",
 				{
-					"bg-accent-soft-10 border border-accent-soft-18 rounded-[5px] px-2 py-[3px]":
+					"bg-accent-soft-10 border border-accent-soft-18 rounded-5 px-2 py-0.75":
 						variant === "accent",
 					"bg-pill-bg border border-pill-bd rounded-full px-3 py-1 pointer-events-none":
 						variant === "default",

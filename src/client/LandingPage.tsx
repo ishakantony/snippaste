@@ -58,12 +58,12 @@ export function LandingPage() {
 				{dark ? "light mode" : "dark mode"}
 			</Button>
 
-			<div className="flex-1 flex flex-col justify-center px-[clamp(40px,6vw,80px)] py-[60px]">
+			<div className="flex-1 flex flex-col justify-center px-[clamp(40px,6vw,80px)] py-15">
 				<div className="flex items-center gap-2.5 mb-9">
-					<div className="w-9 h-9 rounded-[9px] bg-accent-soft-12 border border-accent-soft-20 flex items-center justify-center">
+					<div className="w-9 h-9 rounded-9 bg-accent-soft-12 border border-accent-soft-20 flex items-center justify-center">
 						<Icon name="scissors" size={17} color="var(--accent)" />
 					</div>
-					<span className="text-[13px] font-bold tracking-[0.06em] text-fg-3 uppercase">
+					<span className="text-sm font-bold tracking-[0.06em] text-fg-3 uppercase">
 						Snippaste
 					</span>
 				</div>
@@ -74,7 +74,7 @@ export function LandingPage() {
 					<span className="text-accent">Instantly.</span>
 				</h1>
 
-				<p className="text-base text-fg-2 leading-[1.7] max-w-[380px] mb-10">
+				<p className="text-base text-fg-2 leading-relaxed max-w-95 mb-10">
 					Create a snip, get a link. Share code snippets, notes, or anything in
 					plain text — no signup, no setup.
 				</p>
@@ -83,7 +83,7 @@ export function LandingPage() {
 					{TAGS.map((tag) => (
 						<span
 							key={tag}
-							className="text-[11px] font-medium px-[11px] py-[5px] rounded-full bg-accent-soft-10 text-accent-hover border border-accent-soft-18"
+							className="text-xs font-medium px-2.75 py-1.25 rounded-full bg-accent-soft-10 text-accent-hover border border-accent-soft-18"
 						>
 							{tag}
 						</span>
@@ -99,14 +99,14 @@ export function LandingPage() {
 						<div className="text-lg font-bold tracking-[-0.01em] text-fg mb-1.5">
 							New snip
 						</div>
-						<div className="text-[13px] text-fg-3 leading-relaxed">
+						<div className="text-sm text-fg-3 leading-relaxed">
 							You'll get a shareable URL right away. Start typing in the editor.
 						</div>
 					</div>
 
-					<div className="flex flex-col gap-[7px]">
+					<div className="flex flex-col gap-1.75">
 						<label
-							className="text-[11px] font-semibold text-fg-3 tracking-[0.07em] uppercase"
+							className="text-xs font-semibold text-fg-3 tracking-[0.07em] uppercase"
 							htmlFor="snip-name"
 						>
 							Snip name
@@ -120,12 +120,12 @@ export function LandingPage() {
 								setError(null);
 							}}
 							placeholder="e.g. my-config (optional)"
-							className="w-full h-11 px-3.5 bg-input-bg border border-border-2 rounded-lg text-fg text-[13px] font-mono outline-none transition-[border-color,box-shadow] duration-150 focus:border-accent focus:shadow-[0_0_0_3px_var(--accent-soft-18)] placeholder:text-fg-3 placeholder:opacity-65"
+							className="w-full h-11 px-3.5 bg-input-bg border border-border-2 rounded-lg text-fg text-sm font-mono outline-none transition-[border-color,box-shadow] duration-150 focus:border-accent focus:shadow-[0_0_0_3px_var(--accent-soft-18)] placeholder:text-fg-3 placeholder:opacity-65"
 							spellCheck={false}
 							autoCapitalize="off"
 							autoCorrect="off"
 						/>
-						<div className="text-[11px] text-fg-3">
+						<div className="text-xs text-fg-3">
 							Leave blank to get a random ID
 						</div>
 						{error && (
@@ -154,7 +154,7 @@ export function LandingPage() {
 						))}
 					</div>
 
-					<div className="text-[11px] text-fg-3 leading-[1.7] pt-1 border-t border-border">
+					<div className="text-xs text-fg-3 leading-relaxed pt-1 border-t border-border">
 						Snips are public. Do not paste sensitive data. Content expires and
 						is removed after 30 days.
 					</div>

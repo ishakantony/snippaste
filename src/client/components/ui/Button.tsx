@@ -28,12 +28,11 @@ export function Button({
 						variant === "ghost",
 					"bg-transparent border border-transparent text-fg-3 hover:bg-surface-2 hover:border-border-2":
 						variant === "icon",
-					"h-[30px] px-2.5 text-xs": size === "sm",
-					"h-[34px] px-4 text-[13px] rounded-[7px]": size === "md",
-					"h-[46px] px-4 text-sm rounded-[9px]": size === "lg",
+					"h-7.5 px-2.5 text-xs": size === "sm",
+					"h-8.5 px-4 text-sm rounded-7": size === "md",
+					"h-11.5 px-4 text-sm rounded-9": size === "lg",
 					"w-7 h-7 p-0 rounded-md": variant === "icon" && size === "sm",
-					"w-[30px] h-[30px] p-0 rounded-[7px]":
-						variant === "icon" && size === "md",
+					"w-7.5 h-7.5 p-0 rounded-7": variant === "icon" && size === "md",
 				},
 				className,
 			)}

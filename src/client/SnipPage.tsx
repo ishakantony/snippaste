@@ -334,17 +334,17 @@ function SnipPageInner() {
 			/>
 
 			{loadError && (
-				<div className="px-4 py-1.5 bg-danger/10 border-b border-danger/30 font-mono text-[11px] tracking-wide text-danger shrink-0">
+				<div className="px-4 py-1.5 bg-danger/10 border-b border-danger/30 font-mono text-xs tracking-wide text-danger shrink-0">
 					load error — could not reach server
 				</div>
 			)}
 
 			{remoteChanged && (
-				<div className="px-4 py-1 bg-accent-soft-10 border-b border-accent-soft-18 text-[11px] text-accent-hover shrink-0 flex items-center gap-2">
+				<div className="px-4 py-1 bg-accent-soft-10 border-b border-accent-soft-18 text-xs text-accent-hover shrink-0 flex items-center gap-2">
 					<span>Remote changes available.</span>
 					<button
 						type="button"
-						className="bg-transparent border border-accent-soft-20 text-accent-hover px-2 py-0.5 rounded-[5px] text-[11px] font-medium cursor-pointer"
+						className="bg-transparent border border-accent-soft-20 text-accent-hover px-2 py-0.5 rounded-5 text-xs font-medium cursor-pointer"
 						onClick={handleRefresh}
 					>
 						Refresh

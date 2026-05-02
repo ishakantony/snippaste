@@ -5,6 +5,16 @@
 	--font-sans: "IBM Plex Sans", system-ui, sans-serif;
 	--font-mono: "IBM Plex Mono", "Courier New", monospace;
 
+	--text-2xs: 10px;
+	--text-xs: 11px;
+	--text-sm: 13px;
+
+	--radius-5: 5px;
+	--radius-7: 7px;
+	--radius-9: 9px;
+
+	--leading-relaxed: 1.7;
+
 	--color-accent: #6470f0;
 	--color-accent-hover: #7882f5;
 	--color-accent-active: #5260e0;

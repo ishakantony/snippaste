@@ -38,11 +38,11 @@ function StatusPill({ state }: { state: AutosaveState }) {
 				size={11}
 				color={isSaving ? "var(--warn)" : "var(--ok)"}
 			/>
-			<span className="text-[11px] font-medium text-fg-3 whitespace-nowrap">
+			<span className="text-xs font-medium text-fg-3 whitespace-nowrap">
 				{label}
 			</span>
 			{timeLabel && (
-				<span className="text-[11px] text-fg-3 font-mono whitespace-nowrap">
+				<span className="text-xs text-fg-3 font-mono whitespace-nowrap">
 					{timeLabel}
 				</span>
 			)}
@@ -87,14 +87,14 @@ export function Toolbar({
 
 				<Pill variant="accent">
 					<Icon name="scissors" size={11} color="var(--accent)" />
-					<span className="text-[11px] font-bold text-accent tracking-wide">
+					<span className="text-xs font-bold text-accent tracking-wide">
 						snippaste
 					</span>
 				</Pill>
 
-				<span className="text-[13px] text-fg-3">/</span>
+				<span className="text-sm text-fg-3">/</span>
 				<span
-					className="text-[13px] font-semibold text-fg font-mono overflow-hidden text-ellipsis whitespace-nowrap max-w-[240px]"
+					className="text-sm font-semibold text-fg font-mono overflow-hidden text-ellipsis whitespace-nowrap max-w-60"
 					title={slug}
 				>
 					{slug}
@@ -111,7 +111,7 @@ export function Toolbar({
 			<StatusPill state={saveState} />
 
 			<div className="flex items-center gap-2">
-				<div className="flex items-center border border-border-2 rounded-[7px] overflow-hidden bg-surface-2">
+				<div className="flex items-center border border-border-2 rounded-7 overflow-hidden bg-surface-2">
 					<Button
 						variant="ghost"
 						size="sm"
@@ -138,7 +138,7 @@ export function Toolbar({
 					</Button>
 				</div>
 
-				<div className="flex items-center border border-border-2 rounded-[7px] overflow-hidden bg-surface-2">
+				<div className="flex items-center border border-border-2 rounded-7 overflow-hidden bg-surface-2">
 					<Button
 						variant="danger"
 						size="sm"

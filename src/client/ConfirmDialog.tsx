@@ -28,11 +28,9 @@ export function ConfirmDialog({
 			role="dialog"
 			aria-modal="true"
 		>
-			<div className="bg-modal-bg border border-border-2 rounded-xl w-[340px] p-6 shadow-[0_8px_40px_rgba(0,0,0,0.5)]">
+			<div className="bg-modal-bg border border-border-2 rounded-xl w-85 p-6 shadow-[0_8px_40px_rgba(0,0,0,0.5)]">
 				<div className="text-sm font-semibold text-fg mb-2">Are you sure?</div>
-				<div className="text-[13px] text-fg-2 leading-relaxed mb-5">
-					{message}
-				</div>
+				<div className="text-sm text-fg-2 leading-relaxed mb-5">{message}</div>
 				<div className="flex gap-2 justify-end">
 					<Button variant="ghost" size="md" onClick={onCancel}>
 						Cancel
