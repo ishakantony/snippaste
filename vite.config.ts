@@ -1,27 +1,54 @@
 import path from "node:path";
 import tailwindcss from "@tailwindcss/vite";
 import react from "@vitejs/plugin-react";
-import { defineConfig } from "vite";
+import { defineConfig, loadEnv, type Plugin } from "vite";
+import {
+	envBoolSchema,
+	FLAGS_PLACEHOLDER,
+	featureFlagsSchema,
+} from "./src/shared/featureFlags.js";
 
-export default defineConfig({
-	plugins: [tailwindcss(), react()],
-	root: ".",
-	publicDir: "public",
-	resolve: {
-		alias: {
-			"@": path.resolve(__dirname, "src"),
+function featureFlagsPlugin(envVars: Record<string, string>): Plugin {
+	return {
+		name: "inject-feature-flags",
+		transformIndexHtml(html) {
+			const flags = featureFlagsSchema.parse({
+				qrCode: envBoolSchema.parse(envVars.FEATURE_QR_CODE),
+				languageSwitcher: envBoolSchema.parse(
+					envVars.FEATURE_LANGUAGE_SWITCHER,
+				),
+			});
+			return html.replace(
+				FLAGS_PLACEHOLDER,
+				`<script>window.__FLAGS__ = ${JSON.stringify(flags)}</script>`,
+			);
 		},
-	},
-	build: {
-		outDir: "dist/client",
-	},
-	server: {
-		port: 5173,
-		proxy: {
-			"/api": {
-				target: "http://localhost:7777",
-				changeOrigin: true,
+	};
+}
+
+export default defineConfig(({ mode }) => {
+	const envVars = loadEnv(mode, process.cwd(), "FEATURE_");
+
+	return {
+		plugins: [tailwindcss(), react(), featureFlagsPlugin(envVars)],
+		root: ".",
+		publicDir: "public",
+		resolve: {
+			alias: {
+				"@": path.resolve(__dirname, "src"),
 			},
 		},
-	},
+		build: {
+			outDir: "dist/client",
+		},
+		server: {
+			port: 5173,
+			proxy: {
+				"/api": {
+					target: "http://localhost:7777",
+					changeOrigin: true,
+				},
+			},
+		},
+	};
 });

@@ -40,6 +40,8 @@ COPY --from=build --chown=snippaste:nodejs /app/node_modules/ node_modules/
 
 ENV PORT=7777
 ENV DB_PATH=/data/snippaste.db
+ENV FEATURE_QR_CODE=true
+ENV FEATURE_LANGUAGE_SWITCHER=true
 
 USER snippaste
 EXPOSE 7777

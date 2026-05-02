@@ -3,6 +3,7 @@ import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 import { LanguageSwitcher } from "@/client/components/LanguageSwitcher.js";
 import { Button } from "@/client/components/ui/Button.js";
+import { useFeatureFlag } from "@/client/featureFlagsContext.js";
 import { Icon } from "@/client/Icon.js";
 import { SlugGenerator } from "@/client/slugGenerator.js";
 import { useTheme } from "@/client/themeContext.js";
@@ -15,6 +16,7 @@ export function LandingPage() {
 	const { theme, toggle } = useTheme();
 	const { t } = useTranslation();
 	const dark = theme === "dark";
+	const langEnabled = useFeatureFlag("languageSwitcher");
 
 	const FEATURES = [
 		{
@@ -63,11 +65,13 @@ export function LandingPage() {
 	return (
 		<div className="w-screen h-screen flex bg-bg relative overflow-hidden">
 			<div className="absolute top-5 right-5 z-10 flex items-center gap-2">
-				<LanguageSwitcher
-					variant="ghost"
-					size="sm"
-					className="border border-border rounded-md px-3 py-1.5 text-fg-3 text-xs font-medium"
-				/>
+				{langEnabled && (
+					<LanguageSwitcher
+						variant="ghost"
+						size="sm"
+						className="border border-border rounded-md px-3 py-1.5 text-fg-3 text-xs font-medium"
+					/>
+				)}
 				<Button
 					variant="ghost"
 					size="sm"

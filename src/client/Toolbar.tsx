@@ -4,6 +4,7 @@ import type { AutosaveState } from "@/client/autosaveController.js";
 import { LanguageSwitcher } from "@/client/components/LanguageSwitcher.js";
 import { Button } from "@/client/components/ui/Button.js";
 import { Pill } from "@/client/components/ui/Pill.js";
+import { useFeatureFlag } from "@/client/featureFlagsContext.js";
 import { Icon } from "@/client/Icon.js";
 import { useTheme } from "@/client/themeContext.js";
 
@@ -83,6 +84,8 @@ export function Toolbar({
 	const { theme, toggle } = useTheme();
 	const { t } = useTranslation();
 	const dark = theme === "dark";
+	const qrEnabled = useFeatureFlag("qrCode");
+	const langEnabled = useFeatureFlag("languageSwitcher");
 
 	return (
 		<div className="flex items-center h-12 px-4 gap-3 bg-surface border-b border-border shrink-0 relative z-10">
@@ -131,16 +134,20 @@ export function Toolbar({
 						<Icon name="link" size={13} />
 						{t("toolbar.copyUrl")}
 					</Button>
-					<div className="w-px h-5 bg-border-2 shrink-0" />
-					<Button
-						variant="ghost"
-						size="sm"
-						onClick={onQr}
-						title={t("toolbar.qrCode")}
-					>
-						<Icon name="qr" size={13} />
-						{t("toolbar.qr")}
-					</Button>
+					{qrEnabled && (
+						<>
+							<div className="w-px h-5 bg-border-2 shrink-0" />
+							<Button
+								variant="ghost"
+								size="sm"
+								onClick={onQr}
+								title={t("toolbar.qrCode")}
+							>
+								<Icon name="qr" size={13} />
+								{t("toolbar.qr")}
+							</Button>
+						</>
+					)}
 					<div className="w-px h-5 bg-border-2 shrink-0" />
 					<Button
 						variant="ghost"
@@ -188,12 +195,16 @@ export function Toolbar({
 				</div>
 
 				<div className="flex items-center border border-border-2 rounded-7 bg-surface-2">
-					<LanguageSwitcher
-						variant="ghost"
-						size="sm"
-						className="rounded-none border-none px-2"
-					/>
-					<div className="w-px h-5 bg-border-2 shrink-0" />
+					{langEnabled && (
+						<>
+							<LanguageSwitcher
+								variant="ghost"
+								size="sm"
+								className="rounded-none border-none px-2"
+							/>
+							<div className="w-px h-5 bg-border-2 shrink-0" />
+						</>
+					)}
 					<Button
 						variant="ghost"
 						size="sm"

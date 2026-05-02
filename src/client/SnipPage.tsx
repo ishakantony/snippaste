@@ -12,6 +12,7 @@ import {
 import { ConfirmDialog } from "@/client/ConfirmDialog.js";
 import { getClientId } from "@/client/clientId.js";
 import { QrModal } from "@/client/components/QrModal.js";
+import { useFeatureFlag } from "@/client/featureFlagsContext.js";
 import { useDocumentLanguage } from "@/client/hooks/useDocumentLanguage.js";
 import { StatusBar } from "@/client/StatusBar.js";
 import { subscribe as subscribeStream } from "@/client/snipStream.js";
@@ -100,6 +101,7 @@ function SnipPageInner() {
 	const dark = theme === "dark";
 	const toast = useToast();
 	const { t } = useTranslation();
+	const qrEnabled = useFeatureFlag("qrCode");
 
 	useDocumentLanguage(slug);
 
@@ -390,7 +392,7 @@ function SnipPageInner() {
 				/>
 			)}
 
-			{showQr && (
+			{showQr && qrEnabled && (
 				<QrModal
 					url={getSnipUrl()}
 					slug={slug}

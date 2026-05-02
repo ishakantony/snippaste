@@ -6,6 +6,8 @@ services:
       - '${PORT:-7777}:7777'
     environment:
       DB_PATH: /data/snippaste.db
+      FEATURE_QR_CODE: "true"
+      FEATURE_LANGUAGE_SWITCHER: "true"
     volumes:
       - snipdata:/data
 

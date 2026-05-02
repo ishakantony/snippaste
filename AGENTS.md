@@ -60,7 +60,7 @@ npm run build        # Vite production build (outputs to dist/client/)
 
 ## File structure conventions
 
-- `src/shared/` — Code used by both client and server. Zod schemas, validators
+- `src/shared/` — Code used by both client and server. Zod schemas, validators, feature flags
 - `src/client/components/ui/` — Reusable UI primitives (Button, Pill, ErrorBoundary)
 - `src/client/lib/` — Shared client utilities (cn helper)
 - `src/server/` — Server code. Routes, store, bus, env config
@@ -73,6 +73,8 @@ Validated at server startup via `@t3-oss/env-core` + Zod in `src/server/env.ts`:
 |---|---|---|
 | `PORT` | `7777` | Server listen port |
 | `DB_PATH` | `/data/snippaste.db` | SQLite database file path |
+| `FEATURE_QR_CODE` | `true` | Enable QR code modal in the editor |
+| `FEATURE_LANGUAGE_SWITCHER` | `true` | Enable language switcher in the toolbar |
 
 ## Guardrails
 
@@ -81,3 +83,4 @@ Validated at server startup via `@t3-oss/env-core` + Zod in `src/server/env.ts`:
 - Never use `process.env` directly — always use the validated `env` from `src/server/env.ts`
 - Server files use relative imports (NodeNext module resolution). Client/test files use `@/` aliases
 - Keep `src/shared/` as the canonical location for code used by both client and server
+- Never add a feature flag without updating `src/shared/featureFlags.ts` schema, `src/server/env.ts`, and the flag injection in `src/server/index.ts`
