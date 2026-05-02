@@ -7,6 +7,7 @@ import {
 	Link,
 	type LucideProps,
 	Moon,
+	QrCode,
 	RefreshCw,
 	Save,
 	Scissors,
@@ -33,6 +34,7 @@ const ICONS: Record<string, React.FC<LucideProps>> = {
 	check: Check,
 	home: Home,
 	x: X,
+	qr: QrCode,
 };
 
 export interface IconProps {

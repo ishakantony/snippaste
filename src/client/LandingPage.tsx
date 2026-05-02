@@ -60,9 +60,7 @@ export function LandingPage() {
 
 			<div className="flex-1 flex flex-col justify-center px-[clamp(40px,6vw,80px)] py-15">
 				<div className="flex items-center gap-2.5 mb-9">
-					<div className="w-9 h-9 rounded-9 bg-accent-soft-12 border border-accent-soft-20 flex items-center justify-center">
-						<Icon name="scissors" size={17} color="var(--accent)" />
-					</div>
+					<img src="/logo.svg" alt="Snippaste" className="w-9 h-9 rounded-9" />
 					<span className="text-sm font-bold tracking-[0.06em] text-fg-3 uppercase">
 						Snippaste
 					</span>

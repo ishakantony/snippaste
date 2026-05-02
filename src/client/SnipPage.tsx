@@ -10,6 +10,7 @@ import {
 } from "@/client/autosaveController.js";
 import { ConfirmDialog } from "@/client/ConfirmDialog.js";
 import { getClientId } from "@/client/clientId.js";
+import { QrModal } from "@/client/components/QrModal.js";
 import { StatusBar } from "@/client/StatusBar.js";
 import { subscribe as subscribeStream } from "@/client/snipStream.js";
 import { ToastProvider, useToast } from "@/client/Toast.js";
@@ -103,6 +104,7 @@ function SnipPageInner() {
 	const [confirmClear, setConfirmClear] = useState(false);
 	const [confirmRefresh, setConfirmRefresh] = useState(false);
 	const [remoteChanged, setRemoteChanged] = useState(false);
+	const [showQr, setShowQr] = useState(false);
 
 	const controllerRef = useRef<AutosaveController | null>(null);
 	const editorContainerRef = useRef<HTMLDivElement>(null);
@@ -272,6 +274,14 @@ function SnipPageInner() {
 		toast.show(`Copied URL: /s/${slug}`);
 	}
 
+	function handleQr() {
+		setShowQr(true);
+	}
+
+	function getSnipUrl(): string {
+		return `${window.location.origin}/s/${slug}`;
+	}
+
 	function handleCopyContent() {
 		navigator.clipboard.writeText(getContent()).catch(() => {});
 		toast.show("Copied to clipboard");
@@ -331,6 +341,7 @@ function SnipPageInner() {
 				onSave={handleSave}
 				onClear={handleClear}
 				onRefresh={handleRefresh}
+				onQr={handleQr}
 			/>
 
 			{loadError && (
@@ -376,6 +387,15 @@ function SnipPageInner() {
 					confirmLabel="Refresh"
 					onConfirm={doRefresh}
 					onCancel={() => setConfirmRefresh(false)}
+				/>
+			)}
+
+			{showQr && (
+				<QrModal
+					url={getSnipUrl()}
+					slug={slug}
+					onClose={() => setShowQr(false)}
+					onToast={toast.show}
 				/>
 			)}
 		</div>

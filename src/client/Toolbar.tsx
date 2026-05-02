@@ -59,6 +59,7 @@ export interface ToolbarProps {
 	onSave: () => void;
 	onClear: () => void;
 	onRefresh: () => void;
+	onQr: () => void;
 }
 
 export function Toolbar({
@@ -70,6 +71,7 @@ export function Toolbar({
 	onSave,
 	onClear,
 	onRefresh,
+	onQr,
 }: ToolbarProps) {
 	const { theme, toggle } = useTheme();
 	const dark = theme === "dark";
@@ -79,7 +81,7 @@ export function Toolbar({
 			<div className="flex items-center gap-2 flex-1 min-w-0">
 				<Link to="/" aria-label="Home" title="Home">
 					<Button variant="icon" size="sm" className="no-underline">
-						<Icon name="home" size={14} />
+						<img src="/logo.svg" alt="" className="w-4 h-4 rounded-3" />
 					</Button>
 				</Link>
 
@@ -120,6 +122,11 @@ export function Toolbar({
 					>
 						<Icon name="link" size={13} />
 						Copy URL
+					</Button>
+					<div className="w-px h-5 bg-border-2 shrink-0" />
+					<Button variant="ghost" size="sm" onClick={onQr} title="QR Code">
+						<Icon name="qr" size={13} />
+						QR
 					</Button>
 					<div className="w-px h-5 bg-border-2 shrink-0" />
 					<Button
