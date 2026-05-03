@@ -4,11 +4,11 @@
 	"private": true,
 	"type": "module",
 	"scripts": {
-		"dev:server": "DB_PATH=./snippaste.db tsx watch src/server/index.ts",
+		"dev:server": "DB_PATH=./snippaste.db bun --hot src/server/index.ts",
 		"dev:client": "vite",
-		"dev": "concurrently \"npm run dev:server\" \"npm run dev:client\"",
+		"dev": "concurrently \"bun run dev:server\" \"bun run dev:client\"",
 		"build": "vite build",
-		"build:server": "tsc -p tsconfig.server.json",
+		"build:server": "bun build --target=bun --outfile=dist/server/index.js src/server/index.ts",
 		"typecheck": "tsc --noEmit",
 		"test": "vitest run",
 		"test:e2e": "playwright test",
@@ -16,12 +16,12 @@
 		"lint": "biome check .",
 		"lint:fix": "biome check --write .",
 		"format": "biome format --write .",
-		"check:all": "npm run lint && npm run typecheck && npm test && npm run build"
+		"check:all": "bun run lint && bun run typecheck && bun run test && bun run build && bun run build:server"
 	},
 	"simple-git-hooks": {
-		"pre-commit": "npx lint-staged",
-		"commit-msg": "npx commitlint --edit ${1}",
-		"pre-push": "npm run typecheck && npm test && npm run build"
+		"pre-commit": "bunx lint-staged",
+		"commit-msg": "bunx commitlint --edit ${1}",
+		"pre-push": "bun run typecheck && bun run test && bun run build && bun run build:server"
 	},
 	"lint-staged": {
 		"*.{ts,tsx,js,json}": "biome check --write --no-errors-on-unmatched"
@@ -37,12 +37,10 @@
 		"@codemirror/state": "^6.6.0",
 		"@codemirror/theme-one-dark": "^6.1.3",
 		"@codemirror/view": "^6.41.1",
-		"@hono/node-server": "^1.13.7",
 		"@hono/zod-openapi": "^1.3.0",
 		"@hono/zod-validator": "^0.7.6",
 		"@scalar/hono-api-reference": "^0.10.13",
 		"@t3-oss/env-core": "^0.13.11",
-		"better-sqlite3": "^11.9.1",
 		"clsx": "^2.1.1",
 		"cron": "^4.4.0",
 		"hono": "^4.12.16",
@@ -59,7 +57,7 @@
 		"zustand": "^5.0.12"
 	},
 	"engines": {
-		"node": ">=24.0.0"
+		"bun": ">=1.0.0"
 	},
 	"devDependencies": {
 		"@biomejs/biome": "^2.4.13",
@@ -81,8 +79,9 @@
 		"lint-staged": "^16.4.0",
 		"playwright": "^1.59.1",
 		"simple-git-hooks": "^2.13.1",
+		"better-sqlite3": "^11.9.1",
+		"bun-types": "latest",
 		"tailwindcss": "^4.2.4",
-		"tsx": "^4.19.3",
 		"typescript": "^6.0.3",
 		"vite": "^6.3.3",
 		"vitest": "^4.1.5"

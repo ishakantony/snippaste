@@ -28,7 +28,7 @@ export default defineConfig({
 		},
 	],
 	webServer: {
-		command: `node -e "const fs=require('node:fs'); fs.mkdirSync('test-results/e2e', { recursive: true }); fs.rmSync('${dbPath}', { force: true });" && npm run build && npm run build:server && PORT=${port} DB_PATH=${dbPath} FEATURE_QR_CODE=true FEATURE_LANGUAGE_SWITCHER=true FEATURE_AUTO_SAVE=true node dist/server/server/index.js`,
+		command: `mkdir -p test-results/e2e && rm -f ${dbPath} && bun run build && bun run build:server && PORT=${port} DB_PATH=${dbPath} FEATURE_QR_CODE=true FEATURE_LANGUAGE_SWITCHER=true FEATURE_AUTO_SAVE=true bun dist/server/index.js`,
 		url: `${baseURL}/api/health`,
 		timeout: 120_000,
 		reuseExistingServer: false,

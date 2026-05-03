@@ -5,6 +5,7 @@ export default defineConfig({
 	resolve: {
 		alias: {
 			"@": path.resolve(__dirname, "src"),
+			"bun:sqlite": path.resolve(__dirname, "tests/mocks/bun-sqlite.ts"),
 		},
 	},
 	test: {

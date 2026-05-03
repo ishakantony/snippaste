@@ -1,12 +1,6 @@
-import { existsSync } from "node:fs";
-import { loadEnvFile } from "node:process";
 import { createEnv } from "@t3-oss/env-core";
 import { z } from "zod";
 import { envBoolSchema } from "../shared/featureFlags.js";
-
-if (existsSync(".env")) {
-	loadEnvFile(".env");
-}
 
 const optionalSessionSecretSchema = z.preprocess(
 	(val) => (val === "" ? undefined : val),

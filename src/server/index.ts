@@ -1,8 +1,7 @@
 import { randomBytes } from "node:crypto";
 import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
-import { serve } from "@hono/node-server";
-import { serveStatic } from "@hono/node-server/serve-static";
+import { serveStatic } from "hono/bun";
 import {
 	FLAGS_PLACEHOLDER,
 	featureFlagsSchema,
@@ -51,8 +50,7 @@ const app = buildApp(store, {
 	sessionSecret: SESSION_SECRET,
 });
 
-serve({ fetch: app.fetch, port: PORT }, (info) => {
-	console.log(`Hono server running on http://localhost:${info.port}`);
-	runCleanup(store);
-	startCleanupJob(store);
-});
+const server = Bun.serve({ fetch: app.fetch, port: PORT });
+console.log(`Hono server running on http://localhost:${server.port}`);
+runCleanup(store);
+startCleanupJob(store);
