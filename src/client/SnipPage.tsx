@@ -237,6 +237,7 @@ function SnipPageInner() {
 				if (res.status === 401) {
 					setLocked(true);
 					setProtected(true);
+					setSaveState({ status: AUTOSAVE_STATUS.LOCKED });
 					return null;
 				}
 				if (!res.ok) throw new Error("fetch failed");
@@ -270,7 +271,7 @@ function SnipPageInner() {
 			.catch(() => {
 				setLoadError(true);
 			});
-	}, [slug, setLoadError, setLocked, setProtected, setUpdatedAt]);
+	}, [slug, setLoadError, setLocked, setProtected, setSaveState, setUpdatedAt]);
 
 	// SSE subscription — receive remote updates
 	useEffect(() => {
@@ -411,6 +412,7 @@ function SnipPageInner() {
 				if (res.status === 404) return null;
 				if (res.status === 401) {
 					setLocked(true);
+					setSaveState({ status: AUTOSAVE_STATUS.LOCKED });
 					return null;
 				}
 				if (!res.ok) throw new Error("fetch failed");
@@ -498,6 +500,7 @@ function SnipPageInner() {
 			method: "POST",
 		});
 		setLocked(isProtected);
+		if (isProtected) setSaveState({ status: AUTOSAVE_STATUS.LOCKED });
 		setShowSettings(false);
 		toast.show(t("editor.lockedNow"));
 	}

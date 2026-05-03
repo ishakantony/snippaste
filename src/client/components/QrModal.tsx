@@ -46,7 +46,10 @@ export function QrModal({ url, slug, onClose, onToast }: QrModalProps) {
 
 	return (
 		<Modal onClose={onClose}>
-			<div className="bg-modal-bg border border-border-2 rounded-xl w-90 p-6 shadow-[0_8px_40px_rgba(0,0,0,0.5)] flex flex-col items-center gap-5">
+			<div
+				data-testid="qr-modal"
+				className="bg-modal-bg border border-border-2 rounded-xl w-90 p-6 shadow-[0_8px_40px_rgba(0,0,0,0.5)] flex flex-col items-center gap-5"
+			>
 				<div className="flex items-center justify-between w-full">
 					<div className="flex items-center gap-2">
 						<Icon name="qr" size={14} color="var(--accent)" />
