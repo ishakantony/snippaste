@@ -13,7 +13,6 @@ import {
 } from "react";
 import { useTranslation } from "react-i18next";
 import { useParams } from "react-router-dom";
-import { useAutoSaveSettings } from "@/client/autoSaveSettingsContext.js";
 import {
 	AUTOSAVE_STATUS,
 	AutosaveController,
@@ -22,14 +21,15 @@ import {
 import { ConfirmDialog } from "@/client/ConfirmDialog.js";
 import { getClientId } from "@/client/clientId.js";
 import { SettingsModal } from "@/client/components/SettingsModal.js";
-import { useFeatureFlag } from "@/client/featureFlagsContext.js";
 import { useDocumentLanguage } from "@/client/hooks/useDocumentLanguage.js";
 import { StatusBar } from "@/client/StatusBar.js";
 import { subscribe as subscribeStream } from "@/client/snipStream.js";
-import { ToastProvider, useToast } from "@/client/Toast.js";
+import { useAutoSaveSettings } from "@/client/stores/autoSaveSettingsStore.js";
+import { useFeatureFlag } from "@/client/stores/featureFlagsStore.js";
+import { useTheme } from "@/client/stores/themeStore.js";
+import { useToast } from "@/client/stores/toastStore.js";
 import { Toolbar } from "@/client/Toolbar.js";
 import { THEME } from "@/client/theme.js";
-import { useTheme } from "@/client/themeContext.js";
 
 const QrModal = lazy(() =>
 	import("@/client/components/QrModal.js").then((m) => ({
@@ -626,9 +626,5 @@ function SnipPageInner() {
 }
 
 export function SnipPage() {
-	return (
-		<ToastProvider>
-			<SnipPageInner />
-		</ToastProvider>
-	);
+	return <SnipPageInner />;
 }

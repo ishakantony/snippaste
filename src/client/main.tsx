@@ -1,26 +1,26 @@
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import "@/client/i18n/index.js";
-import { AutoSaveSettingsProvider } from "@/client/autoSaveSettingsContext.js";
 import { ErrorBoundary } from "@/client/components/ErrorBoundary.js";
-import { FeatureFlagsProvider } from "@/client/featureFlagsContext.js";
+import { initializeFeatureFlags } from "@/client/stores/featureFlagsStore.js";
+import { bootstrapLanguageStore } from "@/client/stores/languageStore.js";
+import { bootstrapThemeStore } from "@/client/stores/themeStore.js";
+import { ToastViewport } from "@/client/stores/toastStore.js";
 import "./index.css";
 import { App } from "@/client/App.js";
-import { ThemeProvider } from "@/client/themeContext.js";
 
 const root = document.getElementById("root");
 if (!root) throw new Error("No #root element found");
 
+initializeFeatureFlags();
+bootstrapLanguageStore();
+bootstrapThemeStore();
+
 createRoot(root).render(
 	<StrictMode>
 		<ErrorBoundary>
-			<FeatureFlagsProvider>
-				<ThemeProvider>
-					<AutoSaveSettingsProvider>
-						<App />
-					</AutoSaveSettingsProvider>
-				</ThemeProvider>
-			</FeatureFlagsProvider>
+			<App />
+			<ToastViewport />
 		</ErrorBoundary>
 	</StrictMode>,
 );

@@ -3,11 +3,11 @@ import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 import { LanguageSwitcher } from "@/client/components/LanguageSwitcher.js";
 import { Button } from "@/client/components/ui/Button.js";
-import { useFeatureFlag } from "@/client/featureFlagsContext.js";
 import { Icon } from "@/client/Icon.js";
 import { SlugGenerator } from "@/client/slugGenerator.js";
+import { useFeatureFlag } from "@/client/stores/featureFlagsStore.js";
+import { useTheme } from "@/client/stores/themeStore.js";
 import { THEME } from "@/client/theme.js";
-import { useTheme } from "@/client/themeContext.js";
 import { SlugValidator } from "@/shared/slugValidator.js";
 
 export function LandingPage() {

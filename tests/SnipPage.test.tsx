@@ -1,10 +1,12 @@
 import { cleanup, render, waitFor } from "@testing-library/react";
 import { MemoryRouter, Route, Routes } from "react-router-dom";
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { AutoSaveSettingsProvider } from "@/client/autoSaveSettingsContext.js";
-import { FeatureFlagsProvider } from "@/client/featureFlagsContext.js";
 import { SnipPage } from "@/client/SnipPage.js";
-import { ThemeProvider } from "@/client/themeContext.js";
+import { useAutoSaveSettingsStore } from "@/client/stores/autoSaveSettingsStore.js";
+import {
+	initializeFeatureFlags,
+	useFeatureFlagsStore,
+} from "@/client/stores/featureFlagsStore.js";
 
 const autosaveControllerDeps = vi.hoisted(
 	() => [] as Array<{ enabled?: boolean }>,
@@ -55,19 +57,15 @@ function renderSnipPage(flags: { autoSave: boolean }) {
 		autoSave: flags.autoSave,
 		passwordProtection: true,
 	};
+	useFeatureFlagsStore.setState({ initialized: false });
+	initializeFeatureFlags();
 
 	render(
-		<FeatureFlagsProvider>
-			<ThemeProvider>
-				<AutoSaveSettingsProvider>
-					<MemoryRouter initialEntries={["/s/test-snip"]}>
-						<Routes>
-							<Route path="/s/:name" element={<SnipPage />} />
-						</Routes>
-					</MemoryRouter>
-				</AutoSaveSettingsProvider>
-			</ThemeProvider>
-		</FeatureFlagsProvider>,
+		<MemoryRouter initialEntries={["/s/test-snip"]}>
+			<Routes>
+				<Route path="/s/:name" element={<SnipPage />} />
+			</Routes>
+		</MemoryRouter>,
 	);
 }
 
@@ -75,12 +73,22 @@ describe("SnipPage auto-save feature flag", () => {
 	afterEach(() => {
 		cleanup();
 		localStorage.clear();
+		useAutoSaveSettingsStore.setState({ enabled: false });
+		useFeatureFlagsStore.setState({
+			flags: {
+				qrCode: true,
+				languageSwitcher: true,
+				autoSave: true,
+				passwordProtection: true,
+			},
+			initialized: false,
+		});
 		autosaveControllerDeps.length = 0;
 		vi.restoreAllMocks();
 	});
 
 	it("disables controller auto-save when the feature flag is off", async () => {
-		localStorage.setItem("snip-autosave", "true");
+		useAutoSaveSettingsStore.setState({ enabled: true });
 		vi.spyOn(globalThis, "fetch").mockResolvedValue({
 			ok: false,
 			status: 404,

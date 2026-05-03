@@ -2,8 +2,9 @@ import { useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Button, type ButtonProps } from "@/client/components/ui/Button.js";
 import { Icon } from "@/client/Icon.js";
-import i18n, { STORAGE_KEY } from "@/client/i18n/index.js";
+import type { Language } from "@/client/i18n/index.js";
 import { cn } from "@/client/lib/cn.js";
+import { useLanguage } from "@/client/stores/languageStore.js";
 
 const LANGUAGES = [
 	{ code: "en", label: "English" },
@@ -23,12 +24,12 @@ export function LanguageSwitcher({
 	className,
 }: LanguageSwitcherProps) {
 	const { t } = useTranslation();
+	const { language, setLanguage } = useLanguage();
 	const [open, setOpen] = useState(false);
 	const containerRef = useRef<HTMLDivElement>(null);
 
-	function select(code: string) {
-		i18n.changeLanguage(code);
-		localStorage.setItem(STORAGE_KEY, code);
+	function select(code: Language) {
+		setLanguage(code);
 		setOpen(false);
 	}
 
@@ -36,8 +37,7 @@ export function LanguageSwitcher({
 		setOpen((prev) => !prev);
 	}
 
-	const current =
-		LANGUAGES.find((l) => l.code === i18n.language) ?? LANGUAGES[0];
+	const current = LANGUAGES.find((l) => l.code === language) ?? LANGUAGES[0];
 
 	return (
 		<div ref={containerRef} className="relative">

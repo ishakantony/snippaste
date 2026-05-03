@@ -8,11 +8,11 @@ import {
 import { LanguageSwitcher } from "@/client/components/LanguageSwitcher.js";
 import { Button } from "@/client/components/ui/Button.js";
 import { Pill } from "@/client/components/ui/Pill.js";
-import { useFeatureFlag } from "@/client/featureFlagsContext.js";
 import { Icon } from "@/client/Icon.js";
 import { getExpirationInfo } from "@/client/lib/expirationCountdown.js";
+import { useFeatureFlag } from "@/client/stores/featureFlagsStore.js";
+import { useTheme } from "@/client/stores/themeStore.js";
 import { THEME } from "@/client/theme.js";
-import { useTheme } from "@/client/themeContext.js";
 
 function relativeTime(
 	ts: number,
