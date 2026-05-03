@@ -14,6 +14,8 @@ import {
 } from "react";
 import { useTranslation } from "react-i18next";
 import { useParams } from "react-router-dom";
+import { createAutosaveFetch } from "@/client/api/autosaveFetch.js";
+import { apiClient } from "@/client/api/client.js";
 import {
 	AUTOSAVE_STATUS,
 	AutosaveController,
@@ -171,7 +173,7 @@ function SnipPageInner() {
 	// Autosave controller
 	useEffect(() => {
 		const controller = new AutosaveController({
-			fetch: (url, init) => fetch(url, init),
+			fetch: createAutosaveFetch(slug, apiClient),
 			setTimeout: (fn, ms) => window.setTimeout(fn, ms),
 			clearTimeout: (id) => window.clearTimeout(id),
 			dateNow: () => Date.now(),
@@ -231,7 +233,10 @@ function SnipPageInner() {
 		setLoadError(false);
 		setUnlockError(null);
 
-		fetch(`/api/snips/${encodeURIComponent(slug)}`)
+		const ac = new AbortController();
+
+		apiClient.api.snips[":slug"]
+			.$get({ param: { slug } }, { init: { signal: ac.signal } })
 			.then((res) => {
 				if (res.status === 404) return null;
 				if (res.status === 401) {
@@ -241,12 +246,7 @@ function SnipPageInner() {
 					return null;
 				}
 				if (!res.ok) throw new Error("fetch failed");
-				return res.json() as Promise<{
-					slug: string;
-					content: string;
-					updatedAt: number;
-					protected: boolean;
-				}>;
+				return res.json();
 			})
 			.then((data) => {
 				if (!data) return;
@@ -268,9 +268,12 @@ function SnipPageInner() {
 					applyingRef.current = false;
 				}
 			})
-			.catch(() => {
+			.catch((err) => {
+				if (err?.name === "AbortError") return;
 				setLoadError(true);
 			});
+
+		return () => ac.abort();
 	}, [slug, setLoadError, setLocked, setProtected, setSaveState, setUpdatedAt]);
 
 	// SSE subscription — receive remote updates
@@ -407,7 +410,8 @@ function SnipPageInner() {
 
 	function doRefresh() {
 		setConfirmRefresh(false);
-		fetch(`/api/snips/${encodeURIComponent(slug)}`)
+		apiClient.api.snips[":slug"]
+			.$get({ param: { slug } })
 			.then((res) => {
 				if (res.status === 404) return null;
 				if (res.status === 401) {
@@ -416,11 +420,7 @@ function SnipPageInner() {
 					return null;
 				}
 				if (!res.ok) throw new Error("fetch failed");
-				return res.json() as Promise<{
-					slug: string;
-					content: string;
-					updatedAt: number;
-				}>;
+				return res.json();
 			})
 			.then((data) => {
 				applyContent(data?.content ?? "", { silent: true });
@@ -435,10 +435,9 @@ function SnipPageInner() {
 	async function handleUnlock(e?: FormEvent) {
 		e?.preventDefault();
 		setUnlockError(null);
-		const res = await fetch(`/api/snips/${encodeURIComponent(slug)}/unlock`, {
-			method: "POST",
-			headers: { "Content-Type": "application/json" },
-			body: JSON.stringify({ password: unlockPassword }),
+		const res = await apiClient.api.snips[":slug"].unlock.$post({
+			param: { slug },
+			json: { password: unlockPassword },
 		});
 		if (!res.ok) {
 			setUnlockError(
@@ -462,28 +461,26 @@ function SnipPageInner() {
 			return;
 		}
 
-		const res = await fetch(`/api/snips/${encodeURIComponent(slug)}/password`, {
-			method: "PUT",
-			headers: { "Content-Type": "application/json" },
-			body: JSON.stringify({ password }),
+		const res = await apiClient.api.snips[":slug"].password.$put({
+			param: { slug },
+			json: { password },
 		});
 		if (!res.ok) {
 			if (res.status === 401) setLocked(true);
 			setLoadError(true);
 			return;
 		}
-		await fetch(`/api/snips/${encodeURIComponent(slug)}/unlock`, {
-			method: "POST",
-			headers: { "Content-Type": "application/json" },
-			body: JSON.stringify({ password }),
+		await apiClient.api.snips[":slug"].unlock.$post({
+			param: { slug },
+			json: { password },
 		});
 		setProtected(true);
 		toast.show(t("editor.protectionUpdated"));
 	}
 
 	async function handleRemovePassword() {
-		const res = await fetch(`/api/snips/${encodeURIComponent(slug)}/password`, {
-			method: "DELETE",
+		const res = await apiClient.api.snips[":slug"].password.$delete({
+			param: { slug },
 		});
 		if (!res.ok) {
 			if (res.status === 401) setLocked(true);
@@ -496,9 +493,7 @@ function SnipPageInner() {
 	}
 
 	async function handleLock() {
-		await fetch(`/api/snips/${encodeURIComponent(slug)}/lock`, {
-			method: "POST",
-		});
+		await apiClient.api.snips[":slug"].lock.$post({ param: { slug } });
 		setLocked(isProtected);
 		if (isProtected) setSaveState({ status: AUTOSAVE_STATUS.LOCKED });
 		setShowSettings(false);

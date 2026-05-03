@@ -1,0 +1,5 @@
+import { hc } from "hono/client";
+import type { AppType } from "../../server/routes.js";
+
+export const apiClient = hc<AppType>(window.location.origin);
+export type ApiClient = typeof apiClient;
