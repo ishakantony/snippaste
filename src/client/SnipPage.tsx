@@ -8,6 +8,7 @@ import {
 	Suspense,
 	useCallback,
 	useEffect,
+	useLayoutEffect,
 	useRef,
 	useState,
 } from "react";
@@ -16,7 +17,6 @@ import { useParams } from "react-router-dom";
 import {
 	AUTOSAVE_STATUS,
 	AutosaveController,
-	type AutosaveState,
 } from "@/client/autosaveController.js";
 import { ConfirmDialog } from "@/client/ConfirmDialog.js";
 import { getClientId } from "@/client/clientId.js";
@@ -26,6 +26,7 @@ import { StatusBar } from "@/client/StatusBar.js";
 import { subscribe as subscribeStream } from "@/client/snipStream.js";
 import { useAutoSaveSettings } from "@/client/stores/autoSaveSettingsStore.js";
 import { useFeatureFlag } from "@/client/stores/featureFlagsStore.js";
+import { useSnipSessionStore } from "@/client/stores/snipSessionStore.js";
 import { useTheme } from "@/client/stores/themeStore.js";
 import { useToast } from "@/client/stores/toastStore.js";
 import { Toolbar } from "@/client/Toolbar.js";
@@ -127,19 +128,25 @@ function SnipPageInner() {
 
 	useDocumentLanguage(slug);
 
-	const [loadError, setLoadError] = useState(false);
-	const [saveState, setSaveState] = useState<AutosaveState>({
-		status: AUTOSAVE_STATUS.IDLE,
-	});
+	const loadError = useSnipSessionStore((state) => state.loadError);
+	const remoteChanged = useSnipSessionStore((state) => state.remoteChanged);
+	const updatedAt = useSnipSessionStore((state) => state.updatedAt);
+	const isLocked = useSnipSessionStore((state) => state.isLocked);
+	const isProtected = useSnipSessionStore((state) => state.isProtected);
+	const resetForSlug = useSnipSessionStore((state) => state.resetForSlug);
+	const setLoadError = useSnipSessionStore((state) => state.setLoadError);
+	const setSaveState = useSnipSessionStore((state) => state.setSaveState);
+	const setRemoteChanged = useSnipSessionStore(
+		(state) => state.setRemoteChanged,
+	);
+	const setUpdatedAt = useSnipSessionStore((state) => state.setUpdatedAt);
+	const setLocked = useSnipSessionStore((state) => state.setLocked);
+	const setProtected = useSnipSessionStore((state) => state.setProtected);
 	const [content, setContent] = useState("");
 	const [confirmClear, setConfirmClear] = useState(false);
 	const [confirmRefresh, setConfirmRefresh] = useState(false);
-	const [remoteChanged, setRemoteChanged] = useState(false);
 	const [showQr, setShowQr] = useState(false);
 	const [showSettings, setShowSettings] = useState(false);
-	const [updatedAt, setUpdatedAt] = useState<number | undefined>(undefined);
-	const [isLocked, setIsLocked] = useState(false);
-	const [isProtected, setIsProtected] = useState(false);
 	const [unlockPassword, setUnlockPassword] = useState("");
 	const [unlockError, setUnlockError] = useState<string | null>(null);
 
@@ -157,6 +164,10 @@ function SnipPageInner() {
 	// PUT remote content back to the server.
 	const applyingRef = useRef<boolean>(false);
 
+	useLayoutEffect(() => {
+		resetForSlug(slug);
+	}, [slug, resetForSlug]);
+
 	// Autosave controller
 	useEffect(() => {
 		const controller = new AutosaveController({
@@ -173,14 +184,14 @@ function SnipPageInner() {
 
 		const unsub = controller.subscribe((state) => {
 			setSaveState(state);
-			if (state.status === AUTOSAVE_STATUS.LOCKED) setIsLocked(true);
+			if (state.status === AUTOSAVE_STATUS.LOCKED) setLocked(true);
 		});
 
 		return () => {
 			unsub();
 			controllerRef.current = null;
 		};
-	}, [slug, autoSaveActive]);
+	}, [slug, autoSaveActive, setSaveState, setLocked]);
 
 	// CodeMirror editor — re-create on theme change to apply new tokens.
 	// docRef survives across the cleanup so content persists through the rebuild.
@@ -224,8 +235,8 @@ function SnipPageInner() {
 			.then((res) => {
 				if (res.status === 404) return null;
 				if (res.status === 401) {
-					setIsLocked(true);
-					setIsProtected(true);
+					setLocked(true);
+					setProtected(true);
 					return null;
 				}
 				if (!res.ok) throw new Error("fetch failed");
@@ -238,8 +249,8 @@ function SnipPageInner() {
 			})
 			.then((data) => {
 				if (!data) return;
-				setIsLocked(false);
-				setIsProtected(data.protected);
+				setLocked(false);
+				setProtected(data.protected);
 				setUpdatedAt(data.updatedAt);
 				const view = editorViewRef.current;
 				if (!view) return;
@@ -259,7 +270,7 @@ function SnipPageInner() {
 			.catch(() => {
 				setLoadError(true);
 			});
-	}, [slug]);
+	}, [slug, setLoadError, setLocked, setProtected, setUpdatedAt]);
 
 	// SSE subscription — receive remote updates
 	useEffect(() => {
@@ -304,7 +315,7 @@ function SnipPageInner() {
 		});
 
 		return () => unsub();
-	}, [slug, isLocked]);
+	}, [slug, isLocked, setRemoteChanged, setUpdatedAt]);
 
 	// beforeunload warning when auto-save is off and there are unsaved changes
 	useEffect(() => {
@@ -399,7 +410,7 @@ function SnipPageInner() {
 			.then((res) => {
 				if (res.status === 404) return null;
 				if (res.status === 401) {
-					setIsLocked(true);
+					setLocked(true);
 					return null;
 				}
 				if (!res.ok) throw new Error("fetch failed");
@@ -436,15 +447,15 @@ function SnipPageInner() {
 			return;
 		}
 		setUnlockPassword("");
-		setIsLocked(false);
-		setIsProtected(true);
+		setLocked(false);
+		setProtected(true);
 		doRefresh();
 	}
 
 	async function handleSetPassword(password: string) {
 		if (updatedAt === undefined && !isProtected) {
 			controllerRef.current?.setInitialPassword(password);
-			setIsProtected(true);
+			setProtected(true);
 			toast.show(t("editor.protectionUpdated"));
 			return;
 		}
@@ -455,7 +466,7 @@ function SnipPageInner() {
 			body: JSON.stringify({ password }),
 		});
 		if (!res.ok) {
-			if (res.status === 401) setIsLocked(true);
+			if (res.status === 401) setLocked(true);
 			setLoadError(true);
 			return;
 		}
@@ -464,7 +475,7 @@ function SnipPageInner() {
 			headers: { "Content-Type": "application/json" },
 			body: JSON.stringify({ password }),
 		});
-		setIsProtected(true);
+		setProtected(true);
 		toast.show(t("editor.protectionUpdated"));
 	}
 
@@ -473,12 +484,12 @@ function SnipPageInner() {
 			method: "DELETE",
 		});
 		if (!res.ok) {
-			if (res.status === 401) setIsLocked(true);
+			if (res.status === 401) setLocked(true);
 			setLoadError(true);
 			return;
 		}
 		controllerRef.current?.setInitialPassword(null);
-		setIsProtected(false);
+		setProtected(false);
 		toast.show(t("editor.protectionRemoved"));
 	}
 
@@ -486,22 +497,15 @@ function SnipPageInner() {
 		await fetch(`/api/snips/${encodeURIComponent(slug)}/lock`, {
 			method: "POST",
 		});
-		setIsLocked(isProtected);
+		setLocked(isProtected);
 		setShowSettings(false);
 		toast.show(t("editor.lockedNow"));
 	}
-
-	const isDirty =
-		saveState.status === AUTOSAVE_STATUS.DIRTY ||
-		saveState.status === AUTOSAVE_STATUS.SAVING;
 
 	return (
 		<div className="flex flex-col h-screen bg-bg">
 			<Toolbar
 				slug={slug}
-				saveState={saveState}
-				isDirty={isDirty}
-				updatedAt={updatedAt}
 				onCopyUrl={handleCopyUrl}
 				onCopyContent={handleCopyContent}
 				onSave={handleSave}

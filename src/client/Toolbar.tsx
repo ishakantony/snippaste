@@ -11,6 +11,10 @@ import { Pill } from "@/client/components/ui/Pill.js";
 import { Icon } from "@/client/Icon.js";
 import { getExpirationInfo } from "@/client/lib/expirationCountdown.js";
 import { useFeatureFlag } from "@/client/stores/featureFlagsStore.js";
+import {
+	useSnipSessionDirty,
+	useSnipSessionStore,
+} from "@/client/stores/snipSessionStore.js";
 import { useTheme } from "@/client/stores/themeStore.js";
 import { THEME } from "@/client/theme.js";
 
@@ -127,9 +131,6 @@ function ExpirationPill({ updatedAt }: { updatedAt: number }) {
 
 export interface ToolbarProps {
 	slug: string;
-	saveState: AutosaveState;
-	isDirty: boolean;
-	updatedAt?: number;
 	onCopyUrl: () => void;
 	onCopyContent: () => void;
 	onSave: () => void;
@@ -143,9 +144,6 @@ export interface ToolbarProps {
 
 export function Toolbar({
 	slug,
-	saveState,
-	isDirty,
-	updatedAt,
 	onCopyUrl,
 	onCopyContent,
 	onSave,
@@ -158,6 +156,9 @@ export function Toolbar({
 }: ToolbarProps) {
 	const { theme, toggle } = useTheme();
 	const { t } = useTranslation();
+	const saveState = useSnipSessionStore((state) => state.saveState);
+	const updatedAt = useSnipSessionStore((state) => state.updatedAt);
+	const isDirty = useSnipSessionDirty();
 	const dark = theme === THEME.DARK;
 	const qrEnabled = useFeatureFlag("qrCode");
 	const langEnabled = useFeatureFlag("languageSwitcher");

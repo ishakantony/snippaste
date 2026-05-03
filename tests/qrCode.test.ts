@@ -43,6 +43,16 @@ describe("qrCode", () => {
 		expect(container.querySelector("canvas")).toBeTruthy();
 	});
 
+	it("replaces any existing QR code in the container", async () => {
+		const { createQrCode } = await import("@/client/lib/qrCode.js");
+
+		const container = document.createElement("div");
+		createQrCode({ url: "https://example.com/s/first", container });
+		createQrCode({ url: "https://example.com/s/second", container });
+
+		expect(container.querySelectorAll("canvas")).toHaveLength(1);
+	});
+
 	it("uses Q error correction level", async () => {
 		const { createQrCode } = await import("@/client/lib/qrCode.js");
 		const container = document.createElement("div");

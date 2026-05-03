@@ -7,6 +7,7 @@ import {
 	initializeFeatureFlags,
 	useFeatureFlagsStore,
 } from "@/client/stores/featureFlagsStore.js";
+import { useSnipSessionStore } from "@/client/stores/snipSessionStore.js";
 
 const autosaveControllerDeps = vi.hoisted(
 	() => [] as Array<{ enabled?: boolean }>,
@@ -74,6 +75,15 @@ describe("SnipPage auto-save feature flag", () => {
 		cleanup();
 		localStorage.clear();
 		useAutoSaveSettingsStore.setState({ enabled: false });
+		useSnipSessionStore.setState({
+			activeSlug: null,
+			loadError: false,
+			saveState: { status: "idle" },
+			remoteChanged: false,
+			updatedAt: undefined,
+			isLocked: false,
+			isProtected: false,
+		});
 		useFeatureFlagsStore.setState({
 			flags: {
 				qrCode: true,

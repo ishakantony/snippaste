@@ -18,11 +18,13 @@ export function QrModal({ url, slug, onClose, onToast }: QrModalProps) {
 	const { t } = useTranslation();
 
 	useEffect(() => {
-		if (!qrRef.current) return;
-		qrInstanceRef.current = createQrCode({ url, container: qrRef.current });
+		const container = qrRef.current;
+		if (!container) return;
+
+		qrInstanceRef.current = createQrCode({ url, container });
 		return () => {
 			qrInstanceRef.current = null;
-			if (qrRef.current) qrRef.current.innerHTML = "";
+			container.innerHTML = "";
 		};
 	}, [url]);
 

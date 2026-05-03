@@ -50,6 +50,7 @@ export function createQrCode({
 		image: LOGO_URL,
 	});
 
+	container.innerHTML = "";
 	qr.append(container);
 	return qr;
 }
