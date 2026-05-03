@@ -15,7 +15,8 @@
 		"test:e2e:demo": "E2E_DEMO=1 playwright test --headed --workers=1",
 		"lint": "biome check .",
 		"lint:fix": "biome check --write .",
-		"format": "biome format --write ."
+		"format": "biome format --write .",
+		"check:all": "npm run lint && npm run typecheck && npm test && npm run build"
 	},
 	"simple-git-hooks": {
 		"pre-commit": "npx lint-staged",
