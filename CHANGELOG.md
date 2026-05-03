@@ -2,6 +2,19 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [0.1.4](https://github.com/ishakantony/snippaste/compare/v0.1.3...v0.1.4) (2026-05-03)
+
+
+### Features
+
+* add openapi integration with hono and use hono rpc ([b8f1183](https://github.com/ishakantony/snippaste/commit/b8f118360decfe9bf20f663db5ffa4fc53a10d5c))
+
+
+### Bug Fixes
+
+* broken packages ([5937e16](https://github.com/ishakantony/snippaste/commit/5937e1650c9cb0b6ef6a4e845075a41fb995618c))
+* **client:** stabilize session and qr rendering ([27dbc15](https://github.com/ishakantony/snippaste/commit/27dbc151936cde767ef8a5bf67eefeb6c2004eda))
+
 ## [0.1.3](https://github.com/ishakantony/snippaste/compare/v0.1.2...v0.1.3) (2026-05-02)
 
 
