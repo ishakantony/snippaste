@@ -12,9 +12,8 @@
 		"allowImportingTsExtensions": true,
 		"resolveJsonModule": true,
 		"outDir": "dist",
-		"baseUrl": ".",
 		"paths": {
-			"@/*": ["src/*"]
+			"@/*": ["./src/*"]
 		}
 	},
 	"include": ["src", "tests", "vite.config.ts"],
