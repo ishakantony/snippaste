@@ -17,6 +17,6 @@ publish: setup-builder
 		.
 
 release:
-	npx commit-and-tag-version
+	bunx commit-and-tag-version
 	git push --follow-tags origin main
 	$(MAKE) publish

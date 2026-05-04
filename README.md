@@ -7,8 +7,8 @@ Snippets are stored in SQLite and accessed by short slug (e.g. `http://localhost
 ## Quick start
 
 ```sh
-npm install
-npm run dev
+bun install
+bun run dev
 ```
 
 - **Frontend**: http://localhost:7776 (Vite dev server)
@@ -18,11 +18,11 @@ npm run dev
 
 | Layer | Technology |
 |---|---|
-| Frontend | React 18, CodeMirror 6, Tailwind CSS v4 |
-| Backend | Hono.js on Node.js |
-| Database | SQLite (better-sqlite3) |
+| Frontend | React 19, CodeMirror 6, Tailwind CSS v4 |
+| Backend | Hono.js on Bun |
+| Database | SQLite (bun-sqlite) |
 | Real-time | Server-Sent Events (SSE) |
-| Build | Vite 6 (client), tsc (server) |
+| Build | Vite 6 (client), bun (server) |
 | Validation | Zod schemas (shared between client/server) |
 
 ## Architecture
@@ -36,19 +36,18 @@ src/
 
 - `src/shared/schemas.ts` defines the API contract (slug validation, request bodies)
 - `src/server/env.ts` validates environment variables at startup
-- Server uses relative imports (NodeNext). Client/tests use `@/` path aliases
 
 ## Commands
 
 ```sh
-npm run dev          # Start client + server concurrently
-npm run dev:client   # Vite dev server only (port 7776)
-npm run dev:server   # Hono server only (port 7777)
-npm test             # Run Vitest unit tests
-npm run typecheck    # TypeScript type checking
-npm run lint         # Biome lint + format check
-npm run lint:fix     # Auto-fix lint and formatting issues
-npm run build        # Production build (outputs to dist/client/)
+bun run dev          # Start client + server concurrently
+bun run dev:client   # Vite dev server only (port 7776)
+bun run dev:server   # Hono server only (port 7777)
+bun run test         # Run Vitest unit tests
+bun run typecheck    # TypeScript type checking
+bun run lint         # Biome lint + format check
+bun run lint:fix     # Auto-fix lint and formatting issues
+bun run build        # Production build (outputs to dist/client/)
 ```
 
 ## Local E2E tests
@@ -56,22 +55,22 @@ npm run build        # Production build (outputs to dist/client/)
 Install the Chromium browser once before running Playwright locally:
 
 ```sh
-npx playwright install chromium
+bunx playwright install chromium
 ```
 
 Run the browser E2E suite headlessly:
 
 ```sh
-npm run test:e2e
+bun run test:e2e
 ```
 
 Run the visible management demo with slowed browser actions:
 
 ```sh
-npm run test:e2e:demo
+bun run test:e2e:demo
 ```
 
-E2E tests build the client and server, start the compiled Hono server on a test port, and use a disposable SQLite database under `test-results/e2e/`. They are intentionally local-only and are not part of `npm test`, hooks, or CI/CD.
+E2E tests build the client and server, start the compiled Hono server on a test port, and use a disposable SQLite database under `test-results/e2e/`. They are intentionally local-only and are not part of `bun run test`, hooks, or CI/CD.
 
 ## Environment variables
 

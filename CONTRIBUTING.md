@@ -3,8 +3,8 @@
 ## Quick start
 
 ```bash
-npm install
-npm run dev
+bun install
+bun run dev
 ```
 
 This starts both the Vite dev server (port 7776) and the Hono API server (port 7777).
@@ -13,9 +13,9 @@ This starts both the Vite dev server (port 7776) and the Hono API server (port 7
 
 1. Create a branch from `main`
 2. Make your changes
-3. Ensure tests pass: `npm test`
-4. Ensure types check: `npm run typecheck`
-5. Ensure linting passes: `npm run lint`
+3. Ensure tests pass: `bun run test`
+4. Ensure types check: `bun run typecheck`
+5. Ensure linting passes: `bun run lint`
 6. Commit with a conventional commit message (enforced by commitlint)
 7. Push and open a pull request
 
@@ -37,13 +37,13 @@ docs: update API documentation
 - **Imports**: Use `@/` path alias (maps to `src/`)
 - **Import extensions**: Always use `.js` extensions in import paths (ESM requirement)
 
-Run `npm run lint:fix` to auto-fix lint and formatting issues.
+Run `bun run lint:fix` to auto-fix lint and formatting issues.
 
 ## Testing
 
 ```bash
-npm test             # Run all unit tests (Vitest)
-npm run typecheck    # TypeScript type checking
+bun run test         # Run all unit tests (Vitest)
+bun run typecheck    # TypeScript type checking
 ```
 
 - **Unit tests**: Vitest, located in `tests/*.test.ts`
@@ -66,9 +66,9 @@ src/
 
 ## PR checklist
 
-- [ ] Tests pass (`npm test`)
-- [ ] Types check (`npm run typecheck`)
-- [ ] Lint passes (`npm run lint`)
+- [ ] Tests pass (`bun run test`)
+- [ ] Types check (`bun run typecheck`)
+- [ ] Lint passes (`bun run lint`)
 - [ ] New features have tests
 - [ ] New API routes have Zod schemas in `src/shared/schemas.ts`
 - [ ] Conventional commit messages used

@@ -23,15 +23,15 @@ src/
 ## Development commands
 
 ```bash
-npm install          # Install dependencies
-npm run dev          # Start both client (7776) and server (7777)
-npm run dev:client   # Start Vite dev server only
-npm run dev:server   # Start Hono server only
-npm test             # Run vitest unit tests
-npm run typecheck    # TypeScript type checking (tsc --noEmit)
-npm run lint         # Biome lint + format check
-npm run lint:fix     # Biome lint + format fix
-npm run build        # Vite production build (outputs to dist/client/)
+bun install          # Install dependencies
+bun run dev          # Start both client (7776) and server (7777)
+bun run dev:client   # Start Vite dev server only
+bun run dev:server   # Start Hono server only
+bun run test         # Run vitest unit tests
+bun run typecheck    # TypeScript type checking (tsc --noEmit)
+bun run lint         # Biome lint + format check
+bun run lint:fix     # Biome lint + format fix
+bun run build        # Vite production build (outputs to dist/client/)
 ```
 
 ## Conventions
