@@ -10,6 +10,7 @@ export interface ToolbarMobileSheetProps {
 	closing: boolean;
 	onClose: () => void;
 	disableDismiss: boolean;
+	isLocked: boolean;
 	qrEnabled: boolean;
 	languageSwitcherEnabled: boolean;
 	dark: boolean;
@@ -26,6 +27,7 @@ export function ToolbarMobileSheet({
 	closing,
 	onClose,
 	disableDismiss,
+	isLocked,
 	qrEnabled,
 	languageSwitcherEnabled,
 	dark,
@@ -50,20 +52,23 @@ export function ToolbarMobileSheet({
 			testId="mobile-overflow-sheet"
 		>
 			<div className="grid grid-cols-2 gap-2">
-				{qrEnabled && (
+				{qrEnabled && !isLocked && (
 					<BottomSheetAction label={t("toolbar.qr")} icon="qr" onClick={onQr} />
 				)}
-				<BottomSheetAction
-					label={t("toolbar.refresh")}
-					icon="refresh"
-					onClick={onRefresh}
-				/>
+				{!isLocked && (
+					<BottomSheetAction
+						label={t("toolbar.refresh")}
+						icon="refresh"
+						onClick={onRefresh}
+					/>
+				)}
 				{languageSwitcherEnabled && (
 					<LanguageSwitcher
 						variant="ghost"
 						size="lg"
 						iconSize={15}
 						className="h-11 w-full justify-start gap-3 rounded-lg px-3 text-sm"
+						menuClassName="top-auto bottom-full mt-0 mb-1"
 					/>
 				)}
 				<BottomSheetAction
@@ -71,7 +76,7 @@ export function ToolbarMobileSheet({
 					icon={dark ? "sun" : "moon"}
 					onClick={onToggleTheme}
 				/>
-				{settingsEnabled && (
+				{settingsEnabled && !isLocked && (
 					<BottomSheetAction
 						label={t("toolbar.settings")}
 						icon="settings"
@@ -79,14 +84,16 @@ export function ToolbarMobileSheet({
 					/>
 				)}
 			</div>
-			<div className="mt-3 border-t border-border pt-3">
-				<BottomSheetAction
-					label={t("toolbar.clear")}
-					icon="trash"
-					onClick={onClear}
-					danger
-				/>
-			</div>
+			{!isLocked && (
+				<div className="mt-3 border-t border-border pt-3">
+					<BottomSheetAction
+						label={t("toolbar.clear")}
+						icon="trash"
+						onClick={onClear}
+						danger
+					/>
+				</div>
+			)}
 		</BottomSheet>
 	);
 }

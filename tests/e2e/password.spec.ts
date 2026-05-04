@@ -67,3 +67,84 @@ test("opens a protected snip as locked before unlock", async ({
 	).toBeVisible();
 	await expect(page.getByTestId("save-status")).toContainText("locked");
 });
+
+test("locked mobile snip hides edit actions", async ({ page, request }) => {
+	await page.setViewportSize({ width: 390, height: 844 });
+	const slug = uniqueSlug("password-mobile-locked");
+	await createSnipViaApi(request, slug, "Secret content", "open-sesame");
+
+	await page.goto(`/s/${slug}`);
+
+	await expect(
+		page.getByRole("heading", { name: "Protected snip" }),
+	).toBeVisible();
+	await expect(page.getByTestId("mobile-action-bar")).toBeHidden();
+	await page.getByRole("button", { name: "More actions" }).click();
+
+	const sheet = page.getByTestId("mobile-overflow-sheet");
+	await expect(sheet).toBeVisible();
+	await page.waitForTimeout(250);
+	await expect(sheet).toBeVisible();
+	await expect(sheet.getByRole("button", { name: "Language" })).toBeVisible();
+	await expect(sheet.getByRole("button", { name: "Light mode" })).toBeVisible();
+	await expect(sheet.getByRole("button", { name: "QR" })).toBeHidden();
+	await expect(sheet.getByRole("button", { name: "Refresh" })).toBeHidden();
+	await expect(sheet.getByRole("button", { name: "Settings" })).toBeHidden();
+	await expect(sheet.getByRole("button", { name: "Clear" })).toBeHidden();
+});
+
+test("locked mobile snip allows language and theme changes", async ({
+	page,
+	request,
+}) => {
+	await page.setViewportSize({ width: 390, height: 844 });
+	const slug = uniqueSlug("password-mobile-preferences");
+	await createSnipViaApi(request, slug, "Secret content", "open-sesame");
+
+	await page.goto(`/s/${slug}`);
+
+	await expect(
+		page.getByRole("heading", { name: "Protected snip" }),
+	).toBeVisible();
+	await page.getByRole("button", { name: "More actions" }).click();
+	const sheet = page.getByTestId("mobile-overflow-sheet");
+	await expect(sheet).toBeVisible();
+
+	await sheet.getByRole("button", { name: /light mode/i }).click();
+	await expect(page.locator("html")).toHaveAttribute("data-theme", "light");
+	await expect(sheet).toBeVisible();
+	await expect(sheet.getByRole("button", { name: /dark mode/i })).toBeVisible();
+
+	await sheet.getByRole("button", { name: "Language" }).click();
+	await sheet.getByRole("button", { name: "Bahasa Indonesia" }).click();
+
+	await expect(
+		page.getByRole("heading", { name: "Snip terlindungi" }),
+	).toBeVisible();
+	await expect(sheet.getByRole("button", { name: "Bahasa" })).toBeVisible();
+	await expect(sheet.getByRole("button", { name: "mode gelap" })).toBeVisible();
+	await expect(page.getByTestId("mobile-action-bar")).toBeHidden();
+});
+
+test("locking from mobile settings closes the overflow sheet", async ({
+	page,
+}) => {
+	await page.setViewportSize({ width: 390, height: 844 });
+	const slug = uniqueSlug("password-mobile-lock-now");
+
+	await page.goto(`/s/${slug}`);
+	await typeInEditor(page, "Protected mobile content");
+	await expectAutoSaved(page);
+	await page.getByRole("button", { name: "More actions" }).click();
+	const sheet = page.getByTestId("mobile-overflow-sheet");
+	await expect(sheet).toBeVisible();
+	await sheet.getByRole("button", { name: "Settings" }).click();
+	await page.getByLabel("New password").fill("open-sesame");
+	await page.getByRole("button", { name: "Enable protection" }).click();
+	await page.getByRole("button", { name: "Lock now" }).click();
+
+	await expect(
+		page.getByRole("heading", { name: "Protected snip" }),
+	).toBeVisible();
+	await expect(sheet).toBeHidden();
+});

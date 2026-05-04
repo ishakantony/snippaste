@@ -64,7 +64,10 @@ export function LandingPage() {
 	}
 
 	return (
-		<div className="relative flex min-h-[100dvh] w-screen flex-col overflow-x-hidden bg-bg md:h-screen md:flex-row md:overflow-hidden">
+		<div
+			className="relative flex h-[100dvh] w-full flex-col overflow-x-hidden overflow-y-auto bg-bg md:h-screen md:flex-row md:overflow-hidden"
+			data-testid="landing-page"
+		>
 			<div className="absolute top-4 right-4 z-10 flex items-center gap-2 md:top-5 md:right-5">
 				{langEnabled && (
 					<LanguageSwitcher

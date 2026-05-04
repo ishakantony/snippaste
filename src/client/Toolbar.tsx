@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Link } from "react-router-dom";
 import {
@@ -165,8 +165,10 @@ export function Toolbar({
 	const { t } = useTranslation();
 	const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 	const [mobileMenuClosing, setMobileMenuClosing] = useState(false);
+	const wasLockedRef = useRef(false);
 	const saveState = useSnipSessionStore((state) => state.saveState);
 	const updatedAt = useSnipSessionStore((state) => state.updatedAt);
+	const isLocked = useSnipSessionStore((state) => state.isLocked);
 	const isDirty = useSnipSessionDirty();
 	const dark = theme === THEME.DARK;
 	const qrEnabled = useFeatureFlag("qrCode");
@@ -188,6 +190,14 @@ export function Toolbar({
 			setMobileMenuClosing(false);
 		}, 180);
 	}, []);
+
+	useEffect(() => {
+		const becameLocked = !wasLockedRef.current && isLocked;
+		wasLockedRef.current = isLocked;
+		if (!becameLocked || !mobileMenuOpen) return;
+		setMobileMenuOpen(false);
+		setMobileMenuClosing(false);
+	}, [isLocked, mobileMenuOpen]);
 
 	return (
 		<>
@@ -247,46 +257,52 @@ export function Toolbar({
 				</div>
 			</div>
 
-			<div className="fixed inset-x-0 bottom-0 z-30 border-t border-border bg-surface/95 px-3 pt-2 pb-[calc(env(safe-area-inset-bottom)+8px)] backdrop-blur md:hidden">
-				<div className="grid grid-cols-3 gap-2" data-testid="mobile-action-bar">
-					<Button
-						variant="default"
-						size="lg"
-						className="h-11 min-w-0 rounded-lg border-border-2 bg-surface-2 px-2"
-						onClick={onCopyUrl}
-						title={t("toolbar.copyUrl")}
+			{!isLocked && (
+				<div className="fixed inset-x-0 bottom-0 z-30 border-t border-border bg-surface/95 px-3 pt-2 pb-[calc(env(safe-area-inset-bottom)+8px)] backdrop-blur md:hidden">
+					<div
+						className="grid grid-cols-3 gap-2"
+						data-testid="mobile-action-bar"
 					>
-						<Icon name="link" size={14} />
-						<span className="min-w-0 truncate">{t("toolbar.copyUrl")}</span>
-					</Button>
-					<Button
-						variant="default"
-						size="lg"
-						className="h-11 min-w-0 rounded-lg border-border-2 bg-surface-2 px-2"
-						onClick={onCopyContent}
-						title={t("toolbar.copy")}
-					>
-						<Icon name="copy" size={14} />
-						<span className="min-w-0 truncate">{t("toolbar.copy")}</span>
-					</Button>
-					<Button
-						variant="primary"
-						size="lg"
-						className="h-11 min-w-0 rounded-lg px-2"
-						onClick={onSave}
-						title={t("toolbar.save")}
-					>
-						<Icon name="save" size={14} />
-						<span className="min-w-0 truncate">{t("toolbar.save")}</span>
-					</Button>
+						<Button
+							variant="default"
+							size="lg"
+							className="h-11 min-w-0 rounded-lg border-border-2 bg-surface-2 px-2"
+							onClick={onCopyUrl}
+							title={t("toolbar.copyUrl")}
+						>
+							<Icon name="link" size={14} />
+							<span className="min-w-0 truncate">{t("toolbar.copyUrl")}</span>
+						</Button>
+						<Button
+							variant="default"
+							size="lg"
+							className="h-11 min-w-0 rounded-lg border-border-2 bg-surface-2 px-2"
+							onClick={onCopyContent}
+							title={t("toolbar.copy")}
+						>
+							<Icon name="copy" size={14} />
+							<span className="min-w-0 truncate">{t("toolbar.copy")}</span>
+						</Button>
+						<Button
+							variant="primary"
+							size="lg"
+							className="h-11 min-w-0 rounded-lg px-2"
+							onClick={onSave}
+							title={t("toolbar.save")}
+						>
+							<Icon name="save" size={14} />
+							<span className="min-w-0 truncate">{t("toolbar.save")}</span>
+						</Button>
+					</div>
 				</div>
-			</div>
+			)}
 
 			<ToolbarMobileSheet
 				open={mobileMenuOpen}
 				closing={mobileMenuClosing}
 				onClose={closeMobileMenu}
 				disableDismiss={mobileOverlayOpen}
+				isLocked={isLocked}
 				qrEnabled={qrEnabled}
 				languageSwitcherEnabled={langEnabled}
 				dark={dark}

@@ -51,3 +51,17 @@ test("mobile smoke: creates and opens an editor", async ({ page }) => {
 	await expect(page).toHaveURL(new RegExp(`/s/${slug}$`));
 	await expect(page.getByTestId("snip-editor")).toBeVisible();
 });
+
+test("mobile landing scrolls on short screens", async ({ page }) => {
+	await page.setViewportSize({ width: 390, height: 430 });
+
+	await page.goto("/");
+	const landing = page.getByTestId("landing-page");
+	await expect(landing).toBeVisible();
+	await expect(
+		await landing.evaluate((el) => el.scrollHeight > el.clientHeight),
+	).toBe(true);
+
+	await landing.evaluate((el) => el.scrollTo(0, el.scrollHeight));
+	await expect(await landing.evaluate((el) => el.scrollTop > 0)).toBe(true);
+});

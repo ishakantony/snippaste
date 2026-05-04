@@ -16,6 +16,7 @@ interface LanguageSwitcherProps {
 	variant?: ButtonProps["variant"];
 	size?: ButtonProps["size"];
 	className?: string;
+	menuClassName?: string;
 	iconSize?: number;
 }
 
@@ -23,6 +24,7 @@ export function LanguageSwitcher({
 	variant = "ghost",
 	size = "sm",
 	className,
+	menuClassName,
 	iconSize = 13,
 }: LanguageSwitcherProps) {
 	const { t } = useTranslation();
@@ -55,7 +57,12 @@ export function LanguageSwitcher({
 				{variant !== "icon" && current.code.toUpperCase()}
 			</Button>
 			{open && (
-				<div className="absolute right-0 top-full mt-1 bg-modal-bg border border-border-2 rounded-lg shadow-[0_8px_32px_rgba(0,0,0,0.5)] py-1 z-50 min-w-28">
+				<div
+					className={cn(
+						"absolute right-0 top-full mt-1 bg-modal-bg border border-border-2 rounded-lg shadow-[0_8px_32px_rgba(0,0,0,0.5)] py-1 z-50 min-w-28",
+						menuClassName,
+					)}
+				>
 					{LANGUAGES.map((lang) => (
 						<button
 							key={lang.code}
