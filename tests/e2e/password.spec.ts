@@ -148,3 +148,57 @@ test("locking from mobile settings closes the overflow sheet", async ({
 	).toBeVisible();
 	await expect(sheet).toBeHidden();
 });
+
+test("locked desktop snip hides edit actions but keeps header and preferences", async ({
+	page,
+	request,
+}) => {
+	await page.setViewportSize({ width: 1280, height: 720 });
+	const slug = uniqueSlug("password-desktop-locked");
+	await createSnipViaApi(request, slug, "Secret content", "open-sesame");
+
+	await page.goto(`/s/${slug}`);
+
+	await expect(
+		page.getByRole("heading", { name: "Protected snip" }),
+	).toBeVisible();
+	await expect(page.getByTestId("save-status")).toContainText("locked");
+
+	await expect(page.getByRole("button", { name: "Copy URL" })).toBeHidden();
+	await expect(page.getByRole("button", { name: "QR" })).toBeHidden();
+	await expect(page.getByRole("button", { name: "Copy" })).toBeHidden();
+	await expect(page.getByRole("button", { name: "Save" })).toBeHidden();
+	await expect(page.getByRole("button", { name: "Clear" })).toBeHidden();
+	await expect(page.getByRole("button", { name: "Refresh" })).toBeHidden();
+	await expect(page.getByRole("button", { name: "Settings" })).toBeHidden();
+
+	await expect(page.getByRole("button", { name: "Language" })).toBeVisible();
+	await expect(
+		page.getByRole("button", { name: "Toggle theme" }),
+	).toBeVisible();
+
+	await expect(page.getByTitle(slug)).toBeVisible();
+	await expect(page.getByTestId("save-status")).toBeVisible();
+});
+
+test("desktop status pill changes from locked to ready after unlock", async ({
+	page,
+	request,
+}) => {
+	await page.setViewportSize({ width: 1280, height: 720 });
+	const slug = uniqueSlug("password-desktop-unlock-status");
+	await createSnipViaApi(request, slug, "Secret content", "open-sesame");
+
+	await page.goto(`/s/${slug}`);
+
+	await expect(
+		page.getByRole("heading", { name: "Protected snip" }),
+	).toBeVisible();
+	await expect(page.getByTestId("save-status")).toContainText("locked");
+
+	await page.getByLabel("Password").fill("open-sesame");
+	await page.getByRole("button", { name: "Unlock" }).click();
+
+	await expect(editor(page)).toContainText("Secret content");
+	await expect(page.getByTestId("save-status")).toContainText("ready");
+});

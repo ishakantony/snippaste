@@ -356,75 +356,79 @@ export function Toolbar({
 				)}
 
 				<div className="flex items-center gap-2">
-					<div className="flex items-center border border-border-2 rounded-7 overflow-hidden bg-surface-2">
-						<Button
-							variant="ghost"
-							size="sm"
-							onClick={onCopyUrl}
-							title={t("toolbar.copyUrl")}
-						>
-							<Icon name="link" size={13} />
-							{t("toolbar.copyUrl")}
-						</Button>
-						{qrEnabled && (
-							<>
+					{!isLocked && (
+						<>
+							<div className="flex items-center border border-border-2 rounded-7 overflow-hidden bg-surface-2">
+								<Button
+									variant="ghost"
+									size="sm"
+									onClick={onCopyUrl}
+									title={t("toolbar.copyUrl")}
+								>
+									<Icon name="link" size={13} />
+									{t("toolbar.copyUrl")}
+								</Button>
+								{qrEnabled && (
+									<>
+										<div className="w-px h-5 bg-border-2 shrink-0" />
+										<Button
+											variant="ghost"
+											size="sm"
+											onClick={onQr}
+											title={t("toolbar.qrCode")}
+										>
+											<Icon name="qr" size={13} />
+											{t("toolbar.qr")}
+										</Button>
+									</>
+								)}
 								<div className="w-px h-5 bg-border-2 shrink-0" />
 								<Button
 									variant="ghost"
 									size="sm"
-									onClick={onQr}
-									title={t("toolbar.qrCode")}
+									onClick={onCopyContent}
+									title={t("toolbar.copy")}
 								>
-									<Icon name="qr" size={13} />
-									{t("toolbar.qr")}
+									<Icon name="copy" size={13} />
+									{t("toolbar.copy")}
 								</Button>
-							</>
-						)}
-						<div className="w-px h-5 bg-border-2 shrink-0" />
-						<Button
-							variant="ghost"
-							size="sm"
-							onClick={onCopyContent}
-							title={t("toolbar.copy")}
-						>
-							<Icon name="copy" size={13} />
-							{t("toolbar.copy")}
-						</Button>
-						<div className="w-px h-5 bg-border-2 shrink-0" />
-						<Button
-							variant="ghost"
-							size="sm"
-							onClick={onSave}
-							title={t("toolbar.save")}
-						>
-							<Icon name="save" size={13} />
-							{t("toolbar.save")}
-						</Button>
-					</div>
+								<div className="w-px h-5 bg-border-2 shrink-0" />
+								<Button
+									variant="ghost"
+									size="sm"
+									onClick={onSave}
+									title={t("toolbar.save")}
+								>
+									<Icon name="save" size={13} />
+									{t("toolbar.save")}
+								</Button>
+							</div>
 
-					<div className="flex items-center border border-border-2 rounded-7 overflow-hidden bg-surface-2">
-						<Button
-							variant="danger"
-							size="sm"
-							className="px-2"
-							onClick={onClear}
-							title={t("toolbar.clear")}
-							aria-label={t("toolbar.clear")}
-						>
-							<Icon name="trash" size={13} />
-						</Button>
-						<div className="w-px h-5 bg-border-2 shrink-0" />
-						<Button
-							variant="ghost"
-							size="sm"
-							className="px-2"
-							onClick={onRefresh}
-							title={t("toolbar.refresh")}
-							aria-label={t("toolbar.refresh")}
-						>
-							<Icon name="refresh" size={13} />
-						</Button>
-					</div>
+							<div className="flex items-center border border-border-2 rounded-7 overflow-hidden bg-surface-2">
+								<Button
+									variant="danger"
+									size="sm"
+									className="px-2"
+									onClick={onClear}
+									title={t("toolbar.clear")}
+									aria-label={t("toolbar.clear")}
+								>
+									<Icon name="trash" size={13} />
+								</Button>
+								<div className="w-px h-5 bg-border-2 shrink-0" />
+								<Button
+									variant="ghost"
+									size="sm"
+									className="px-2"
+									onClick={onRefresh}
+									title={t("toolbar.refresh")}
+									aria-label={t("toolbar.refresh")}
+								>
+									<Icon name="refresh" size={13} />
+								</Button>
+							</div>
+						</>
+					)}
 
 					<div className="flex items-center border border-border-2 rounded-7 bg-surface-2">
 						{langEnabled && (
@@ -437,7 +441,7 @@ export function Toolbar({
 								<div className="w-px h-5 bg-border-2 shrink-0" />
 							</>
 						)}
-						{settingsEnabled && (
+						{!isLocked && settingsEnabled && (
 							<>
 								<Button
 									variant="ghost"

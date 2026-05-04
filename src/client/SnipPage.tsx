@@ -456,6 +456,7 @@ function SnipPageInner() {
 		}
 		setUnlockPassword("");
 		setLocked(false);
+		setSaveState({ status: AUTOSAVE_STATUS.IDLE });
 		setProtected(true);
 		doRefresh();
 	}
