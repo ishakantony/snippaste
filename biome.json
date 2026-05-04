@@ -6,6 +6,8 @@
 			"!!**/dist",
 			"!!**/coverage",
 			"!!**/test-results",
+			"!!**/.agents",
+			"!!**/.claude",
 			"!**/*.md"
 		]
 	},
