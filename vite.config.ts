@@ -46,14 +46,18 @@ export default defineConfig(({ mode }) => {
 			outDir: "dist/client",
 			rollupOptions: {
 				output: {
-					manualChunks: {
-						"vendor-react": ["react", "react-dom", "react-router-dom"],
-						"vendor-codemirror": [
-							"@codemirror/commands",
-							"@codemirror/state",
-							"@codemirror/theme-one-dark",
-							"@codemirror/view",
-						],
+					manualChunks(id) {
+						if (
+							/[\\/]node_modules[\\/](react|react-dom|react-router-dom)[\\/]/.test(
+								id,
+							)
+						) {
+							return "vendor-react";
+						}
+
+						if (/[\\/]node_modules[\\/]@codemirror[\\/]/.test(id)) {
+							return "vendor-codemirror";
+						}
 					},
 				},
 			},
