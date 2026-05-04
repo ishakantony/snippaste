@@ -1,0 +1,6 @@
+{
+	"$comment": "This file is auto-created at <skillDir>/web-inspect.config.json the first time you run start.mjs with --page and --dev-url flags. You rarely need to edit it manually. pageFiles are relative HTML entries the overlay script tag is injected into. devUrl is the URL the user opens in the browser to view the running app.",
+	"pageFiles": ["index.html"],
+	"devUrl": "http://localhost:5173",
+	"scanRoots": ["public", "src", "app", "pages"]
+}

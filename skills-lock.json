@@ -49,6 +49,12 @@
 			"skillPath": "tdd/SKILL.md",
 			"computedHash": "ad055544599481182d0079c4198e85da26677cb408a677be2da04915375f0427"
 		},
+		"web-inspect": {
+			"source": "ishakantony/skills",
+			"sourceType": "github",
+			"skillPath": "web-inspect/SKILL.md",
+			"computedHash": "32aa4b540a183bcba345239d55c1af4193d665fbafa3c8598207353c7e15dac3"
+		},
 		"write-a-prd": {
 			"source": "ishakantony/skills",
 			"sourceType": "github",
