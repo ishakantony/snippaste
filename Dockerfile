@@ -5,10 +5,15 @@ FROM oven/bun:1 AS build
 
 WORKDIR /app
 
+RUN apt-get update \
+ && apt-get install -y --no-install-recommends python3 make g++ \
+ && rm -rf /var/lib/apt/lists/*
+
 COPY package.json bun.lock* ./
 RUN bun install --frozen-lockfile
 
 COPY src/ src/
+COPY drizzle/ drizzle/
 COPY public/ public/
 COPY index.html ./
 COPY vite.config.ts ./
@@ -29,6 +34,7 @@ RUN groupadd --system --gid 1001 bunjs \
 RUN mkdir -p /data && chown snippaste:bunjs /data
 
 COPY --from=build --chown=snippaste:bunjs /app/dist/ dist/
+COPY --from=build --chown=snippaste:bunjs /app/drizzle/ drizzle/
 
 ENV PORT=7777
 ENV DB_PATH=/data/snippaste.db

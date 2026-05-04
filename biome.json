@@ -5,6 +5,7 @@
 			"**",
 			"!!**/dist",
 			"!!**/coverage",
+			"!!**/drizzle",
 			"!!**/test-results",
 			"!!**/.agents",
 			"!!**/.claude",

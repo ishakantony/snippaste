@@ -1,9 +1,10 @@
 import { defineConfig } from "@playwright/test";
 
 const port = 7778;
-const baseURL = `http://127.0.0.1:${port}`;
+const baseURL = process.env.E2E_BASE_URL ?? `http://127.0.0.1:${port}`;
 const dbPath = "test-results/e2e/snippaste-e2e.db";
 const demo = process.env.E2E_DEMO === "1";
+const skipWebServer = process.env.E2E_SKIP_WEBSERVER === "1";
 
 export default defineConfig({
 	testDir: "./tests/e2e",
@@ -27,10 +28,12 @@ export default defineConfig({
 			use: { browserName: "chromium" },
 		},
 	],
-	webServer: {
-		command: `mkdir -p test-results/e2e && rm -f ${dbPath} && bun run build && PORT=${port} DB_PATH=${dbPath} FEATURE_QR_CODE=true FEATURE_LANGUAGE_SWITCHER=true FEATURE_AUTO_SAVE=true bun dist/server/index.js`,
-		url: `${baseURL}/api/health`,
-		timeout: 120_000,
-		reuseExistingServer: false,
-	},
+	webServer: skipWebServer
+		? undefined
+		: {
+				command: `mkdir -p test-results/e2e && rm -f ${dbPath} && bun run build && PORT=${port} DB_PATH=${dbPath} FEATURE_QR_CODE=true FEATURE_LANGUAGE_SWITCHER=true FEATURE_AUTO_SAVE=true bun dist/server/index.js`,
+				url: `${baseURL}/api/health`,
+				timeout: 120_000,
+				reuseExistingServer: false,
+			},
 });

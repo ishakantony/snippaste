@@ -1,4 +1,6 @@
-import { Database } from "bun:sqlite";
+import { eq, lt, sql } from "drizzle-orm";
+import { type AppDb, type DatabaseHandle, openDatabase } from "./db/index.js";
+import { snips } from "./db/schema.js";
 import { env } from "./env.js";
 
 export interface SnipDTO {
@@ -9,64 +11,26 @@ export interface SnipDTO {
 	passwordUpdatedAt: number | null;
 }
 
-const SCHEMA = `
-CREATE TABLE IF NOT EXISTS snips (
-  slug       TEXT    PRIMARY KEY,
-  content    TEXT    NOT NULL,
-  created_at INTEGER NOT NULL,
-  updated_at INTEGER NOT NULL,
-  password_hash TEXT,
-  password_updated_at INTEGER
-)
-`;
-
 export class SnipStore {
-	private db: Database;
+	private handle: DatabaseHandle;
+	private db: AppDb;
 
 	constructor(dbPath: string = env.DB_PATH) {
-		this.db = new Database(dbPath);
-		this.db.run("PRAGMA journal_mode = WAL");
-		this.db.run(SCHEMA);
-		this.migrate();
-	}
-
-	private migrate(): void {
-		const columns = this.db
-			.query<{ name: string }, []>("PRAGMA table_info(snips)")
-			.all()
-			.map((column) => column.name);
-		if (!columns.includes("password_hash")) {
-			this.db.run("ALTER TABLE snips ADD COLUMN password_hash TEXT");
-		}
-		if (!columns.includes("password_updated_at")) {
-			this.db.run("ALTER TABLE snips ADD COLUMN password_updated_at INTEGER");
-		}
+		this.handle = openDatabase(dbPath);
+		this.db = this.handle.db;
 	}
 
 	get(slug: string): SnipDTO | null {
-		const row = this.db
-			.query<
-				{
-					slug: string;
-					content: string;
-					updated_at: number;
-					password_hash: string | null;
-					password_updated_at: number | null;
-				},
-				[string]
-			>(
-				"SELECT slug, content, updated_at, password_hash, password_updated_at FROM snips WHERE slug = ?",
-			)
-			.get(slug);
+		const row = this.db.select().from(snips).where(eq(snips.slug, slug)).get();
 
 		if (!row) return null;
 
 		return {
 			slug: row.slug,
 			content: row.content,
-			updatedAt: row.updated_at,
-			protected: row.password_hash !== null,
-			passwordUpdatedAt: row.password_updated_at,
+			updatedAt: row.updatedAt,
+			protected: row.passwordHash !== null,
+			passwordUpdatedAt: row.passwordUpdatedAt,
 		};
 	}
 
@@ -74,71 +38,85 @@ export class SnipStore {
 		const now = Date.now();
 		if (passwordHash !== undefined) {
 			this.db
-				.query(
-					`INSERT INTO snips (slug, content, created_at, updated_at, password_hash, password_updated_at)
-         VALUES (?, ?, ?, ?, ?, ?)
-         ON CONFLICT(slug) DO UPDATE SET
-           content    = excluded.content,
-           updated_at = excluded.updated_at,
-           password_hash = COALESCE(snips.password_hash, excluded.password_hash),
-           password_updated_at = COALESCE(snips.password_updated_at, excluded.password_updated_at)`,
-				)
-				.run(slug, content, now, now, passwordHash, now);
+				.insert(snips)
+				.values({
+					slug,
+					content,
+					createdAt: now,
+					updatedAt: now,
+					passwordHash,
+					passwordUpdatedAt: now,
+				})
+				.onConflictDoUpdate({
+					target: snips.slug,
+					set: {
+						content: sql`excluded.content`,
+						updatedAt: sql`excluded.updated_at`,
+						passwordHash: sql`COALESCE(${snips.passwordHash}, excluded.password_hash)`,
+						passwordUpdatedAt: sql`COALESCE(${snips.passwordUpdatedAt}, excluded.password_updated_at)`,
+					},
+				})
+				.run();
 			return;
 		}
 
 		this.db
-			.query(
-				`INSERT INTO snips (slug, content, created_at, updated_at)
-         VALUES (?, ?, ?, ?)
-         ON CONFLICT(slug) DO UPDATE SET
-           content    = excluded.content,
-           updated_at = excluded.updated_at`,
-			)
-			.run(slug, content, now, now);
+			.insert(snips)
+			.values({ slug, content, createdAt: now, updatedAt: now })
+			.onConflictDoUpdate({
+				target: snips.slug,
+				set: {
+					content: sql`excluded.content`,
+					updatedAt: sql`excluded.updated_at`,
+				},
+			})
+			.run();
 	}
 
 	getPasswordHash(slug: string): string | null {
 		const row = this.db
-			.query<{ password_hash: string | null }, [string]>(
-				"SELECT password_hash FROM snips WHERE slug = ?",
-			)
-			.get(slug);
-		return row?.password_hash ?? null;
+			.select({ passwordHash: snips.passwordHash })
+			.from(snips)
+			.where(eq(snips.slug, slug))
+			.get();
+		return row?.passwordHash ?? null;
 	}
 
 	setPassword(slug: string, passwordHash: string): void {
 		this.db
-			.query(
-				"UPDATE snips SET password_hash = ?, password_updated_at = ? WHERE slug = ?",
-			)
-			.run(passwordHash, Date.now(), slug);
+			.update(snips)
+			.set({ passwordHash, passwordUpdatedAt: Date.now() })
+			.where(eq(snips.slug, slug))
+			.run();
 	}
 
 	removePassword(slug: string): void {
 		this.db
-			.query(
-				"UPDATE snips SET password_hash = NULL, password_updated_at = NULL WHERE slug = ?",
-			)
-			.run(slug);
+			.update(snips)
+			.set({ passwordHash: null, passwordUpdatedAt: null })
+			.where(eq(snips.slug, slug))
+			.run();
 	}
 
 	clearContent(slug: string): void {
 		const now = Date.now();
 		this.db
-			.query(`UPDATE snips SET content = '', updated_at = ? WHERE slug = ?`)
-			.run(now, slug);
+			.update(snips)
+			.set({ content: "", updatedAt: now })
+			.where(eq(snips.slug, slug))
+			.run();
 	}
 
 	deleteStale(maxAgeDays: number): number {
 		const cutoff = Date.now() - maxAgeDays * 24 * 60 * 60 * 1000;
 		const result = this.db
-			.query("DELETE FROM snips WHERE updated_at < ?")
-			.run(cutoff);
+			.delete(snips)
+			.where(lt(snips.updatedAt, cutoff))
+			.run() as unknown as { changes: number };
 		return result.changes;
 	}
 
 	close(): void {
-		this.db.close();
+		this.handle.close();
 	}
 }

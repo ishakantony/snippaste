@@ -17,6 +17,10 @@ class Statement<T = unknown> {
 	} {
 		return this.stmt.run(...params);
 	}
+
+	values(...params: unknown[]): unknown[][] {
+		return this.stmt.raw().all(...params) as unknown[][];
+	}
 }
 
 class Database {
@@ -34,12 +38,20 @@ class Database {
 		}
 	}
 
+	exec(sql: string): void {
+		this.db.exec(sql);
+	}
+
 	query<T = unknown>(sql: string): Statement<T> {
 		return new Statement<T>(this.db.prepare(sql));
 	}
 
 	prepare<T = unknown>(sql: string): Statement<T> {
 		return this.query<T>(sql);
+	}
+
+	transaction<T>(fn: () => T): () => T {
+		return this.db.transaction(fn) as () => T;
 	}
 
 	close(): void {

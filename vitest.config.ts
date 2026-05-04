@@ -8,6 +8,9 @@ export default defineConfig({
 			"bun:sqlite": path.resolve(__dirname, "tests/mocks/bun-sqlite.ts"),
 		},
 	},
+	ssr: {
+		noExternal: ["drizzle-orm"],
+	},
 	test: {
 		environment: "jsdom",
 		exclude: [...configDefaults.exclude, "tests/e2e/**"],

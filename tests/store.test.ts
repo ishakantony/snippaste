@@ -1,5 +1,23 @@
+import { Database } from "bun:sqlite";
+import { mkdtempSync, rmSync } from "node:fs";
+import { tmpdir } from "node:os";
+import { join } from "node:path";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import { SnipStore } from "@/server/store.js";
+
+interface RawStatement<T> {
+	all(...params: unknown[]): T[];
+	get(...params: unknown[]): T | null;
+	run(...params: unknown[]): { changes: number };
+}
+
+interface RawClient {
+	prepare<T>(sql: string): RawStatement<T>;
+}
+
+function rawClientFor(store: SnipStore): RawClient {
+	return (store as unknown as { handle: { client: RawClient } }).handle.client;
+}
 
 describe("SnipStore (in-memory SQLite)", () => {
 	let store: SnipStore;
@@ -50,12 +68,11 @@ describe("SnipStore (in-memory SQLite)", () => {
 		// Access the DB directly through a second store on the same :memory: is not possible,
 		// so we verify indirectly: created_at is set on first upsert and the row can be re-read.
 		// We expose the DB through a subclass for this test only.
-		const db = (store as unknown as { db: import("better-sqlite3").Database })
-			.db;
+		const db = rawClientFor(store);
 
 		store.upsert("slug1", "v1");
 		const before = db
-			.prepare<[], { created_at: number }>(
+			.prepare<{ created_at: number }>(
 				"SELECT created_at FROM snips WHERE slug = 'slug1'",
 			)
 			.get()!.created_at;
@@ -63,7 +80,7 @@ describe("SnipStore (in-memory SQLite)", () => {
 		// Brief delay to ensure timestamps could differ
 		store.upsert("slug1", "v2");
 		const after = db
-			.prepare<[], { created_at: number }>(
+			.prepare<{ created_at: number }>(
 				"SELECT created_at FROM snips WHERE slug = 'slug1'",
 			)
 			.get()!.created_at;
@@ -72,12 +89,11 @@ describe("SnipStore (in-memory SQLite)", () => {
 	});
 
 	it("bumps updated_at on subsequent upserts", () => {
-		const db = (store as unknown as { db: import("better-sqlite3").Database })
-			.db;
+		const db = rawClientFor(store);
 
 		store.upsert("slug2", "v1");
 		const ua1 = db
-			.prepare<[], { updated_at: number }>(
+			.prepare<{ updated_at: number }>(
 				"SELECT updated_at FROM snips WHERE slug = 'slug2'",
 			)
 			.get()!.updated_at;
@@ -90,7 +106,7 @@ describe("SnipStore (in-memory SQLite)", () => {
 
 		store.upsert("slug2", "v2");
 		const ua2 = db
-			.prepare<[], { updated_at: number }>(
+			.prepare<{ updated_at: number }>(
 				"SELECT updated_at FROM snips WHERE slug = 'slug2'",
 			)
 			.get()!.updated_at;
@@ -117,8 +133,7 @@ describe("SnipStore (in-memory SQLite)", () => {
 	});
 
 	it("deleteStale removes only old snips", () => {
-		const db = (store as unknown as { db: import("better-sqlite3").Database })
-			.db;
+		const db = rawClientFor(store);
 		const now = Date.now();
 		const day = 24 * 60 * 60 * 1000;
 
@@ -141,5 +156,88 @@ describe("SnipStore (in-memory SQLite)", () => {
 		const deleted = store.deleteStale(30);
 		expect(deleted).toBe(0);
 		expect(store.get("recent")).not.toBeNull();
+	});
+});
+
+describe("SnipStore migrations", () => {
+	let dir: string;
+
+	beforeEach(() => {
+		dir = mkdtempSync(join(tmpdir(), "snippaste-store-"));
+	});
+
+	afterEach(() => {
+		rmSync(dir, { recursive: true, force: true });
+	});
+
+	it("creates all tables for a new database", () => {
+		const dbPath = join(dir, "fresh.db");
+		const store = new SnipStore(dbPath);
+		store.close();
+
+		const db = new Database(dbPath);
+		try {
+			const rawDb = db as unknown as RawClient;
+			const snipsTable = rawDb
+				.prepare<{ name: string }>(
+					"SELECT name FROM sqlite_master WHERE type = 'table' AND name = 'snips'",
+				)
+				.get();
+			const migrationsTable = rawDb
+				.prepare<{ name: string }>(
+					"SELECT name FROM sqlite_master WHERE type = 'table' AND name = '__drizzle_migrations'",
+				)
+				.get();
+
+			expect(snipsTable?.name).toBe("snips");
+			expect(migrationsTable?.name).toBe("__drizzle_migrations");
+		} finally {
+			db.close();
+		}
+	});
+
+	it("upgrades a pre-Drizzle snips table without losing data", () => {
+		const dbPath = join(dir, "legacy.db");
+		const legacyDb = new Database(dbPath);
+		legacyDb.exec(`
+			CREATE TABLE snips (
+				slug TEXT PRIMARY KEY,
+				content TEXT NOT NULL,
+				created_at INTEGER NOT NULL,
+				updated_at INTEGER NOT NULL
+			);
+		`);
+		legacyDb
+			.prepare(
+				"INSERT INTO snips (slug, content, created_at, updated_at) VALUES (?, ?, ?, ?)",
+			)
+			.run("legacy", "survives", 1, 2);
+		legacyDb.close();
+
+		const store = new SnipStore(dbPath);
+		const snip = store.get("legacy");
+		store.close();
+
+		expect(snip).toMatchObject({
+			slug: "legacy",
+			content: "survives",
+			updatedAt: 2,
+			protected: false,
+			passwordUpdatedAt: null,
+		});
+
+		const migratedDb = new Database(dbPath);
+		try {
+			const rawDb = migratedDb as unknown as RawClient;
+			const columns = rawDb
+				.prepare<{ name: string }>("PRAGMA table_info(snips)")
+				.all()
+				.map((column) => column.name);
+
+			expect(columns).toContain("password_hash");
+			expect(columns).toContain("password_updated_at");
+		} finally {
+			migratedDb.close();
+		}
 	});
 });
