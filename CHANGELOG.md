@@ -2,6 +2,19 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [0.1.5](https://github.com/ishakantony/snippaste/compare/v0.1.4...v0.1.5) (2026-05-04)
+
+
+### Features
+
+* **client:** improve mobile editor layout ([5dc5f47](https://github.com/ishakantony/snippaste/commit/5dc5f4762f3b0d578bb889c83ea1ca7703abbd6e))
+* **db:** migrate snip store to drizzle ([650dd3f](https://github.com/ishakantony/snippaste/commit/650dd3f967cd72e90a56e9c2a4737a5d69ed2a31))
+
+
+### Bug Fixes
+
+* **test:** target confirm dialog by test id ([1f2b85e](https://github.com/ishakantony/snippaste/commit/1f2b85e69927b7234086f304cc9fdbdb0a194a18))
+
 ## [0.1.4](https://github.com/ishakantony/snippaste/compare/v0.1.3...v0.1.4) (2026-05-03)
 
 
