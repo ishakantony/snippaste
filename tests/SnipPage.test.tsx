@@ -1,7 +1,7 @@
 import { cleanup, render, waitFor } from "@testing-library/react";
 import { MemoryRouter, Route, Routes } from "react-router-dom";
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { SnipPage } from "@/client/SnipPage.js";
+import { SnipPage } from "@/client/pages/SnipPage.js";
 import { useAutoSaveSettingsStore } from "@/client/stores/autoSaveSettingsStore.js";
 import {
 	initializeFeatureFlags,

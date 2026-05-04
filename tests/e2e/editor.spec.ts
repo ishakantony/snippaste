@@ -11,6 +11,27 @@ import {
 	uniqueSlug,
 } from "./helpers.js";
 
+test("status bar updates line and char counts live as user types", async ({
+	page,
+}) => {
+	const slug = uniqueSlug("status-bar-live");
+	await enableAutoSave(page);
+	await page.goto(`/s/${slug}`);
+
+	const statusBar = page.getByTestId("status-bar");
+	await expect(statusBar).toContainText("1 line");
+	await expect(statusBar).toContainText("0 chars");
+
+	await typeInEditor(page, "Hello");
+	await expect(statusBar).toContainText("5 chars");
+	await expect(statusBar).toContainText("1 line");
+
+	await page.keyboard.press("Enter");
+	await typeInEditor(page, "World");
+	await expect(statusBar).toContainText("11 chars");
+	await expect(statusBar).toContainText("2 lines");
+});
+
 test("creates a snip, autosaves content, and reloads persisted text", async ({
 	page,
 }) => {

@@ -6,7 +6,7 @@ import { SnipPageLoadingFallback } from "@/client/components/SnipPageLoadingFall
 import { LandingPage } from "@/client/pages/LandingPage.js";
 
 const SnipPage = lazy(() =>
-	import("@/client/SnipPage.js").then((m) => ({ default: m.SnipPage })),
+	import("@/client/pages/SnipPage.js").then((m) => ({ default: m.SnipPage })),
 );
 
 export function App() {
