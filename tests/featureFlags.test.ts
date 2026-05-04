@@ -3,7 +3,7 @@ import {
 	type FeatureFlags,
 	FLAGS_PLACEHOLDER,
 	featureFlagsSchema,
-} from "@/shared/featureFlags.js";
+} from "@/shared/featureFlags";
 
 describe("featureFlagsSchema", () => {
 	it("applies defaults when fields are missing", () => {

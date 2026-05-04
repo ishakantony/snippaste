@@ -1,10 +1,10 @@
 import { useTranslation } from "react-i18next";
-import { LanguageSwitcher } from "@/client/components/LanguageSwitcher.js";
-import { Button } from "@/client/components/ui/Button.js";
-import { Icon } from "@/client/Icon.js";
-import { useFeatureFlag } from "@/client/stores/featureFlagsStore.js";
-import { useTheme } from "@/client/stores/themeStore.js";
-import { THEME } from "@/client/theme.js";
+import { LanguageSwitcher } from "@/client/components/LanguageSwitcher";
+import { Button } from "@/client/components/ui/Button";
+import { Icon } from "@/client/Icon";
+import { useFeatureFlag } from "@/client/stores/featureFlagsStore";
+import { useTheme } from "@/client/stores/themeStore";
+import { THEME } from "@/client/theme";
 
 export function HeaderActions() {
 	const { theme, toggle } = useTheme();

@@ -2,7 +2,7 @@ import { create } from "zustand";
 import {
 	AUTOSAVE_STATUS,
 	type AutosaveState,
-} from "@/client/autosaveController.js";
+} from "@/client/autosaveController";
 
 interface SnipSessionValues {
 	activeSlug: string | null;

@@ -1,10 +1,10 @@
 import { act, render, screen } from "@testing-library/react";
 import { afterEach, describe, expect, it } from "vitest";
-import { AUTOSAVE_STATUS } from "@/client/autosaveController.js";
+import { AUTOSAVE_STATUS } from "@/client/autosaveController";
 import {
 	useSnipSessionDirty,
 	useSnipSessionStore,
-} from "@/client/stores/snipSessionStore.js";
+} from "@/client/stores/snipSessionStore";
 
 function DirtyIndicator() {
 	const dirty = useSnipSessionDirty();

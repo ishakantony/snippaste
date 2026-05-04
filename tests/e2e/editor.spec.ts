@@ -9,7 +9,7 @@ import {
 	setEditorText,
 	typeInEditor,
 	uniqueSlug,
-} from "./helpers.js";
+} from "./helpers";
 
 test("status bar updates line and char counts live as user types", async ({
 	page,

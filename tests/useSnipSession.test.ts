@@ -8,11 +8,11 @@ if (typeof window === "undefined") {
 	};
 }
 
-import { apiClient } from "@/client/api/client.js";
-import { AUTOSAVE_STATUS } from "@/client/autosaveController.js";
-import { useSnipSession } from "@/client/components/features/snip/useSnipSession.js";
-import type { SnipStreamHandlers } from "@/client/snipStream.js";
-import { useSnipSessionStore } from "@/client/stores/snipSessionStore.js";
+import { apiClient } from "@/client/api/client";
+import { AUTOSAVE_STATUS } from "@/client/autosaveController";
+import { useSnipSession } from "@/client/components/features/snip/useSnipSession";
+import type { SnipStreamHandlers } from "@/client/snipStream";
+import { useSnipSessionStore } from "@/client/stores/snipSessionStore";
 
 const mockSubscribe = vi.fn(() => () => {});
 let mockControllerState = { status: "idle" };

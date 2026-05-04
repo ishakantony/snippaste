@@ -1,13 +1,13 @@
 import { useEffect, useRef } from "react";
-import { createAutosaveFetch } from "@/client/api/autosaveFetch.js";
-import { apiClient } from "@/client/api/client.js";
+import { createAutosaveFetch } from "@/client/api/autosaveFetch";
+import { apiClient } from "@/client/api/client";
 import {
 	AUTOSAVE_STATUS,
 	AutosaveController,
-} from "@/client/autosaveController.js";
-import { getClientId } from "@/client/clientId.js";
-import { subscribe as subscribeStream } from "@/client/snipStream.js";
-import { useSnipSessionStore } from "@/client/stores/snipSessionStore.js";
+} from "@/client/autosaveController";
+import { getClientId } from "@/client/clientId";
+import { subscribe as subscribeStream } from "@/client/snipStream";
+import { useSnipSessionStore } from "@/client/stores/snipSessionStore";
 
 interface UseSnipSessionOptions {
 	autoSaveActive: boolean;

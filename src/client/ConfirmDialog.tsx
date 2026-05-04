@@ -1,6 +1,6 @@
 import { useTranslation } from "react-i18next";
-import { Button } from "@/client/components/ui/Button.js";
-import { Modal } from "@/client/components/ui/Modal.js";
+import { Button } from "@/client/components/ui/Button";
+import { Modal } from "@/client/components/ui/Modal";
 
 export interface ConfirmDialogProps {
 	message: string;

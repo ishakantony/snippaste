@@ -1,5 +1,5 @@
 import { type FormEvent, useState } from "react";
-import { apiClient } from "@/client/api/client.js";
+import { apiClient } from "@/client/api/client";
 
 interface UseSnipPasswordOptions {
 	onUnlock: () => void;

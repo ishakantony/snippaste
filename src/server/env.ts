@@ -1,6 +1,6 @@
 import { createEnv } from "@t3-oss/env-core";
 import { z } from "zod";
-import { envBoolSchema } from "../shared/featureFlags.js";
+import { envBoolSchema } from "../shared/featureFlags";
 
 const optionalSessionSecretSchema = z.preprocess(
 	(val) => (val === "" ? undefined : val),

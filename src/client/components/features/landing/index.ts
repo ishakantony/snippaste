@@ -1,9 +1,9 @@
-export { CreateSnipForm } from "./CreateSnipForm.js";
-export { Disclaimer } from "./Disclaimer.js";
-export { FeatureItem } from "./FeatureItem.js";
-export { FeatureList } from "./FeatureList.js";
-export { HeaderActions } from "./HeaderActions.js";
-export { HeroSection } from "./HeroSection.js";
-export { TagList } from "./TagList.js";
-export type { Feature, LandingFormState } from "./types.js";
-export { useLandingForm } from "./useLandingForm.js";
+export { CreateSnipForm } from "./CreateSnipForm";
+export { Disclaimer } from "./Disclaimer";
+export { FeatureItem } from "./FeatureItem";
+export { FeatureList } from "./FeatureList";
+export { HeaderActions } from "./HeaderActions";
+export { HeroSection } from "./HeroSection";
+export { TagList } from "./TagList";
+export type { Feature, LandingFormState } from "./types";
+export { useLandingForm } from "./useLandingForm";

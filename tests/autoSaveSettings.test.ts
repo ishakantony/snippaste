@@ -4,7 +4,7 @@ import {
 	loadAutoSave,
 	STORAGE_KEY,
 	saveAutoSave,
-} from "@/client/autoSaveSettings.js";
+} from "@/client/autoSaveSettings";
 
 function makeFakeStorage(
 	initial: Record<string, string> = {},

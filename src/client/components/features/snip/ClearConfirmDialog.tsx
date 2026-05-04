@@ -1,5 +1,5 @@
 import { useTranslation } from "react-i18next";
-import { ConfirmDialog } from "@/client/ConfirmDialog.js";
+import { ConfirmDialog } from "@/client/ConfirmDialog";
 
 export interface ClearConfirmDialogProps {
 	open: boolean;

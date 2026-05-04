@@ -6,7 +6,7 @@ import {
 	setEditorText,
 	typeInEditor,
 	uniqueSlug,
-} from "./helpers.js";
+} from "./helpers";
 
 test("syncs edits into a second browser page", async ({ browser }) => {
 	const slug = uniqueSlug("sync-clean");

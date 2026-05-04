@@ -1,6 +1,6 @@
 import { render, screen } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
-import { ErrorBanner } from "@/client/components/features/snip/ErrorBanner.js";
+import { ErrorBanner } from "@/client/components/features/snip/ErrorBanner";
 
 describe("ErrorBanner", () => {
 	it("renders when loadError is true", () => {

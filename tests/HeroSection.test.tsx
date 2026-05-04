@@ -1,6 +1,6 @@
 import { render, screen } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
-import { HeroSection } from "@/client/components/features/landing/HeroSection.js";
+import { HeroSection } from "@/client/components/features/landing/HeroSection";
 
 describe("HeroSection", () => {
 	it("renders brand name", () => {

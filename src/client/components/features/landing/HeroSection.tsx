@@ -1,5 +1,5 @@
 import { useTranslation } from "react-i18next";
-import { TagList } from "./TagList.js";
+import { TagList } from "./TagList";
 
 export function HeroSection() {
 	const { t } = useTranslation();

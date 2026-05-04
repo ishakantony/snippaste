@@ -1,9 +1,9 @@
 import { useTranslation } from "react-i18next";
-import { LanguageSwitcher } from "@/client/components/LanguageSwitcher.js";
+import { LanguageSwitcher } from "@/client/components/LanguageSwitcher";
 import {
 	BottomSheet,
 	BottomSheetAction,
-} from "@/client/components/ui/BottomSheet.js";
+} from "@/client/components/ui/BottomSheet";
 
 export interface ToolbarMobileSheetProps {
 	open: boolean;

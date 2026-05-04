@@ -1,5 +1,5 @@
 import { lazy, Suspense } from "react";
-import { useToast } from "@/client/stores/toastStore.js";
+import { useToast } from "@/client/stores/toastStore";
 
 const QrModal = lazy(() =>
 	import("@/client/components/QrModal.js").then((m) => ({

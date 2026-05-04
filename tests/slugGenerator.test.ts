@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { SlugGenerator } from "@/client/slugGenerator.js";
+import { SlugGenerator } from "@/client/slugGenerator";
 
 const URL_SAFE_ALPHABET = new Set("abcdefghijklmnopqrstuvwxyz0123456789");
 

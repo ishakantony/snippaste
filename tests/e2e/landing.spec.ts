@@ -1,5 +1,5 @@
 import { expect, test } from "@playwright/test";
-import { uniqueSlug } from "./helpers.js";
+import { uniqueSlug } from "./helpers";
 
 test("creates a snip from an explicit valid slug", async ({ page }) => {
 	const slug = uniqueSlug("landing-valid");

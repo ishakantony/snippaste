@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { Pill } from "@/client/components/ui/Pill.js";
-import { Icon } from "@/client/Icon.js";
-import { getExpirationInfo } from "@/client/lib/expirationCountdown.js";
+import { Pill } from "@/client/components/ui/Pill";
+import { Icon } from "@/client/Icon";
+import { getExpirationInfo } from "@/client/lib/expirationCountdown";
 
 export interface ToolbarExpirationPillProps {
 	updatedAt: number;

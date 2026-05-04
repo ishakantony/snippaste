@@ -1,5 +1,5 @@
-import type { FetchLike } from "../autosaveController.js";
-import type { ApiClient } from "./client.js";
+import type { FetchLike } from "../autosaveController";
+import type { ApiClient } from "./client";
 
 export function createAutosaveFetch(
 	slug: string,

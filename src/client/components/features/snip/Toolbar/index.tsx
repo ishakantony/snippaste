@@ -1,5 +1,5 @@
-import { DesktopToolbar } from "./DesktopToolbar.js";
-import { MobileToolbar } from "./MobileToolbar.js";
+import { DesktopToolbar } from "./DesktopToolbar";
+import { MobileToolbar } from "./MobileToolbar";
 
 export interface ToolbarProps {
 	slug: string;

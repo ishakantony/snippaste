@@ -1,19 +1,19 @@
 import { useTranslation } from "react-i18next";
 import { Link } from "react-router-dom";
-import { LanguageSwitcher } from "@/client/components/LanguageSwitcher.js";
-import { Button } from "@/client/components/ui/Button.js";
-import { Pill } from "@/client/components/ui/Pill.js";
-import { Icon } from "@/client/Icon.js";
-import { useFeatureFlag } from "@/client/stores/featureFlagsStore.js";
+import { LanguageSwitcher } from "@/client/components/LanguageSwitcher";
+import { Button } from "@/client/components/ui/Button";
+import { Pill } from "@/client/components/ui/Pill";
+import { Icon } from "@/client/Icon";
+import { useFeatureFlag } from "@/client/stores/featureFlagsStore";
 import {
 	useSnipSessionDirty,
 	useSnipSessionStore,
-} from "@/client/stores/snipSessionStore.js";
-import { useTheme } from "@/client/stores/themeStore.js";
-import { THEME } from "@/client/theme.js";
-import type { ToolbarProps } from "./index.js";
-import { ToolbarExpirationPill } from "./ToolbarExpirationPill.js";
-import { ToolbarStatusPill } from "./ToolbarStatusPill.js";
+} from "@/client/stores/snipSessionStore";
+import { useTheme } from "@/client/stores/themeStore";
+import { THEME } from "@/client/theme";
+import type { ToolbarProps } from "./index";
+import { ToolbarExpirationPill } from "./ToolbarExpirationPill";
+import { ToolbarStatusPill } from "./ToolbarStatusPill";
 
 export function DesktopToolbar({
 	slug,

@@ -1,6 +1,6 @@
 import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
-import { applyTheme, THEME, type Theme } from "@/client/theme.js";
+import { applyTheme, THEME, type Theme } from "@/client/theme";
 
 interface ThemeState {
 	theme: Theme;

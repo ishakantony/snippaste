@@ -1,9 +1,9 @@
 import { lazy, Suspense } from "react";
 import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
-import { ErrorBoundary } from "@/client/components/ErrorBoundary.js";
-import { SnipPageErrorFallback } from "@/client/components/SnipPageErrorFallback.js";
-import { SnipPageLoadingFallback } from "@/client/components/SnipPageLoadingFallback.js";
-import { LandingPage } from "@/client/pages/LandingPage.js";
+import { ErrorBoundary } from "@/client/components/ErrorBoundary";
+import { SnipPageErrorFallback } from "@/client/components/SnipPageErrorFallback";
+import { SnipPageLoadingFallback } from "@/client/components/SnipPageLoadingFallback";
+import { LandingPage } from "@/client/pages/LandingPage";
 
 const SnipPage = lazy(() =>
 	import("@/client/pages/SnipPage.js").then((m) => ({ default: m.SnipPage })),

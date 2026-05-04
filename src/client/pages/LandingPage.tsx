@@ -3,8 +3,8 @@ import {
 	HeaderActions,
 	HeroSection,
 	useLandingForm,
-} from "@/client/components/features/landing/index.js";
-import { useDocumentLanguage } from "@/client/hooks/useDocumentLanguage.js";
+} from "@/client/components/features/landing/index";
+import { useDocumentLanguage } from "@/client/hooks/useDocumentLanguage";
 
 export function LandingPage() {
 	useDocumentLanguage();

@@ -1,4 +1,4 @@
-import i18n from "@/client/i18n/index.js";
+import i18n from "@/client/i18n/index";
 
 export function SnipPageLoadingFallback() {
 	const t = i18n.t.bind(i18n);

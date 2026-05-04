@@ -7,7 +7,7 @@ import {
 	openSettings,
 	typeInEditor,
 	uniqueSlug,
-} from "./helpers.js";
+} from "./helpers";
 
 test.beforeEach(async ({ page }) => {
 	await enableAutoSave(page);

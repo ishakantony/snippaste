@@ -1,6 +1,6 @@
 import { render } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
-import { StatusBar } from "@/client/components/features/snip/StatusBar.js";
+import { StatusBar } from "@/client/components/features/snip/StatusBar";
 
 function statusBarText(container: HTMLElement): {
 	lines: string | null;

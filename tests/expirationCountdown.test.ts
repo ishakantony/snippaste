@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { getExpirationInfo } from "@/client/lib/expirationCountdown.js";
+import { getExpirationInfo } from "@/client/lib/expirationCountdown";
 
 describe("getExpirationInfo", () => {
 	it("returns green with 29d left when updated 1 day ago", () => {

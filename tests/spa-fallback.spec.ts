@@ -1,6 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
-import { buildApp } from "@/server/routes.js";
-import { SnipStore } from "@/server/store.js";
+import { buildApp } from "@/server/routes";
+import { SnipStore } from "@/server/store";
 
 const SPA_SHELL = `<!doctype html><html><body><div id="root"></div></body></html>`;
 const TEST_SESSION_SECRET = "test-session-secret";

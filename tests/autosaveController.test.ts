@@ -4,7 +4,7 @@ import {
 	type AutosaveState,
 	type ClearTimeoutLike,
 	type SetTimeoutLike,
-} from "@/client/autosaveController.js";
+} from "@/client/autosaveController";
 
 // ---------------------------------------------------------------------------
 // Test helpers

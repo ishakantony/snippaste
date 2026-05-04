@@ -1,6 +1,6 @@
 import { render, screen } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
-import { TagList } from "@/client/components/features/landing/TagList.js";
+import { TagList } from "@/client/components/features/landing/TagList";
 
 describe("TagList", () => {
 	it("renders all tags with translated text", () => {

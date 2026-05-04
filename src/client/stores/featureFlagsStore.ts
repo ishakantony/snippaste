@@ -1,8 +1,5 @@
 import { create } from "zustand";
-import {
-	type FeatureFlags,
-	featureFlagsSchema,
-} from "@/shared/featureFlags.js";
+import { type FeatureFlags, featureFlagsSchema } from "@/shared/featureFlags";
 
 declare global {
 	interface Window {

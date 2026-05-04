@@ -1,5 +1,5 @@
 import { useTranslation } from "react-i18next";
-import { Icon } from "@/client/Icon.js";
+import { Icon } from "@/client/Icon";
 
 export interface FeatureItemProps {
 	icon: string;

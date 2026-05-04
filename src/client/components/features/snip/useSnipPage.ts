@@ -1,17 +1,17 @@
 import { useCallback, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useParams } from "react-router-dom";
-import { AUTOSAVE_STATUS } from "@/client/autosaveController.js";
-import { useDocumentLanguage } from "@/client/hooks/useDocumentLanguage.js";
-import { useAutoSaveSettings } from "@/client/stores/autoSaveSettingsStore.js";
-import { useFeatureFlag } from "@/client/stores/featureFlagsStore.js";
-import { useSnipSessionStore } from "@/client/stores/snipSessionStore.js";
-import { useTheme } from "@/client/stores/themeStore.js";
-import { useToast } from "@/client/stores/toastStore.js";
-import { THEME } from "@/client/theme.js";
-import { useSnipEditor } from "./useSnipEditor.js";
-import { useSnipPassword } from "./useSnipPassword.js";
-import { useSnipSession } from "./useSnipSession.js";
+import { AUTOSAVE_STATUS } from "@/client/autosaveController";
+import { useDocumentLanguage } from "@/client/hooks/useDocumentLanguage";
+import { useAutoSaveSettings } from "@/client/stores/autoSaveSettingsStore";
+import { useFeatureFlag } from "@/client/stores/featureFlagsStore";
+import { useSnipSessionStore } from "@/client/stores/snipSessionStore";
+import { useTheme } from "@/client/stores/themeStore";
+import { useToast } from "@/client/stores/toastStore";
+import { THEME } from "@/client/theme";
+import { useSnipEditor } from "./useSnipEditor";
+import { useSnipPassword } from "./useSnipPassword";
+import { useSnipSession } from "./useSnipSession";
 
 export function useSnipPage() {
 	const { name } = useParams<{ name: string }>();

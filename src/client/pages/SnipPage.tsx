@@ -1,14 +1,14 @@
-import { ClearConfirmDialog } from "@/client/components/features/snip/ClearConfirmDialog.js";
-import { ErrorBanner } from "@/client/components/features/snip/ErrorBanner.js";
-import { LockScreen } from "@/client/components/features/snip/LockScreen.js";
-import { QrModalWrapper } from "@/client/components/features/snip/QrModalWrapper.js";
-import { RefreshConfirmDialog } from "@/client/components/features/snip/RefreshConfirmDialog.js";
-import { RemoteChangesBanner } from "@/client/components/features/snip/RemoteChangesBanner.js";
-import { SettingsModalWrapper } from "@/client/components/features/snip/SettingsModalWrapper.js";
-import { SnipEditor } from "@/client/components/features/snip/SnipEditor.js";
-import { StatusBar } from "@/client/components/features/snip/StatusBar.js";
-import { Toolbar } from "@/client/components/features/snip/Toolbar/index.js";
-import { useSnipPage } from "@/client/components/features/snip/useSnipPage.js";
+import { ClearConfirmDialog } from "@/client/components/features/snip/ClearConfirmDialog";
+import { ErrorBanner } from "@/client/components/features/snip/ErrorBanner";
+import { LockScreen } from "@/client/components/features/snip/LockScreen";
+import { QrModalWrapper } from "@/client/components/features/snip/QrModalWrapper";
+import { RefreshConfirmDialog } from "@/client/components/features/snip/RefreshConfirmDialog";
+import { RemoteChangesBanner } from "@/client/components/features/snip/RemoteChangesBanner";
+import { SettingsModalWrapper } from "@/client/components/features/snip/SettingsModalWrapper";
+import { SnipEditor } from "@/client/components/features/snip/SnipEditor";
+import { StatusBar } from "@/client/components/features/snip/StatusBar";
+import { Toolbar } from "@/client/components/features/snip/Toolbar/index";
+import { useSnipPage } from "@/client/components/features/snip/useSnipPage";
 
 export function SnipPage() {
 	const {

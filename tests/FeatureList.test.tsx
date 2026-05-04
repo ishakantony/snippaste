@@ -1,7 +1,7 @@
 import { render, screen } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
-import { FeatureItem } from "@/client/components/features/landing/FeatureItem.js";
-import { FeatureList } from "@/client/components/features/landing/FeatureList.js";
+import { FeatureItem } from "@/client/components/features/landing/FeatureItem";
+import { FeatureList } from "@/client/components/features/landing/FeatureList";
 
 describe("FeatureItem", () => {
 	it("renders icon and translated text", () => {

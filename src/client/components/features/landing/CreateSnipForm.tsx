@@ -1,8 +1,8 @@
 import { useTranslation } from "react-i18next";
-import { Button } from "@/client/components/ui/Button.js";
-import { Icon } from "@/client/Icon.js";
-import { Disclaimer } from "./Disclaimer.js";
-import { FeatureList } from "./FeatureList.js";
+import { Button } from "@/client/components/ui/Button";
+import { Icon } from "@/client/Icon";
+import { Disclaimer } from "./Disclaimer";
+import { FeatureList } from "./FeatureList";
 
 export interface CreateSnipFormProps {
 	name: string;

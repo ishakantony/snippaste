@@ -1,7 +1,7 @@
 import { render, screen } from "@testing-library/react";
 import { userEvent } from "@testing-library/user-event";
 import { describe, expect, it, vi } from "vitest";
-import { SettingsModal } from "@/client/components/SettingsModal.js";
+import { SettingsModal } from "@/client/components/SettingsModal";
 
 describe("SettingsModal", () => {
 	it("renders auto-save toggle with current state", () => {

@@ -2,9 +2,9 @@ import { useTranslation } from "react-i18next";
 import {
 	AUTOSAVE_STATUS,
 	type AutosaveState,
-} from "@/client/autosaveController.js";
-import { Pill } from "@/client/components/ui/Pill.js";
-import { Icon } from "@/client/Icon.js";
+} from "@/client/autosaveController";
+import { Pill } from "@/client/components/ui/Pill";
+import { Icon } from "@/client/Icon";
 
 function relativeTime(
 	ts: number,

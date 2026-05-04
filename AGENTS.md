@@ -40,7 +40,7 @@ bun run build        # Vite production build (outputs to dist/client/)
 - **Linter/formatter**: Biome (no ESLint, no Prettier)
 - **Styling**: Tailwind CSS v4. Use `cn()` from `@/client/lib/cn.ts` for conditional classes
 - **Imports**: Use `@/` path alias (maps to `src/`). e.g. `import { cn } from "@/client/lib/cn.js"`
-- **Extensions**: Import paths must use `.js` extensions (required by ESM)
+- **Extensions**: Omit file extensions in import paths (resolved automatically by `moduleResolution: "bundler"`)
 
 ### Commits
 - **Conventional Commits** enforced via commitlint (e.g. `feat:`, `fix:`, `chore:`, `docs:`)

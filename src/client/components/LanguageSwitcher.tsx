@@ -1,10 +1,10 @@
 import { useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { Button, type ButtonProps } from "@/client/components/ui/Button.js";
-import { Icon } from "@/client/Icon.js";
-import type { Language } from "@/client/i18n/index.js";
-import { cn } from "@/client/lib/cn.js";
-import { useLanguage } from "@/client/stores/languageStore.js";
+import { Button, type ButtonProps } from "@/client/components/ui/Button";
+import { Icon } from "@/client/Icon";
+import type { Language } from "@/client/i18n/index";
+import { cn } from "@/client/lib/cn";
+import { useLanguage } from "@/client/stores/languageStore";
 
 const LANGUAGES = [
 	{ code: "en", label: "English" },

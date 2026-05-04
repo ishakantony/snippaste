@@ -1,5 +1,5 @@
 import { useTranslation } from "react-i18next";
-import { TAG_KEYS } from "./constants.js";
+import { TAG_KEYS } from "./constants";
 
 export function TagList() {
 	const { t } = useTranslation();

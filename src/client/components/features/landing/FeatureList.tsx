@@ -1,5 +1,5 @@
-import { FEATURES } from "./constants.js";
-import { FeatureItem } from "./FeatureItem.js";
+import { FEATURES } from "./constants";
+import { FeatureItem } from "./FeatureItem";
 
 export function FeatureList() {
 	return (

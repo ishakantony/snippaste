@@ -1,19 +1,19 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Link } from "react-router-dom";
-import { ToolbarMobileSheet } from "@/client/components/ToolbarMobileSheet.js";
-import { Button } from "@/client/components/ui/Button.js";
-import { Icon } from "@/client/Icon.js";
-import { useFeatureFlag } from "@/client/stores/featureFlagsStore.js";
+import { ToolbarMobileSheet } from "@/client/components/ToolbarMobileSheet";
+import { Button } from "@/client/components/ui/Button";
+import { Icon } from "@/client/Icon";
+import { useFeatureFlag } from "@/client/stores/featureFlagsStore";
 import {
 	useSnipSessionDirty,
 	useSnipSessionStore,
-} from "@/client/stores/snipSessionStore.js";
-import { useTheme } from "@/client/stores/themeStore.js";
-import { THEME } from "@/client/theme.js";
-import type { ToolbarProps } from "./index.js";
-import { ToolbarExpirationPill } from "./ToolbarExpirationPill.js";
-import { ToolbarStatusPill } from "./ToolbarStatusPill.js";
+} from "@/client/stores/snipSessionStore";
+import { useTheme } from "@/client/stores/themeStore";
+import { THEME } from "@/client/theme";
+import type { ToolbarProps } from "./index";
+import { ToolbarExpirationPill } from "./ToolbarExpirationPill";
+import { ToolbarStatusPill } from "./ToolbarStatusPill";
 
 export function MobileToolbar({
 	slug,

@@ -1,5 +1,5 @@
 import { CronJob } from "cron";
-import type { SnipStore } from "./store.js";
+import type { SnipStore } from "./store";
 
 const MAX_AGE_DAYS = 30;
 const CRON_EXPRESSION = "0 3 * * *"; // 3 AM daily

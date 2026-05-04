@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { SlugValidator } from "@/shared/slugValidator.js";
+import { SlugValidator } from "@/shared/slugValidator";
 
 describe("SlugValidator.validate", () => {
 	// --- valid slugs (post-normalization) ---

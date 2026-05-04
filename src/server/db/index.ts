@@ -1,8 +1,8 @@
 import { Database } from "bun:sqlite";
 import { type BunSQLiteDatabase, drizzle } from "drizzle-orm/bun-sqlite";
 import { migrate } from "drizzle-orm/bun-sqlite/migrator";
-import { env } from "../env.js";
-import * as schema from "./schema.js";
+import { env } from "../env";
+import * as schema from "./schema";
 
 export type AppDb = BunSQLiteDatabase<typeof schema>;
 

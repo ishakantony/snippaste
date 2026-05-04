@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 import { create } from "zustand";
-import { Icon } from "@/client/Icon.js";
-import { cn } from "@/client/lib/cn.js";
+import { Icon } from "@/client/Icon";
+import { cn } from "@/client/lib/cn";
 
 interface ToastState {
 	msg: string;

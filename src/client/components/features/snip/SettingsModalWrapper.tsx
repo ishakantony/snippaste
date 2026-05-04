@@ -1,6 +1,6 @@
-import { SettingsModal } from "@/client/components/SettingsModal.js";
-import { useAutoSaveSettings } from "@/client/stores/autoSaveSettingsStore.js";
-import { useFeatureFlag } from "@/client/stores/featureFlagsStore.js";
+import { SettingsModal } from "@/client/components/SettingsModal";
+import { useAutoSaveSettings } from "@/client/stores/autoSaveSettingsStore";
+import { useFeatureFlag } from "@/client/stores/featureFlagsStore";
 
 export interface SettingsModalWrapperProps {
 	open: boolean;

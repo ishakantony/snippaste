@@ -1,8 +1,8 @@
 import { act, renderHook } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { AUTOSAVE_STATUS } from "@/client/autosaveController.js";
-import { useSnipPassword } from "@/client/components/features/snip/useSnipPassword.js";
-import { useSnipSessionStore } from "@/client/stores/snipSessionStore.js";
+import { AUTOSAVE_STATUS } from "@/client/autosaveController";
+import { useSnipPassword } from "@/client/components/features/snip/useSnipPassword";
+import { useSnipSessionStore } from "@/client/stores/snipSessionStore";
 
 if (typeof window === "undefined") {
 	(globalThis as Record<string, unknown>).window = {
@@ -10,7 +10,7 @@ if (typeof window === "undefined") {
 	};
 }
 
-import { apiClient } from "@/client/api/client.js";
+import { apiClient } from "@/client/api/client";
 
 vi.mock("@/client/api/client.js", () => ({
 	apiClient: {

@@ -1,9 +1,9 @@
 import { useEffect, useRef } from "react";
 import { useTranslation } from "react-i18next";
-import { Button } from "@/client/components/ui/Button.js";
-import { Modal } from "@/client/components/ui/Modal.js";
-import { Icon } from "@/client/Icon.js";
-import { createQrCode } from "@/client/lib/qrCode.js";
+import { Button } from "@/client/components/ui/Button";
+import { Modal } from "@/client/components/ui/Modal";
+import { Icon } from "@/client/Icon";
+import { createQrCode } from "@/client/lib/qrCode";
 
 export interface QrModalProps {
 	url: string;

@@ -2,14 +2,11 @@ import { randomBytes } from "node:crypto";
 import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
 import { serveStatic } from "hono/bun";
-import {
-	FLAGS_PLACEHOLDER,
-	featureFlagsSchema,
-} from "../shared/featureFlags.js";
-import { runCleanup, startCleanupJob } from "./cleanup.js";
-import { env } from "./env.js";
-import { buildApp } from "./routes.js";
-import { SnipStore } from "./store.js";
+import { FLAGS_PLACEHOLDER, featureFlagsSchema } from "../shared/featureFlags";
+import { runCleanup, startCleanupJob } from "./cleanup";
+import { env } from "./env";
+import { buildApp } from "./routes";
+import { SnipStore } from "./store";
 
 const PORT = env.PORT;
 const SESSION_SECRET =

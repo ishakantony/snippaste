@@ -1,8 +1,8 @@
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
-import { SlugGenerator } from "@/client/slugGenerator.js";
-import { SlugValidator } from "@/shared/slugValidator.js";
+import { SlugGenerator } from "@/client/slugGenerator";
+import { SlugValidator } from "@/shared/slugValidator";
 
 export function useLandingForm() {
 	const [name, setName] = useState("");

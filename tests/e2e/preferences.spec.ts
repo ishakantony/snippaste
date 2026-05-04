@@ -1,5 +1,5 @@
 import { expect, test } from "@playwright/test";
-import { enableAutoSave, uniqueSlug } from "./helpers.js";
+import { enableAutoSave, uniqueSlug } from "./helpers";
 
 test.beforeEach(async ({ page }) => {
 	await enableAutoSave(page);

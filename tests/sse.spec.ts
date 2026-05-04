@@ -1,7 +1,7 @@
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
-import { buildApp } from "@/server/routes.js";
-import { SnipBus, type SnipUpdate } from "@/server/snipBus.js";
-import { SnipStore } from "@/server/store.js";
+import { buildApp } from "@/server/routes";
+import { SnipBus, type SnipUpdate } from "@/server/snipBus";
+import { SnipStore } from "@/server/store";
 
 const TEST_SESSION_SECRET = "test-session-secret";
 

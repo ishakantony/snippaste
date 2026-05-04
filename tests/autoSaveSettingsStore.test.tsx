@@ -4,7 +4,7 @@ import { afterEach, describe, expect, it } from "vitest";
 import {
 	useAutoSaveSettings,
 	useAutoSaveSettingsStore,
-} from "@/client/stores/autoSaveSettingsStore.js";
+} from "@/client/stores/autoSaveSettingsStore";
 
 function TestComponent() {
 	const { enabled, toggle } = useAutoSaveSettings();

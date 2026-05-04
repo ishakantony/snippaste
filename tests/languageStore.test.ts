@@ -3,11 +3,11 @@ import i18n, {
 	detectLanguage,
 	parseStoredLanguage,
 	STORAGE_KEY,
-} from "@/client/i18n/index.js";
+} from "@/client/i18n/index";
 import {
 	bootstrapLanguageStore,
 	useLanguageStore,
-} from "@/client/stores/languageStore.js";
+} from "@/client/stores/languageStore";
 
 describe("language store", () => {
 	afterEach(() => {

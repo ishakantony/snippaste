@@ -11,16 +11,16 @@ import {
 	passwordBodySchema,
 	slugSchema,
 	snipPutBodySchema,
-} from "../shared/schemas.js";
+} from "../shared/schemas";
 import {
 	cookieNameForSlug,
 	hashPassword,
 	signUnlockCookie,
 	verifyPassword,
 	verifyUnlockCookie,
-} from "./passwordAuth.js";
-import { SnipBus, type SnipUpdate } from "./snipBus.js";
-import type { SnipStore } from "./store.js";
+} from "./passwordAuth";
+import { SnipBus, type SnipUpdate } from "./snipBus";
+import type { SnipStore } from "./store";
 
 extendZodWithOpenApi(z);
 

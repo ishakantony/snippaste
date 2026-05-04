@@ -1,7 +1,7 @@
 import { render, screen } from "@testing-library/react";
 import { userEvent } from "@testing-library/user-event";
 import { describe, expect, it, vi } from "vitest";
-import { CreateSnipForm } from "@/client/components/features/landing/CreateSnipForm.js";
+import { CreateSnipForm } from "@/client/components/features/landing/CreateSnipForm";
 
 describe("CreateSnipForm", () => {
 	it("renders form with input and submit button", () => {

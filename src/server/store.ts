@@ -1,7 +1,7 @@
 import { eq, lt, sql } from "drizzle-orm";
-import { type AppDb, type DatabaseHandle, openDatabase } from "./db/index.js";
-import { snips } from "./db/schema.js";
-import { env } from "./env.js";
+import { type AppDb, type DatabaseHandle, openDatabase } from "./db/index";
+import { snips } from "./db/schema";
+import { env } from "./env";
 
 export interface SnipDTO {
 	slug: string;

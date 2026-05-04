@@ -1,13 +1,13 @@
 import { cleanup, render, waitFor } from "@testing-library/react";
 import { MemoryRouter, Route, Routes } from "react-router-dom";
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { SnipPage } from "@/client/pages/SnipPage.js";
-import { useAutoSaveSettingsStore } from "@/client/stores/autoSaveSettingsStore.js";
+import { SnipPage } from "@/client/pages/SnipPage";
+import { useAutoSaveSettingsStore } from "@/client/stores/autoSaveSettingsStore";
 import {
 	initializeFeatureFlags,
 	useFeatureFlagsStore,
-} from "@/client/stores/featureFlagsStore.js";
-import { useSnipSessionStore } from "@/client/stores/snipSessionStore.js";
+} from "@/client/stores/featureFlagsStore";
+import { useSnipSessionStore } from "@/client/stores/snipSessionStore";
 
 const autosaveControllerDeps = vi.hoisted(
 	() => [] as Array<{ enabled?: boolean }>,

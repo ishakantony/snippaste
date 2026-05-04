@@ -1,7 +1,7 @@
 import { type ReactNode, useEffect } from "react";
-import { Icon } from "@/client/Icon.js";
-import { cn } from "@/client/lib/cn.js";
-import { Button } from "./Button.js";
+import { Icon } from "@/client/Icon";
+import { cn } from "@/client/lib/cn";
+import { Button } from "./Button";
 
 export interface BottomSheetProps {
 	open: boolean;

@@ -4,7 +4,7 @@ import i18n, {
 	detectLanguage,
 	type Language,
 	STORAGE_KEY,
-} from "@/client/i18n/index.js";
+} from "@/client/i18n/index";
 
 interface LanguageState {
 	language: Language;

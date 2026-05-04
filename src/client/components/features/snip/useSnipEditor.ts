@@ -1,7 +1,7 @@
 import { EditorState } from "@codemirror/state";
 import { EditorView } from "@codemirror/view";
 import { useEffect, useRef } from "react";
-import { buildExtensions } from "./editorTheme.js";
+import { buildExtensions } from "./editorTheme";
 
 interface UseSnipEditorOptions {
 	isLocked: boolean;

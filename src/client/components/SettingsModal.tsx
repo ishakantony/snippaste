@@ -1,12 +1,12 @@
 import { type FormEvent, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { Modal } from "@/client/components/ui/Modal.js";
-import { Icon } from "@/client/Icon.js";
+import { Modal } from "@/client/components/ui/Modal";
+import { Icon } from "@/client/Icon";
 import {
 	PASSWORD_MAX_LENGTH,
 	PASSWORD_MIN_LENGTH,
 	passwordBodySchema,
-} from "@/shared/schemas.js";
+} from "@/shared/schemas";
 
 export interface SettingsModalProps {
 	open: boolean;

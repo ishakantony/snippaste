@@ -1,7 +1,7 @@
 import { cleanup, render, screen } from "@testing-library/react";
 import { afterEach, describe, expect, it } from "vitest";
-import { SnipPageErrorFallback } from "@/client/components/SnipPageErrorFallback.js";
-import { SnipPageLoadingFallback } from "@/client/components/SnipPageLoadingFallback.js";
+import { SnipPageErrorFallback } from "@/client/components/SnipPageErrorFallback";
+import { SnipPageLoadingFallback } from "@/client/components/SnipPageLoadingFallback";
 
 describe("snip page fallbacks", () => {
 	afterEach(() => {
