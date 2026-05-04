@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [0.1.6](https://github.com/ishakantony/snippaste/compare/v0.1.5...v0.1.6) (2026-05-04)
+
+
+### Bug Fixes
+
+* **client:** hide locked toolbar actions and reset save state on unlock ([e09602d](https://github.com/ishakantony/snippaste/commit/e09602d2bcb7ac959edf00acce8ce2ad08c2491c))
+* **mobile:** resolve locked snip sheet and landing scroll issues ([b1c067f](https://github.com/ishakantony/snippaste/commit/b1c067fe26b5c81b16c8c5121b411f7a11472c88))
+
 ## [0.1.5](https://github.com/ishakantony/snippaste/compare/v0.1.4...v0.1.5) (2026-05-04)
 
 
