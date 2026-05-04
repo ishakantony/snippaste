@@ -19,7 +19,7 @@ export function ConfirmDialog({
 	const label = confirmLabel ?? t("common.confirm");
 
 	return (
-		<Modal onClose={onCancel}>
+		<Modal onClose={onCancel} testId="confirm-dialog">
 			<div className="w-full max-w-85 rounded-xl border border-border-2 bg-modal-bg p-5 shadow-[0_8px_40px_rgba(0,0,0,0.5)] md:p-6">
 				<div className="text-sm font-semibold text-fg mb-2">
 					{t("editor.areYouSure")}

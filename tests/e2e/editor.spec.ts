@@ -178,7 +178,7 @@ test("mobile overflow sheet stacks modals above the sheet", async ({
 	).toBeVisible();
 	await expect(sheet).toBeVisible();
 	await page.keyboard.press("Escape");
-	await expect(page.getByRole("dialog")).toBeHidden();
+	await expect(page.getByTestId("confirm-dialog")).toBeHidden();
 	await expect(sheet).toBeVisible();
 });
 
