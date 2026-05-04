@@ -12,7 +12,7 @@ Merge a branch that is checked out in an existing git worktree into the current 
 1. Only merge branches that are currently associated with an existing `git worktree` entry.
 2. If the user did not provide a branch, discover supported branches and ask the user to choose using the Question tool.
 3. Never use a normal merge commit. The final merge command must be `git merge --ff-only <branch>` or equivalent fast-forward-only command.
-4. Before merging, run `npm run check:all` and `npm run test:e2e` from the source worktree. If either fails, stop and report the failure.
+4. Before merging, run `bun run check:all` and `bun run test:e2e` from the source worktree. If either fails, stop and report the failure.
 5. Do not discard, reset, or overwrite user changes. If a required worktree is dirty, ask before continuing.
 
 ## Quick Start
@@ -22,8 +22,8 @@ Given a branch argument:
 ```bash
 git worktree list --porcelain
 git status --short
-npm run check:all
-npm run test:e2e
+bun run check:all
+bun run test:e2e
 git merge --ff-only feature-branch
 ```
 
@@ -62,8 +62,8 @@ Run project checks from the source worktree path, not from the target worktree, 
 From the source worktree path, run in order:
 
 ```bash
-npm run check:all
-npm run test:e2e
+bun run check:all
+bun run test:e2e
 ```
 
 If either command fails, stop. Report the failing command and do not merge.
