@@ -49,6 +49,13 @@ const baseEditorTheme = EditorView.theme({
 	},
 	".cm-content": { padding: "14px 0", caretColor: "var(--accent)" },
 	".cm-line": { padding: "0 20px" },
+	"@media (max-width: 767px)": {
+		"&": { fontSize: "15px" },
+		".cm-scroller": { lineHeight: "24px" },
+		".cm-content": { padding: "12px 0 86px" },
+		".cm-line": { padding: "0 14px" },
+		".cm-gutters": { display: "none" },
+	},
 });
 
 const lightTheme = EditorView.theme({
@@ -501,9 +508,10 @@ function SnipPageInner() {
 	}
 
 	return (
-		<div className="flex flex-col h-screen bg-bg">
+		<div className="flex h-[100dvh] flex-col bg-bg md:h-screen">
 			<Toolbar
 				slug={slug}
+				content={content}
 				onCopyUrl={handleCopyUrl}
 				onCopyContent={handleCopyContent}
 				onSave={handleSave}
@@ -513,6 +521,9 @@ function SnipPageInner() {
 				onSettings={() => setShowSettings(true)}
 				autoSaveEnabled={autoSaveActive}
 				autoSaveFeatureEnabled={autoSaveFeatureEnabled}
+				mobileOverlayOpen={
+					confirmClear || confirmRefresh || showQr || showSettings
+				}
 			/>
 
 			{loadError && (
@@ -535,9 +546,9 @@ function SnipPageInner() {
 			)}
 
 			{isLocked ? (
-				<div className="flex-1 flex items-center justify-center px-6">
+				<div className="flex flex-1 items-center justify-center px-4 py-6 md:px-6">
 					<form
-						className="w-full max-w-sm bg-surface border border-border rounded-xl p-6 shadow-sm"
+						className="w-full max-w-sm rounded-xl border border-border bg-surface p-5 shadow-sm md:p-6"
 						onSubmit={handleUnlock}
 					>
 						<h2 className="text-lg font-bold text-fg mb-2">
@@ -554,14 +565,14 @@ function SnipPageInner() {
 							type="password"
 							value={unlockPassword}
 							onChange={(e) => setUnlockPassword(e.target.value)}
-							className="mt-1 w-full h-10 px-3 bg-input-bg border border-border-2 rounded-lg text-fg outline-none focus:border-accent"
+							className="mt-1 h-11 w-full rounded-lg border border-border-2 bg-input-bg px-3 text-base text-fg outline-none focus:border-accent md:h-10 md:text-sm"
 						/>
 						{unlockError && (
 							<div className="text-xs text-danger mt-2">{unlockError}</div>
 						)}
 						<button
 							type="submit"
-							className="mt-4 w-full h-10 rounded-lg bg-accent text-white text-sm font-semibold disabled:opacity-50"
+							className="mt-4 h-11 w-full rounded-lg bg-accent text-sm font-semibold text-white disabled:opacity-50 md:h-10"
 							disabled={unlockPassword.length < 4}
 						>
 							{t("editor.unlock")}
@@ -569,11 +580,11 @@ function SnipPageInner() {
 					</form>
 				</div>
 			) : (
-				<div className="flex-1 flex overflow-hidden">
+				<div className="flex flex-1 overflow-hidden pb-18 md:pb-0">
 					<div
 						ref={editorContainerRef}
 						data-testid="snip-editor"
-						className="flex-1 overflow-hidden flex flex-col"
+						className="flex flex-1 flex-col overflow-hidden"
 					/>
 				</div>
 			)}

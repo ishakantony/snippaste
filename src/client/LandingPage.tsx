@@ -64,46 +64,48 @@ export function LandingPage() {
 	}
 
 	return (
-		<div className="w-screen h-screen flex bg-bg relative overflow-hidden">
-			<div className="absolute top-5 right-5 z-10 flex items-center gap-2">
+		<div className="relative flex min-h-[100dvh] w-screen flex-col overflow-x-hidden bg-bg md:h-screen md:flex-row md:overflow-hidden">
+			<div className="absolute top-4 right-4 z-10 flex items-center gap-2 md:top-5 md:right-5">
 				{langEnabled && (
 					<LanguageSwitcher
 						variant="ghost"
 						size="sm"
-						className="border border-border rounded-md px-3 py-1.5 text-fg-3 text-xs font-medium"
+						className="rounded-md border border-border px-2.5 py-1.5 text-xs font-medium text-fg-3 md:px-3"
 					/>
 				)}
 				<Button
 					variant="ghost"
 					size="sm"
-					className="border border-border rounded-md px-3 py-1.5 text-fg-3 text-xs font-medium"
+					className="rounded-md border border-border px-2.5 py-1.5 text-xs font-medium text-fg-3 md:px-3"
 					onClick={toggle}
 					aria-label={t("common.toggleTheme")}
 				>
 					<Icon name={dark ? "sun" : "moon"} size={13} />
-					{dark ? t("common.lightMode") : t("common.darkMode")}
+					<span className="hidden sm:inline">
+						{dark ? t("common.lightMode") : t("common.darkMode")}
+					</span>
 				</Button>
 			</div>
 
-			<div className="flex-1 flex flex-col justify-center px-[clamp(40px,6vw,80px)] py-15">
-				<div className="flex items-center gap-2.5 mb-9">
+			<div className="order-1 flex flex-col px-5 pt-18 pb-6 md:flex-1 md:justify-center md:px-[clamp(40px,6vw,80px)] md:py-15">
+				<div className="mb-7 flex items-center gap-2.5 md:mb-9">
 					<img src="/logo.svg" alt="Snippaste" className="w-9 h-9 rounded-9" />
 					<span className="text-sm font-bold tracking-[0.06em] text-fg-3 uppercase">
 						Snippaste
 					</span>
 				</div>
 
-				<h1 className="text-[clamp(36px,4.5vw,52px)] font-bold tracking-[-0.03em] text-fg leading-[1.08] mb-5.5">
+				<h1 className="mb-4 text-[clamp(32px,10vw,44px)] font-bold leading-[1.08] tracking-[-0.03em] text-fg md:mb-5.5 md:text-[clamp(36px,4.5vw,52px)]">
 					{t("landing.heading1")}
 					<br />
 					<span className="text-accent">{t("landing.heading2")}</span>
 				</h1>
 
-				<p className="text-base text-fg-2 leading-relaxed max-w-95 mb-10">
+				<p className="mb-6 max-w-95 text-sm leading-relaxed text-fg-2 md:mb-10 md:text-base">
 					{t("landing.description")}
 				</p>
 
-				<div className="flex gap-2 flex-wrap">
+				<div className="hidden flex-wrap gap-2 md:flex">
 					{TAGS.map((tag) => (
 						<span
 							key={tag}
@@ -115,9 +117,9 @@ export function LandingPage() {
 				</div>
 			</div>
 
-			<div className="w-px bg-border my-12 shrink-0" />
+			<div className="order-3 mx-5 h-px bg-border md:order-2 md:mx-0 md:my-12 md:h-auto md:w-px md:shrink-0" />
 
-			<div className="w-[clamp(300px,34vw,420px)] flex items-center justify-center px-[clamp(28px,4vw,56px)] py-12 shrink-0">
+			<div className="order-2 flex shrink-0 items-center justify-center px-5 pb-7 md:order-3 md:w-[clamp(300px,34vw,420px)] md:px-[clamp(28px,4vw,56px)] md:py-12">
 				<form className="w-full flex flex-col gap-5" onSubmit={handleSubmit}>
 					<div>
 						<div className="text-lg font-bold tracking-[-0.01em] text-fg mb-1.5">
@@ -144,7 +146,7 @@ export function LandingPage() {
 								setError(null);
 							}}
 							placeholder={t("landing.placeholder")}
-							className="w-full h-11 px-3.5 bg-input-bg border border-border-2 rounded-lg text-fg text-sm font-mono outline-none transition-[border-color,box-shadow] duration-150 focus:border-accent focus:shadow-[0_0_0_3px_var(--accent-soft-18)] placeholder:text-fg-3 placeholder:opacity-65"
+							className="h-12 w-full rounded-lg border border-border-2 bg-input-bg px-3.5 font-mono text-base text-fg outline-none transition-[border-color,box-shadow] duration-150 placeholder:text-fg-3 placeholder:opacity-65 focus:border-accent focus:shadow-[0_0_0_3px_var(--accent-soft-18)] md:h-11 md:text-sm"
 							spellCheck={false}
 							autoCapitalize="off"
 							autoCorrect="off"

@@ -10,7 +10,7 @@ export function StatusBar({ content }: StatusBarProps) {
 	const chars = content.length;
 
 	return (
-		<div className="h-6.5 shrink-0 bg-surface border-t border-border flex items-center px-3.5 gap-4">
+		<div className="hidden h-6.5 shrink-0 items-center gap-4 border-t border-border bg-surface px-3.5 md:flex">
 			<span className="text-2xs text-fg-3 font-mono">
 				{t("status.lines", { count: lines })}
 			</span>

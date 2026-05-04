@@ -1,6 +1,7 @@
 import { type FormEvent, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Modal } from "@/client/components/ui/Modal.js";
+import { Icon } from "@/client/Icon.js";
 import {
 	PASSWORD_MAX_LENGTH,
 	PASSWORD_MIN_LENGTH,
@@ -47,10 +48,20 @@ export function SettingsModal({
 
 	return (
 		<Modal onClose={onClose}>
-			<div className="bg-modal-bg border border-border rounded-lg shadow-lg p-6 w-80">
-				<h2 className="text-sm font-semibold text-fg mb-4">
-					{t("settings.title")}
-				</h2>
+			<div className="w-full max-w-80 rounded-lg border border-border bg-modal-bg p-5 shadow-lg md:p-6">
+				<div className="mb-4 flex items-center justify-between gap-3">
+					<h2 className="text-sm font-semibold text-fg">
+						{t("settings.title")}
+					</h2>
+					<button
+						type="button"
+						onClick={onClose}
+						aria-label="Close settings"
+						className="flex h-8 w-8 items-center justify-center rounded-md border border-transparent text-fg-3 hover:border-border-2 hover:bg-surface-2 hover:text-fg"
+					>
+						<Icon name="x" size={14} />
+					</button>
+				</div>
 
 				{autoSaveFeatureEnabled && (
 					<>
@@ -105,11 +116,11 @@ export function SettingsModal({
 								onChange={(e) => setPassword(e.target.value)}
 								minLength={PASSWORD_MIN_LENGTH}
 								maxLength={PASSWORD_MAX_LENGTH}
-								className="w-full h-9 px-3 bg-input-bg border border-border-2 rounded-md text-fg text-sm outline-none focus:border-accent"
+								className="h-11 w-full rounded-md border border-border-2 bg-input-bg px-3 text-base text-fg outline-none focus:border-accent md:h-9 md:text-sm"
 							/>
 							<button
 								type="submit"
-								className="h-8 px-3 rounded-md bg-accent text-white text-xs font-semibold disabled:opacity-50"
+								className="h-10 rounded-md bg-accent px-3 text-xs font-semibold text-white disabled:opacity-50 md:h-8"
 								disabled={!passwordValid}
 							>
 								{isProtected
@@ -119,17 +130,17 @@ export function SettingsModal({
 						</form>
 
 						{isProtected && (
-							<div className="flex gap-2">
+							<div className="flex flex-wrap gap-2">
 								<button
 									type="button"
-									className="h-8 px-3 rounded-md border border-border-2 text-xs text-fg-2"
+									className="h-10 rounded-md border border-border-2 px-3 text-xs text-fg-2 md:h-8"
 									onClick={onLock}
 								>
 									{t("settings.lockNow")}
 								</button>
 								<button
 									type="button"
-									className="h-8 px-3 rounded-md border border-danger/40 text-xs text-danger"
+									className="h-10 rounded-md border border-danger/40 px-3 text-xs text-danger md:h-8"
 									onClick={onRemovePassword}
 								>
 									{t("settings.removeProtection")}

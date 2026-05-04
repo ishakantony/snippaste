@@ -20,12 +20,12 @@ export function ConfirmDialog({
 
 	return (
 		<Modal onClose={onCancel}>
-			<div className="bg-modal-bg border border-border-2 rounded-xl w-85 p-6 shadow-[0_8px_40px_rgba(0,0,0,0.5)]">
+			<div className="w-full max-w-85 rounded-xl border border-border-2 bg-modal-bg p-5 shadow-[0_8px_40px_rgba(0,0,0,0.5)] md:p-6">
 				<div className="text-sm font-semibold text-fg mb-2">
 					{t("editor.areYouSure")}
 				</div>
 				<div className="text-sm text-fg-2 leading-relaxed mb-5">{message}</div>
-				<div className="flex gap-2 justify-end">
+				<div className="flex justify-end gap-2">
 					<Button variant="ghost" size="md" onClick={onCancel}>
 						{t("common.cancel")}
 					</Button>

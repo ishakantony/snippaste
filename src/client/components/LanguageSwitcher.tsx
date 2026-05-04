@@ -16,12 +16,14 @@ interface LanguageSwitcherProps {
 	variant?: ButtonProps["variant"];
 	size?: ButtonProps["size"];
 	className?: string;
+	iconSize?: number;
 }
 
 export function LanguageSwitcher({
 	variant = "ghost",
 	size = "sm",
 	className,
+	iconSize = 13,
 }: LanguageSwitcherProps) {
 	const { t } = useTranslation();
 	const { language, setLanguage } = useLanguage();
@@ -49,7 +51,7 @@ export function LanguageSwitcher({
 				aria-label={t("languageSwitcher.label")}
 				title={t("languageSwitcher.label")}
 			>
-				<Icon name="globe" size={13} />
+				<Icon name="globe" size={iconSize} />
 				{variant !== "icon" && current.code.toUpperCase()}
 			</Button>
 			{open && (

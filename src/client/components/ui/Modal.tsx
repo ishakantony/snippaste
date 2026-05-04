@@ -16,7 +16,7 @@ export function Modal({ onClose, children }: ModalProps) {
 
 	return (
 		<div
-			className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 animate-[confirm-fade_150ms_ease]"
+			className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4 animate-[confirm-fade_150ms_ease]"
 			role="dialog"
 			aria-modal="true"
 			onClick={(e) => {

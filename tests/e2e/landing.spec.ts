@@ -34,6 +34,17 @@ test("mobile smoke: creates and opens an editor", async ({ page }) => {
 	const slug = uniqueSlug("mobile");
 
 	await page.goto("/");
+	await expect(page.getByLabel("Snip name")).toBeVisible();
+	await expect(page.getByRole("button", { name: "Create snip" })).toBeVisible();
+	await expect(page.getByRole("button", { name: "Language" })).toBeVisible();
+	await expect(
+		page.getByRole("button", { name: "Toggle theme" }),
+	).toBeVisible();
+	await expect(
+		await page.evaluate(
+			() => document.documentElement.scrollWidth <= window.innerWidth,
+		),
+	).toBe(true);
 	await page.getByLabel("Snip name").fill(slug);
 	await page.getByRole("button", { name: "Create snip" }).click();
 

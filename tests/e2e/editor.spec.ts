@@ -114,3 +114,89 @@ test("shows too-large status when the server rejects a save", async ({
 		timeout: 5_000,
 	});
 });
+
+test("mobile layout exposes primary actions and hides desktop chrome", async ({
+	page,
+}) => {
+	await page.setViewportSize({ width: 390, height: 844 });
+	const slug = uniqueSlug("editor-mobile");
+
+	await page.goto(`/s/${slug}`);
+
+	await expect(page.getByTestId("mobile-snip-title")).toContainText(slug);
+	await expect(page.getByTestId("mobile-action-bar")).toBeVisible();
+	await expect(page.getByRole("button", { name: "Copy URL" })).toBeVisible();
+	await expect(
+		page.getByRole("button", { name: "Copy", exact: true }),
+	).toBeVisible();
+	await expect(page.getByRole("button", { name: "Save" })).toBeVisible();
+	await expect(
+		page.getByRole("button", { name: "More actions" }),
+	).toBeVisible();
+	await expect(
+		page.getByTestId("snip-editor").locator(".cm-gutters"),
+	).toBeHidden();
+	await expect(
+		await page.evaluate(
+			() => document.documentElement.scrollWidth <= window.innerWidth,
+		),
+	).toBe(true);
+});
+
+test("mobile overflow sheet stacks modals above the sheet", async ({
+	page,
+}) => {
+	await page.setViewportSize({ width: 390, height: 844 });
+	const slug = uniqueSlug("editor-sheet");
+
+	await page.goto(`/s/${slug}`);
+	await page.getByRole("button", { name: "More actions" }).click();
+	const sheet = page.getByTestId("mobile-overflow-sheet");
+	await expect(sheet).toBeVisible();
+
+	await sheet.getByRole("button", { name: "QR" }).click();
+	await expect(page.getByTestId("qr-modal")).toBeVisible();
+	await expect(sheet).toBeVisible();
+	await page.keyboard.press("Escape");
+	await expect(page.getByTestId("qr-modal")).toBeHidden();
+	await expect(sheet).toBeVisible();
+
+	await sheet.getByRole("button", { name: "Settings" }).click();
+	await expect(page.getByRole("heading", { name: "Settings" })).toBeVisible();
+	await expect(sheet).toBeVisible();
+	await page.keyboard.press("Escape");
+	await expect(page.getByRole("heading", { name: "Settings" })).toBeHidden();
+	await expect(sheet).toBeVisible();
+
+	await page.getByRole("button", { name: "Close more actions" }).click();
+	await expect(sheet).toBeHidden();
+	await typeInEditor(page, "Clear from mobile sheet");
+	await page.getByRole("button", { name: "More actions" }).click();
+	await sheet.getByRole("button", { name: "Clear" }).click();
+	await expect(
+		page.getByRole("dialog").getByText("Are you sure?"),
+	).toBeVisible();
+	await expect(sheet).toBeVisible();
+	await page.keyboard.press("Escape");
+	await expect(page.getByRole("dialog")).toBeHidden();
+	await expect(sheet).toBeVisible();
+});
+
+test("mobile layout holds at narrow phone width", async ({ page }) => {
+	await page.setViewportSize({ width: 360, height: 740 });
+	const slug = uniqueSlug("editor-narrow");
+
+	await page.goto(`/s/${slug}`);
+
+	await expect(page.getByTestId("mobile-action-bar")).toBeVisible();
+	await expect(page.getByRole("button", { name: "Copy URL" })).toBeVisible();
+	await expect(
+		page.getByRole("button", { name: "Copy", exact: true }),
+	).toBeVisible();
+	await expect(page.getByRole("button", { name: "Save" })).toBeVisible();
+	await expect(
+		await page.evaluate(
+			() => document.documentElement.scrollWidth <= window.innerWidth,
+		),
+	).toBe(true);
+});
