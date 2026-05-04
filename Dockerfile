@@ -15,7 +15,6 @@ COPY vite.config.ts ./
 COPY tsconfig.json ./
 
 RUN bun run build
-RUN bun run build:server
 
 # ── runtime stage ─────────────────────────────────────────────────────────────
 FROM oven/bun:1 AS runtime
