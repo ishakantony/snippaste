@@ -75,7 +75,7 @@ describe("SnipStore (in-memory SQLite)", () => {
 			.prepare<{ created_at: number }>(
 				"SELECT created_at FROM snips WHERE slug = 'slug1'",
 			)
-			.get()!.created_at;
+			.get()?.created_at as number;
 
 		// Brief delay to ensure timestamps could differ
 		store.upsert("slug1", "v2");
@@ -83,7 +83,7 @@ describe("SnipStore (in-memory SQLite)", () => {
 			.prepare<{ created_at: number }>(
 				"SELECT created_at FROM snips WHERE slug = 'slug1'",
 			)
-			.get()!.created_at;
+			.get()?.created_at as number;
 
 		expect(after).toBe(before);
 	});
@@ -96,7 +96,7 @@ describe("SnipStore (in-memory SQLite)", () => {
 			.prepare<{ updated_at: number }>(
 				"SELECT updated_at FROM snips WHERE slug = 'slug2'",
 			)
-			.get()!.updated_at;
+			.get()?.updated_at as number;
 
 		// Force a detectable time gap
 		const start = Date.now();
@@ -109,7 +109,7 @@ describe("SnipStore (in-memory SQLite)", () => {
 			.prepare<{ updated_at: number }>(
 				"SELECT updated_at FROM snips WHERE slug = 'slug2'",
 			)
-			.get()!.updated_at;
+			.get()?.updated_at as number;
 
 		expect(ua2).toBeGreaterThanOrEqual(ua1);
 	});

@@ -189,7 +189,8 @@ describe("SSE event stream", () => {
 		);
 		expect(res.status).toBe(200);
 
-		const reader = res.body!.getReader();
+		if (!res.body) throw new Error("No response body");
+		const reader = res.body.getReader();
 		const decoder = new TextDecoder();
 
 		async function readUntilEvent(
@@ -245,7 +246,9 @@ describe("SSE event stream", () => {
 		await reader.cancel();
 
 		expect(update).not.toBeNull();
-		const payload = JSON.parse(update!.data) as {
+		const payload = JSON.parse(
+			(update as { event: string; data: string }).data,
+		) as {
 			content: string;
 			updatedAt: number;
 			clientId?: string;

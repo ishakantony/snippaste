@@ -1,5 +1,6 @@
 import { render, screen } from "@testing-library/react";
 import { userEvent } from "@testing-library/user-event";
+import type React from "react";
 import { describe, expect, it, vi } from "vitest";
 import { CreateSnipForm } from "@/client/components/features/landing/CreateSnipForm";
 
@@ -34,7 +35,9 @@ describe("CreateSnipForm", () => {
 	});
 
 	it("calls onSubmit when form is submitted", async () => {
-		const onSubmit = vi.fn();
+		const onSubmit = vi.fn((e: React.FormEvent) => {
+			e.preventDefault();
+		});
 		render(
 			<CreateSnipForm
 				name=""

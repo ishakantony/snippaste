@@ -57,7 +57,7 @@ function makeHarness() {
 			return createdUrl;
 		},
 		get last() {
-			return last!;
+			return last as ReturnType<typeof JSON.parse>;
 		},
 	};
 }

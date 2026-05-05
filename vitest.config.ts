@@ -5,7 +5,7 @@ export default defineConfig({
 	resolve: {
 		alias: {
 			"@": path.resolve(__dirname, "src"),
-			"bun:sqlite": path.resolve(__dirname, "tests/mocks/bun-sqlite.ts"),
+			"bun:sqlite": path.resolve(__dirname, "src/tests/mocks/bun-sqlite.ts"),
 		},
 	},
 	ssr: {
@@ -13,8 +13,9 @@ export default defineConfig({
 	},
 	test: {
 		environment: "jsdom",
-		exclude: [...configDefaults.exclude, "tests/e2e/**"],
+		include: ["src/**/*.test.{ts,tsx}"],
+		exclude: [...configDefaults.exclude],
 		globals: true,
-		setupFiles: ["./tests/setup.ts"],
+		setupFiles: ["./src/tests/setup.ts"],
 	},
 });

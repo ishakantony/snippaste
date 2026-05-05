@@ -1,4 +1,4 @@
-import { render, screen } from "@testing-library/react";
+import { act, cleanup, render, screen } from "@testing-library/react";
 import { userEvent } from "@testing-library/user-event";
 import { afterEach, describe, expect, it } from "vitest";
 import {
@@ -20,14 +20,16 @@ function TestComponent() {
 
 describe("auto-save settings store", () => {
 	afterEach(() => {
+		cleanup();
 		localStorage.clear();
 		useAutoSaveSettingsStore.setState({ enabled: false });
 	});
 
 	it("defaults to false when storage is empty", async () => {
-		await useAutoSaveSettingsStore.persist.rehydrate();
-
 		render(<TestComponent />);
+		await act(async () => {
+			await useAutoSaveSettingsStore.persist.rehydrate();
+		});
 
 		expect(screen.getByTestId("status").textContent).toBe("off");
 	});
@@ -38,15 +40,16 @@ describe("auto-save settings store", () => {
 			JSON.stringify({ state: { enabled: true }, version: 0 }),
 		);
 		await useAutoSaveSettingsStore.persist.rehydrate();
-
 		render(<TestComponent />);
 
 		expect(screen.getByTestId("status").textContent).toBe("on");
 	});
 
 	it("toggles value and persists to storage", async () => {
-		await useAutoSaveSettingsStore.persist.rehydrate();
 		render(<TestComponent />);
+		await act(async () => {
+			await useAutoSaveSettingsStore.persist.rehydrate();
+		});
 
 		const button = screen.getByRole("button", { name: /toggle/i });
 		await userEvent.click(button);

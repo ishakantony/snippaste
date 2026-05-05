@@ -51,6 +51,10 @@ vi.mock("@/client/snipStream.js", () => ({
 	subscribe: vi.fn(() => () => {}),
 }));
 
+vi.mock("@/client/components/features/snip/SnipEditor", () => ({
+	SnipEditor: () => <div data-testid="snip-editor">SnipEditor</div>,
+}));
+
 function renderSnipPage(flags: { autoSave: boolean }) {
 	window.__FLAGS__ = {
 		qrCode: true,

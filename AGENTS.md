@@ -13,6 +13,9 @@ src/
   client/      React SPA (Vite + React Router v6)
   server/      Hono.js API server (Node.js)
   shared/      Code shared between client and server (schemas, validators)
+  tests/       Shared test infrastructure (setup, mocks)
+tests/
+  e2e/         Playwright E2E tests
 ```
 
 - **Frontend**: React 18, CodeMirror 6 editor, Tailwind CSS v4
@@ -48,8 +51,9 @@ bun run build        # Vite production build (outputs to dist/client/)
 - Pre-push hook runs typecheck + tests + build
 
 ### Testing
-- **Unit tests**: Vitest in `tests/` directory, named `<module>.test.ts`
-- **E2E tests**: Playwright in `tests/` directory, named `<feature>.spec.ts`
+- **Unit tests**: Co-located with source code in `src/`, named `<module>.test.ts` (e.g. `src/server/store.test.ts` next to `src/server/store.ts`)
+- **Test infrastructure**: Shared setup and mocks in `src/tests/` (e.g. `src/tests/setup.ts`, `src/tests/mocks/`)
+- **E2E tests**: Playwright in `tests/e2e/` directory, named `<feature>.spec.ts`
 - Use `:memory:` SQLite for test isolation
 - All new features must have tests
 
@@ -64,6 +68,7 @@ bun run build        # Vite production build (outputs to dist/client/)
 - `src/client/components/ui/` — Reusable UI primitives (Button, Pill, ErrorBoundary)
 - `src/client/lib/` — Shared client utilities (cn helper)
 - `src/server/` — Server code. Routes, store, bus, env config
+- `src/tests/` — Shared test infrastructure (setup, mocks). Unit tests are co-located with their source modules
 
 ## Environment variables
 
