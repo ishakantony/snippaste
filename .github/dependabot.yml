@@ -16,6 +16,9 @@ updates:
           - "react-dom"
           - "@types/react"
           - "@types/react-dom"
+      codemirror:
+        patterns:
+          - "@codemirror/*"
 
   - package-ecosystem: docker
     directory: /
